@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"package": "me.gv0id.arbalests.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"ExampleMixin",
+		"ModDataComponentTypesMx"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
