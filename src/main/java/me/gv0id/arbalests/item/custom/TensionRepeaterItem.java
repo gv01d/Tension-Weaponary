@@ -116,17 +116,31 @@ public class TensionRepeaterItem extends RangedWeaponItem {
 
             // ------------------------------------------ //
             // Cooldown Manager
-            ArbalestCooldown arbalestCooldown = itemStack.get(ModDataComponentTypes.ARBALEST_COOLDOWN);
-            if (arbalestCooldown != null){
-                itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(arbalestCooldown.seconds()));
-            }
-            else {
-                itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(2));
-            }
 
-            UseCooldownComponent useCooldownComponent = itemStack.get(DataComponentTypes.USE_COOLDOWN);
-            if (useCooldownComponent != null){
-                useCooldownComponent.set(itemStack,user);
+            ArbalestCooldown arbalestCooldown = itemStack.get(ModDataComponentTypes.ARBALEST_COOLDOWN);
+            if (chargedProjectilesComponent.isEmpty()) {
+                if (arbalestCooldown != null){
+                    itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(arbalestCooldown.seconds() * 2));
+                }
+                else {
+                    itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(2));
+                }
+                UseCooldownComponent useCooldownComponent = itemStack.get(DataComponentTypes.USE_COOLDOWN);
+                if (useCooldownComponent != null) {
+                    useCooldownComponent.set(itemStack, user);
+                }
+            }
+            else{
+                if (arbalestCooldown != null){
+                    itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(arbalestCooldown.seconds()));
+                }
+                else {
+                    itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(2));
+                }
+                UseCooldownComponent useCooldownComponent = itemStack.get(DataComponentTypes.USE_COOLDOWN);
+                if (useCooldownComponent != null){
+                    useCooldownComponent.set(itemStack,user);
+                }
             }
             // ------------------------------------------ //
             return ActionResult.CONSUME;
@@ -262,7 +276,6 @@ public class TensionRepeaterItem extends RangedWeaponItem {
         else if(projectileStack.isOf(Items.WIND_CHARGE))
         {
             Entity ent = shooter;
-            //return new WindChargeEntity(ent ,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity());
             return new WindGaleEntity(ent,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),3F,3F);
         }
         else {
