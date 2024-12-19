@@ -40,11 +40,18 @@ public class WindGaleEntity extends AbstractWindGaleEntity {
         super(ModEntityType.WIND_GALE, world, player, x, y, z);
     }
 
-    public WindGaleEntity(World world, double x, double y, double z, Vec3d velocity,float knockback,float explosionPower) {
+    public WindGaleEntity( World world, double x, double y, double z, Vec3d velocity,float knockback,float explosionPower) {
         super(ModEntityType.WIND_GALE, x, y, z, velocity, world);
         KNOCKBACK_POWER = knockback;
         EXPLOSION_POWER = explosionPower;
     }
+
+    public WindGaleEntity(Entity owner, World world, double x, double y, double z, Vec3d velocity,float knockback,float explosionPower) {
+        super(owner,ModEntityType.WIND_GALE, x, y, z, velocity, world);
+        KNOCKBACK_POWER = knockback;
+        EXPLOSION_POWER = explosionPower;
+    }
+
     public WindGaleEntity(World world, double x, double y, double z, Vec3d velocity) {
         super(ModEntityType.WIND_GALE, x, y, z, velocity, world);
     }

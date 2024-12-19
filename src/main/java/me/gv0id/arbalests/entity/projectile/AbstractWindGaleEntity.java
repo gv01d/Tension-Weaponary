@@ -47,6 +47,11 @@ public abstract class AbstractWindGaleEntity extends ExplosiveProjectileEntity i
         super(entityType, d, e, f, vec3d, world);
         this.accelerationPower = 0.0;
     }
+    public AbstractWindGaleEntity(Entity owner, EntityType<? extends AbstractWindGaleEntity> entityType, double d, double e, double f, Vec3d vec3d, World world) {
+        super(entityType, d, e, f, vec3d, world);
+        this.setOwner(owner);
+        this.accelerationPower = 0.0;
+    }
 
     @Override
     protected Box calculateDefaultBoundingBox(Vec3d pos) {

@@ -261,8 +261,9 @@ public class TensionRepeaterItem extends RangedWeaponItem {
         }
         else if(projectileStack.isOf(Items.WIND_CHARGE))
         {
-            return new WindChargeEntity(world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity());
-            //return new WindGaleEntity(world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),3F,3F);
+            Entity ent = shooter;
+            //return new WindChargeEntity(ent ,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity());
+            return new WindGaleEntity(ent,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),3F,3F);
         }
         else {
             ProjectileEntity projectileEntity = super.createArrowEntity(world, shooter, weaponStack, projectileStack, critical);
@@ -297,7 +298,7 @@ public class TensionRepeaterItem extends RangedWeaponItem {
         int s = (shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND); // shoots amount based on enchantment
 
         float roll = 0F;
-        float power = 1.5F;
+        float power = 3F;
 
         for (int j = 0; j < s; j++) {
             ItemStack itemStack = (ItemStack)projectiles.get(j);
@@ -305,20 +306,15 @@ public class TensionRepeaterItem extends RangedWeaponItem {
                 float k = h + i * (float)((j + 1) / 2) * g;
                 i = -i;
                 int l = j;
-                if(itemStack.isOf(Items.WIND_CHARGE)){
-                    ProjectileEntity.spawn(
-                            this.createArrowEntity(world, shooter, stack, itemStack, critical),
-                            world,
-                            itemStack,
-                            entity -> entity.setVelocity(shooter, shooter.getPitch(), shooter.getYaw(), roll, power, divergence)
-                    );
-                };
+
+                Arbalests.LOGGER.info("NotWind");
                 ProjectileEntity.spawn(
-                        this.createArrowEntity(world, shooter, stack, itemStack, critical),
-                        world,
-                        itemStack,
-                        projectile -> this.shoot(shooter, projectile, l, speed, divergence, k, target)
+                    this.createArrowEntity(world, shooter, stack, itemStack, critical),
+                    world,
+                    itemStack,
+                    projectile -> this.shoot(shooter, projectile, l, speed, divergence, k, target)
                 );
+
                 stack.damage(this.getWeaponStackDamage(itemStack), shooter, LivingEntity.getSlotForHand(hand));
                 if (stack.isEmpty()) {
                     break;
