@@ -2,6 +2,7 @@ package me.gv0id.arbalests.components;
 
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
 import me.gv0id.arbalests.components.type.MultiChargedProjectilesComponent;
+import me.gv0id.arbalests.components.type.TensionRepeaterCharging;
 import me.gv0id.arbalests.mixin.ModDataComponentTypesMx;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.UseCooldownComponent;
@@ -22,6 +23,11 @@ public class ModDataComponentTypes {
 
     public static final ComponentType<ArbalestCooldown> ARBALEST_COOLDOWN = register(
             "arbalests:arbalest_cooldown", builder -> builder.codec(ArbalestCooldown.CODEC).packetCodec(ArbalestCooldown.PACKET_CODEC).cache()
+    );
+
+    public static final ComponentType<TensionRepeaterCharging> TENSION_REPEATER_CHARGING_COMPONENT_TYPE = register(
+            "arbalest:tension_repeater_charging",
+            builder -> builder.codec(TensionRepeaterCharging.CODEC).packetCodec(TensionRepeaterCharging.PACKET_CODEC).cache()
     );
 
     private static <T> ComponentType<T> register(String id, UnaryOperator<ComponentType.Builder<T>> builderOperator) {

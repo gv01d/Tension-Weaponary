@@ -1,12 +1,12 @@
 {
-	"required": true,
-	"package": "me.gv0id.arbalests.mixin.client",
-	"compatibilityLevel": "JAVA_21",
-	"client": [
-		"ExampleClientMixin",
-		"MixinItemGenerator"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "me.gv0id.arbalests.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ExampleClientMixin",
+    "HeldItemRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }

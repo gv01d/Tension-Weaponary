@@ -3,6 +3,7 @@ package me.gv0id.arbalests.item;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
+import me.gv0id.arbalests.components.type.TensionRepeaterCharging;
 import me.gv0id.arbalests.item.custom.TensionRepeaterItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.Block;
@@ -58,6 +59,7 @@ public class ModItems {
                     .component(ModDataComponentTypes.ARBALEST_COOLDOWN, new ArbalestCooldown(0.5f))
                     .enchantable(1)
                     .useCooldown(1)
+                    .component(ModDataComponentTypes.TENSION_REPEATER_CHARGING_COMPONENT_TYPE, TensionRepeaterCharging.DEFAULT)
     );
 
     // ----------------------------------------------------------------------------------------------------------

@@ -6,49 +6,49 @@
       "cases": [
         {
           "model": {
-            "type": "minecraft:model",
+            "type": "arbalests:model",
             "model": "arbalests:item/tension_repeater_arrow"
           },
           "when": "arrow"
         },
         {
           "model": {
-            "type": "minecraft:model",
+            "type": "arbalests:model",
             "model": "arbalests:item/tension_repeater_firework"
           },
           "when": "rocket"
         }
       ],
       "fallback": {
-        "type": "minecraft:model",
+        "type": "arbalests:model",
         "model": "arbalests:item/tension_repeater"
       },
       "property": "minecraft:charge_type"
     },
     "on_true": {
-      "type": "minecraft:range_dispatch",
+      "type": "arbalests:range_dispatch",
       "entries": [
         {
           "model": {
-            "type": "minecraft:model",
+            "type": "arbalests:model",
             "model": "arbalests:item/tension_repeater_pulling_1"
           },
           "threshold": 0.58
         },
         {
           "model": {
-            "type": "minecraft:model",
+            "type": "arbalests:model",
             "model": "arbalests:item/tension_repeater_pulling_2"
           },
           "threshold": 1.0
         }
       ],
       "fallback": {
-        "type": "minecraft:model",
+        "type": "arbalests:model",
         "model": "arbalests:item/tension_repeater_pulling_0"
       },
-      "property": "minecraft:crossbow/pull"
+      "property": "arbalests:crossbow/pull"
     },
-    "property": "minecraft:using_item"
+    "property": "arbalests:using_item"
   }
 }

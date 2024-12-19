@@ -6,17 +6,19 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
+import me.gv0id.arbalests.components.type.TensionRepeaterCharging;
+import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.FireworkRocketEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.*;
 import net.minecraft.item.*;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.item.tooltip.TooltipType;
@@ -43,13 +45,14 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 public class TensionRepeaterItem extends RangedWeaponItem {
     public static final int ROUND = 1;
     public static final int AMMO = 3;
+    public static final Predicate<ItemStack> TENSION_REPEATER_HELD_PROJECTILES = CROSSBOW_HELD_PROJECTILES.or(stack -> stack.isOf(Items.WIND_CHARGE));
+
 
     protected static List<ItemStack> repeaterLoad(ItemStack stack, ItemStack projectileStack, LivingEntity shooter) {
         if (projectileStack.isEmpty()) {
@@ -74,7 +77,7 @@ public class TensionRepeaterItem extends RangedWeaponItem {
 
 
 
-    private static final float DEFAULT_PULL_TIME = 1.25F;
+    private static final float DEFAULT_PULL_TIME = 2.5F;
     public static final int RANGE = 8;
     private boolean charged = false;
     private boolean loaded = false;
@@ -95,7 +98,7 @@ public class TensionRepeaterItem extends RangedWeaponItem {
 
     @Override
     public Predicate<ItemStack> getHeldProjectiles() {
-        return CROSSBOW_HELD_PROJECTILES;
+        return TENSION_REPEATER_HELD_PROJECTILES;
     }
 
     @Override
@@ -134,11 +137,18 @@ public class TensionRepeaterItem extends RangedWeaponItem {
             // Cooldown Manager
             itemStack.remove(DataComponentTypes.USE_COOLDOWN);
             // ------------------------------------------ //
+            itemStack.set(ModDataComponentTypes.TENSION_REPEATER_CHARGING_COMPONENT_TYPE,TensionRepeaterCharging.CHARGED);
             user.setCurrentHand(hand);
             return ActionResult.CONSUME;
         } else {
+            itemStack.set(ModDataComponentTypes.TENSION_REPEATER_CHARGING_COMPONENT_TYPE,TensionRepeaterCharging.CHARGED);
             return ActionResult.FAIL;
         }
+    }
+
+    public static boolean isCharging(ItemStack stack){
+        TensionRepeaterCharging tensionRepeaterCharging = stack.get(ModDataComponentTypes.TENSION_REPEATER_CHARGING_COMPONENT_TYPE);
+        return tensionRepeaterCharging.isCharging();
     }
 
     private static float getSpeed(ChargedProjectilesComponent stack) {
@@ -147,6 +157,7 @@ public class TensionRepeaterItem extends RangedWeaponItem {
 
     @Override
     public boolean onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
+        stack.set(ModDataComponentTypes.TENSION_REPEATER_CHARGING_COMPONENT_TYPE, TensionRepeaterCharging.DEFAULT);
         int i = this.getMaxUseTime(stack, user) - remainingUseTicks;
         float f = getPullProgress(i, stack, user);
         if (f >= 1.0F && !isFullyCharged(stack, user) && loadProjectiles(user, stack)) {
@@ -242,11 +253,18 @@ public class TensionRepeaterItem extends RangedWeaponItem {
         return new Vector3f(vector3f).rotateAxis(yaw * (float) (Math.PI / 180.0), vector3f3.x, vector3f3.y, vector3f3.z);
     }
 
+
     @Override
     protected ProjectileEntity createArrowEntity(World world, LivingEntity shooter, ItemStack weaponStack, ItemStack projectileStack, boolean critical) {
         if (projectileStack.isOf(Items.FIREWORK_ROCKET)) {
             return new FireworkRocketEntity(world, projectileStack, shooter, shooter.getX(), shooter.getEyeY() - 0.15F, shooter.getZ(), true);
-        } else {
+        }
+        else if(projectileStack.isOf(Items.WIND_CHARGE))
+        {
+            return new WindChargeEntity(world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity());
+            //return new WindGaleEntity(world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),3F,3F);
+        }
+        else {
             ProjectileEntity projectileEntity = super.createArrowEntity(world, shooter, weaponStack, projectileStack, critical);
             if (projectileEntity instanceof PersistentProjectileEntity persistentProjectileEntity) {
                 persistentProjectileEntity.setSound(SoundEvents.ITEM_CROSSBOW_HIT);
@@ -278,6 +296,8 @@ public class TensionRepeaterItem extends RangedWeaponItem {
         float i = 1.0F;
         int s = (shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND); // shoots amount based on enchantment
 
+        float roll = 0F;
+        float power = 1.5F;
 
         for (int j = 0; j < s; j++) {
             ItemStack itemStack = (ItemStack)projectiles.get(j);
@@ -285,6 +305,14 @@ public class TensionRepeaterItem extends RangedWeaponItem {
                 float k = h + i * (float)((j + 1) / 2) * g;
                 i = -i;
                 int l = j;
+                if(itemStack.isOf(Items.WIND_CHARGE)){
+                    ProjectileEntity.spawn(
+                            this.createArrowEntity(world, shooter, stack, itemStack, critical),
+                            world,
+                            itemStack,
+                            entity -> entity.setVelocity(shooter, shooter.getPitch(), shooter.getYaw(), roll, power, divergence)
+                    );
+                };
                 ProjectileEntity.spawn(
                         this.createArrowEntity(world, shooter, stack, itemStack, critical),
                         world,
@@ -405,7 +433,7 @@ public class TensionRepeaterItem extends RangedWeaponItem {
     }
 
     public static int getPullTime(ItemStack stack, LivingEntity user) {
-        float f = EnchantmentHelper.getCrossbowChargeTime(stack, user, 1.25F);
+        float f = EnchantmentHelper.getCrossbowChargeTime(stack, user, DEFAULT_PULL_TIME);
         return MathHelper.floor(f * 20.0F);
     }
 

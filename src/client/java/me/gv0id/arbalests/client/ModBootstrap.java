@@ -1,6 +1,5 @@
 package me.gv0id.arbalests.client;
 
-import me.gv0id.arbalests.client.render.item.property.numeric.ModNumericProperties;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -12,9 +11,5 @@ public class ModBootstrap {
     }
 
     public static void initialize() {
-        if (!initialized) {
-            initialized = true;
-            ModNumericProperties.bootstrap();
-        }
     }
 }

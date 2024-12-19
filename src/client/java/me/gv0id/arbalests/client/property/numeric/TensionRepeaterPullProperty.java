@@ -1,4 +1,4 @@
-package me.gv0id.arbalests.client.render.item.property.numeric;
+package me.gv0id.arbalests.client.property.numeric;
 
 import com.mojang.serialization.MapCodec;
 import me.gv0id.arbalests.item.custom.TensionRepeaterItem;
@@ -22,7 +22,7 @@ public class TensionRepeaterPullProperty implements NumericProperty{
     public float getValue(ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity holder, int seed) {
         if (holder == null) {
             return 0.0F;
-        } else if (TensionRepeaterItem.isCharged(stack)) {
+        } else if (TensionRepeaterItem.isFullyCharged(stack,holder)) {
             return 0.0F;
         } else {
             int i = TensionRepeaterItem.getPullTime(stack, holder);

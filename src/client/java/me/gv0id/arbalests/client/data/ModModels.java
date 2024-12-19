@@ -13,7 +13,7 @@ public class ModModels {
     }
 
     private static Model item(String parent, TextureKey... requiredTextureKeys) {
-        return new Model(Optional.of(Identifier.ofVanilla("item/" + parent)), Optional.empty(), requiredTextureKeys);
+        return new Model(Optional.of(Identifier.of("arbalests","item/" + parent)), Optional.empty(), requiredTextureKeys);
     }
 
     static {

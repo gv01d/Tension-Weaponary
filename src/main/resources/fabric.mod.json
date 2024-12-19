@@ -12,13 +12,19 @@
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "icon.png",
+	"icon": "assets/arbalests/icon.png",
 	"environment": "*",
 	"entrypoints": {
+		"fabric-datagen": [
+			"me.gv0id.arbalests.data.ModDatagen",
+			"me.gv0id.arbalests.client.data.ModDataGen"
+
+		],
 		"main": [
 			"me.gv0id.arbalests.Arbalests"
 		],
 		"client": [
+			"me.gv0id.arbalests.client.render.entity.ModEntityRenderers",
 			"me.gv0id.arbalests.ArbalestsClient"
 		]
 	},
