@@ -3,14 +3,13 @@ package me.gv0id.arbalests.item;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
-import me.gv0id.arbalests.components.type.TensionRepeaterCharging;
-import me.gv0id.arbalests.item.custom.TensionRepeaterItem;
+import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
+import me.gv0id.arbalests.item.custom.DeadbeatCrossbowItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.Block;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
@@ -49,9 +48,9 @@ public class ModItems {
     );
 
     //Tension Repeater
-    public static final Item TENSION_REPEATER = register(
-            "tension_repeater",
-            TensionRepeaterItem::new,
+    public static final Item DEADBEAT_CROSSBOW = register(
+            "deadbeat_crossbow",
+            DeadbeatCrossbowItem::new,
             new Item.Settings()
                     .maxCount(1)
                     .maxDamage(465)
@@ -59,7 +58,7 @@ public class ModItems {
                     .component(ModDataComponentTypes.ARBALEST_COOLDOWN, new ArbalestCooldown(0.5f))
                     .enchantable(1)
                     .useCooldown(1)
-                    .component(ModDataComponentTypes.TENSION_REPEATER_CHARGING_COMPONENT_TYPE, TensionRepeaterCharging.DEFAULT)
+                    .component(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.DEFAULT)
     );
 
     // ----------------------------------------------------------------------------------------------------------
@@ -70,7 +69,7 @@ public class ModItems {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
                 .register((itemGroup) -> itemGroup.add(ModItems.SUSPICIOUS_SUBSTANCE));
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT)
-                .register((itemGroup) -> itemGroup.add(ModItems.TENSION_REPEATER));
+                .register((itemGroup) -> itemGroup.add(ModItems.DEADBEAT_CROSSBOW));
     }
 
     // ----------------------------------------------------------------------------------------------------------

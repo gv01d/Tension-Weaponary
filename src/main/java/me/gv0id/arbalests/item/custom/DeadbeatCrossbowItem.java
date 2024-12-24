@@ -6,7 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
-import me.gv0id.arbalests.components.type.TensionRepeaterCharging;
+import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
 import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.component.DataComponentTypes;
@@ -15,7 +15,6 @@ import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
@@ -30,6 +29,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -48,10 +48,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class TensionRepeaterItem extends RangedWeaponItem {
+public class DeadbeatCrossbowItem extends RangedWeaponItem {
     public static final int ROUND = 1;
     public static final int AMMO = 3;
-    public static final Predicate<ItemStack> TENSION_REPEATER_HELD_PROJECTILES = CROSSBOW_HELD_PROJECTILES.or(stack -> stack.isOf(Items.WIND_CHARGE));
+    public static final Predicate<ItemStack> DEADBEAT_CROSSBOW_HELD_PROJECTILES = CROSSBOW_HELD_PROJECTILES.or(stack -> stack.isOf(Items.WIND_CHARGE));
 
 
     protected static List<ItemStack> repeaterLoad(ItemStack stack, ItemStack projectileStack, LivingEntity shooter) {
@@ -77,11 +77,11 @@ public class TensionRepeaterItem extends RangedWeaponItem {
 
 
 
-    private static final float DEFAULT_PULL_TIME = 2.5F;
+    private static final float DEFAULT_PULL_TIME = 3.0F;
     public static final int RANGE = 8;
     private boolean charged = false;
     private boolean loaded = false;
-    private static final float CHARGE_PROGRESS = 0.2F;
+    private static final float CHARGE_PROGRESS = 0.1F;
     private static final float LOAD_PROGRESS = 0.5F;
     private static final float DEFAULT_SPEED = 3.15F;
     private static final float FIREWORK_ROCKET_SPEED = 1.6F;
@@ -92,13 +92,13 @@ public class TensionRepeaterItem extends RangedWeaponItem {
             Optional.of(SoundEvents.ITEM_CROSSBOW_LOADING_END)
     );
 
-    public TensionRepeaterItem(Item.Settings settings) {
+    public DeadbeatCrossbowItem(Item.Settings settings) {
         super(settings);
     }
 
     @Override
     public Predicate<ItemStack> getHeldProjectiles() {
-        return TENSION_REPEATER_HELD_PROJECTILES;
+        return DEADBEAT_CROSSBOW_HELD_PROJECTILES;
     }
 
     @Override
@@ -118,7 +118,9 @@ public class TensionRepeaterItem extends RangedWeaponItem {
             // Cooldown Manager
 
             ArbalestCooldown arbalestCooldown = itemStack.get(ModDataComponentTypes.ARBALEST_COOLDOWN);
-            if (chargedProjectilesComponent.isEmpty()) {
+            Arbalests.LOGGER.info("Amount of projectiles : {}",chargedProjectilesComponent.getProjectiles().size());
+
+            if (chargedProjectilesComponent.getProjectiles().size() < 2) {
                 if (arbalestCooldown != null){
                     itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(arbalestCooldown.seconds() * 2));
                 }
@@ -143,7 +145,7 @@ public class TensionRepeaterItem extends RangedWeaponItem {
                 }
             }
             // ------------------------------------------ //
-            return ActionResult.CONSUME;
+        return ActionResult.SUCCESS;
         } else if (!user.getProjectileType(itemStack).isEmpty()) {
             this.charged = false;
             this.loaded = false;
@@ -151,18 +153,18 @@ public class TensionRepeaterItem extends RangedWeaponItem {
             // Cooldown Manager
             itemStack.remove(DataComponentTypes.USE_COOLDOWN);
             // ------------------------------------------ //
-            itemStack.set(ModDataComponentTypes.TENSION_REPEATER_CHARGING_COMPONENT_TYPE,TensionRepeaterCharging.CHARGED);
+            itemStack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.CHARGED);
             user.setCurrentHand(hand);
             return ActionResult.CONSUME;
         } else {
-            itemStack.set(ModDataComponentTypes.TENSION_REPEATER_CHARGING_COMPONENT_TYPE,TensionRepeaterCharging.CHARGED);
+            itemStack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.CHARGED);
             return ActionResult.FAIL;
         }
     }
 
     public static boolean isCharging(ItemStack stack){
-        TensionRepeaterCharging tensionRepeaterCharging = stack.get(ModDataComponentTypes.TENSION_REPEATER_CHARGING_COMPONENT_TYPE);
-        return tensionRepeaterCharging.isCharging();
+        DeadbeatCrossbowCharging deadbeatCrossbowCharging = stack.get(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE);
+        return deadbeatCrossbowCharging.isCharging();
     }
 
     private static float getSpeed(ChargedProjectilesComponent stack) {
@@ -171,7 +173,7 @@ public class TensionRepeaterItem extends RangedWeaponItem {
 
     @Override
     public boolean onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-        stack.set(ModDataComponentTypes.TENSION_REPEATER_CHARGING_COMPONENT_TYPE, TensionRepeaterCharging.DEFAULT);
+        stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.DEFAULT);
         int i = this.getMaxUseTime(stack, user) - remainingUseTicks;
         float f = getPullProgress(i, stack, user);
         if (f >= 1.0F && !isFullyCharged(stack, user) && loadProjectiles(user, stack)) {
@@ -403,7 +405,6 @@ public class TensionRepeaterItem extends RangedWeaponItem {
         if (!world.isClient) {
             CrossbowItem.LoadingSounds loadingSounds = this.getLoadingSounds(stack);
             float f = (float)(stack.getMaxUseTime(user) - remainingUseTicks) / (float)getPullTime(stack, user);
-
             Arbalests.LOGGER.info("F : {}, stack: {}, AMMO :{} , st + 1 / AMMO = {} ",
                     f,
                     stack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles().size(),
@@ -417,12 +418,12 @@ public class TensionRepeaterItem extends RangedWeaponItem {
                         .ifPresent(sound -> world.playSound(null, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), SoundCategory.PLAYERS, 1.0F, 0.5F + (f/2)));
             }
 
-            if (f < 0.2F) {
+            if (f < 0.1F) {
                 this.charged = false;
                 this.loaded = false;
             }
 
-            if (f >= 0.2F && !this.charged) {
+            if (f >= 0.1F && !this.charged) {
                 this.charged = true;
                 loadingSounds.start()
                         .ifPresent(sound -> world.playSound(null, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), SoundCategory.PLAYERS, 0.5F, 1.0F));
@@ -469,18 +470,25 @@ public class TensionRepeaterItem extends RangedWeaponItem {
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
         ChargedProjectilesComponent chargedProjectilesComponent = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (chargedProjectilesComponent != null && !chargedProjectilesComponent.isEmpty()) {
-            ItemStack itemStack = (ItemStack)chargedProjectilesComponent.getProjectiles().get(0);
-            tooltip.add(Text.translatable("item.minecraft.crossbow.projectile").append(ScreenTexts.SPACE).append(itemStack.toHoverableText()));
-            if (type.isAdvanced() && itemStack.isOf(Items.FIREWORK_ROCKET)) {
-                List<Text> list = Lists.<Text>newArrayList();
-                Items.FIREWORK_ROCKET.appendTooltip(itemStack, context, list, type);
-                if (!list.isEmpty()) {
-                    for (int i = 0; i < list.size(); i++) {
-                        list.set(i, Text.literal("  ").append((Text)list.get(i)).formatted(Formatting.GRAY));
-                    }
-
-                    tooltip.addAll(list);
+            List<ItemStack> itemList = chargedProjectilesComponent.getProjectiles();
+            MutableText itemText = Text.translatable("item.arbalests.deadbeat_crossbow.projectile");
+            int j = 0;
+            for (ItemStack itemStack : itemList){
+                if (j > 0){
+                    itemText.append(ScreenTexts.LINE_BREAK);
                 }
+                tooltip.add((itemStack.toHoverableText()));
+                if (type.isAdvanced() && itemStack.isOf(Items.FIREWORK_ROCKET)) {
+                    List<Text> list = Lists.<Text>newArrayList();
+                    Items.FIREWORK_ROCKET.appendTooltip(itemStack, context, list, type);
+                    if (!list.isEmpty()) {
+                        for (int i = 0; i < list.size(); i++) {
+                            list.set(i, Text.literal("  ").append((Text)list.get(i)).formatted(Formatting.GRAY));
+                        }
+                        tooltip.addAll(list);
+                    }
+                }
+                j++;
             }
         }
     }
@@ -498,9 +506,11 @@ public class TensionRepeaterItem extends RangedWeaponItem {
     public static enum ChargeType implements StringIdentifiable {
         NONE("none"),
         ARROW("arrow"),
+        WIND_CHARGE("wind_charge"),
+        SPECTRAL_ARROW("spectral_arrow"),
         ROCKET("rocket");
 
-        public static final Codec<CrossbowItem.ChargeType> CODEC = StringIdentifiable.createCodec(CrossbowItem.ChargeType::values);
+        public static final EnumCodec<ChargeType> CODEC = StringIdentifiable.createCodec(ChargeType::values);
         private final String name;
 
         private ChargeType(final String name) {

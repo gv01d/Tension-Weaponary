@@ -12,6 +12,6 @@ public class ModNumericProperties {
     }
 
     public static void inicialization(){
-        NumericProperties.ID_MAPPER.put(Identifier.of("arbalests","tension_repeater/pull"), TensionRepeaterPullProperty.CODEC);
+        NumericProperties.ID_MAPPER.put(Identifier.of("arbalests","deadbeat_crossbow/pull"), DeadbeatCrossbowPullProperty.CODEC);
     }
 }

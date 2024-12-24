@@ -7,7 +7,8 @@ import net.minecraft.util.Identifier;
 import java.util.Optional;
 
 public class ModModels {
-    public static final Model TENSION_REPEATER;
+    public static final Model DEADBEAT_CROSSBOW;
+    public static final Model DEADBEAT_CROSSBOW_MAIN_CHARGE;
 
     public ModModels() {
     }
@@ -17,6 +18,7 @@ public class ModModels {
     }
 
     static {
-        TENSION_REPEATER = item("tension_repeater", TextureKey.LAYER0);
+        DEADBEAT_CROSSBOW = item("deadbeat_crossbow", TextureKey.LAYER0);
+        DEADBEAT_CROSSBOW_MAIN_CHARGE = item("deadbeat_charge",  TextureKey.LAYER0);
     }
 }

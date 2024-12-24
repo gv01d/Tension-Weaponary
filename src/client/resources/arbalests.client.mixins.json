@@ -3,6 +3,7 @@
   "package": "me.gv0id.arbalests.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "ClientPlayerEntityMixin",
     "ExampleClientMixin",
     "HeldItemRendererMixin"
   ],

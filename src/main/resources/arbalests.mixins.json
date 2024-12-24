@@ -3,12 +3,15 @@
   "package": "me.gv0id.arbalests.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "EntityMixin",
     "ExampleMixin",
     "ExplosionImplMixin",
+    "LivingEntityMixin",
     "ModDataComponentTypesMx",
+    "PlayerEntityMixin",
     "ServerPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-	}
+  }
 }

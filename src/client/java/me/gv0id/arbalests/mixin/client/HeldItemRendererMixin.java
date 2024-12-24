@@ -23,7 +23,7 @@ public class HeldItemRendererMixin {
             )
     )
     private boolean applyRenderCrossbows(ItemStack itSt,Item it , Operation<Boolean> original) {
-        return itSt.isOf(ModItems.TENSION_REPEATER) || original.call(itSt,it);
+        return itSt.isOf(ModItems.DEADBEAT_CROSSBOW) || original.call(itSt,it);
     }
 }
 
