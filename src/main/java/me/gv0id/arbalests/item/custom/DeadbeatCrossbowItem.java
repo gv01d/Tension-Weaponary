@@ -18,11 +18,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
+import net.minecraft.inventory.StackReference;
 import net.minecraft.item.*;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenTexts;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -31,10 +33,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.*;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
@@ -45,6 +44,7 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -60,7 +60,6 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         } else {
             int i = shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND;
             int s = i + stack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles().size();
-            Arbalests.LOGGER.info("Stack: {}",stack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles().size());
             List<ItemStack> list = new ArrayList<>(s);
             list.addAll(stack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles());
             ItemStack itemStack = projectileStack.copy();
@@ -73,6 +72,49 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             }
             return list;
         }
+    }
+
+    @Override
+    public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference){
+        if ((clickType == ClickType.LEFT) || otherStack.isEmpty()) return false;
+
+        if (DEADBEAT_CROSSBOW_HELD_PROJECTILES.test(otherStack)) {
+            if (!isFullyCharged(stack)) {
+                ChargedProjectilesComponent chargedProjectilesComponent = stack.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.DEFAULT);
+                List<ItemStack> list = new ArrayList<>(List.copyOf(chargedProjectilesComponent.getProjectiles()));
+                if (list.size() < AMMO) {
+                    CrossbowItem.LoadingSounds loadingSounds = this.getLoadingSounds(stack);
+                    list.add(otherStack.split(1));
+                    float f = ((float) list.size()) / AMMO;
+                    loadingSounds.end()
+                            .ifPresent(sound -> player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), (SoundEvent) sound.value(), SoundCategory.PLAYERS, 1.0F, 0.5F + (f / 2)));
+
+                    stack.set(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.of(list));
+                    if (isChamberFull(stack, player))
+                        stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.LOADED);
+                    else
+                        stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.DEFAULT);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    public void maxCooldown(ItemStack stack, PlayerEntity user){
+        ChargedProjectilesComponent chargedProjectilesComponent = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
+        if (chargedProjectilesComponent == null)
+            return;
+        float colldown = 0.1F;
+        ArrayList<ItemStack> list = new ArrayList<>(List.copyOf(chargedProjectilesComponent.getProjectiles()));
+        for (  ItemStack it : list ){
+            colldown += getCooldown(it);
+        }
+        stack.set(DataComponentTypes.USE_COOLDOWN, new UseCooldownComponent(colldown));
+        UseCooldownComponent cooldownComponent = stack.get(DataComponentTypes.USE_COOLDOWN);
+        assert cooldownComponent != null;
+        cooldownComponent.set(stack,user);
     }
 
 
@@ -92,7 +134,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             Optional.of(SoundEvents.ITEM_CROSSBOW_LOADING_END)
     );
 
-    public DeadbeatCrossbowItem(Item.Settings settings) {
+    public DeadbeatCrossbowItem(Settings settings) {
         super(settings);
     }
 
@@ -109,8 +151,13 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     @Override
     public ActionResult use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
+        if(user.getItemCooldownManager().isCoolingDown(itemStack))
+            return ActionResult.FAIL;
+
+        Arbalests.LOGGER.info("Cooldown : {}",user.getItemCooldownManager().getCooldownProgress(itemStack, 0.0F));
+
         ChargedProjectilesComponent chargedProjectilesComponent = itemStack.get(DataComponentTypes.CHARGED_PROJECTILES);
-        if (chargedProjectilesComponent != null && !chargedProjectilesComponent.isEmpty()) {
+        if (chargedProjectilesComponent != null && !chargedProjectilesComponent.isEmpty() && isCharged(itemStack)) {
             this.shootAll(world, user, hand, itemStack, getSpeed(chargedProjectilesComponent), 1.0F, null);
 
 
@@ -118,34 +165,23 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             // Cooldown Manager
 
             ArbalestCooldown arbalestCooldown = itemStack.get(ModDataComponentTypes.ARBALEST_COOLDOWN);
-            Arbalests.LOGGER.info("Amount of projectiles : {}",chargedProjectilesComponent.getProjectiles().size());
 
             if (chargedProjectilesComponent.getProjectiles().size() < 2) {
-                if (arbalestCooldown != null){
-                    itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(arbalestCooldown.seconds() * 2));
-                }
-                else {
-                    itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(2));
-                }
-                UseCooldownComponent useCooldownComponent = itemStack.get(DataComponentTypes.USE_COOLDOWN);
-                if (useCooldownComponent != null) {
-                    useCooldownComponent.set(itemStack, user);
+                if (user instanceof PlayerEntity playerEntity) {
+                    assert arbalestCooldown != null;
+                    playerEntity.getItemCooldownManager().set(itemStack, (int) (arbalestCooldown.seconds() * 20.0F));
+                    itemStack.set(ModDataComponentTypes.ARBALEST_COOLDOWN, new ArbalestCooldown(0.1F));
+                    itemStack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.DEFAULT);
                 }
             }
             else{
-                if (arbalestCooldown != null){
-                    itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(arbalestCooldown.seconds()));
-                }
-                else {
-                    itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(2));
-                }
-                UseCooldownComponent useCooldownComponent = itemStack.get(DataComponentTypes.USE_COOLDOWN);
-                if (useCooldownComponent != null){
-                    useCooldownComponent.set(itemStack,user);
+                if (user instanceof PlayerEntity playerEntity) {
+                    playerEntity.getItemCooldownManager().set(itemStack, (int) (getCooldown(itemStack) * 20.0F));
+                    itemStack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.CHARGED);
                 }
             }
             // ------------------------------------------ //
-        return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS;
         } else if (!user.getProjectileType(itemStack).isEmpty()) {
             this.charged = false;
             this.loaded = false;
@@ -153,18 +189,13 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             // Cooldown Manager
             itemStack.remove(DataComponentTypes.USE_COOLDOWN);
             // ------------------------------------------ //
-            itemStack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.CHARGED);
+            itemStack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.CHARGING);
             user.setCurrentHand(hand);
             return ActionResult.CONSUME;
         } else {
-            itemStack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.CHARGED);
+            itemStack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.DEFAULT);
             return ActionResult.FAIL;
         }
-    }
-
-    public static boolean isCharging(ItemStack stack){
-        DeadbeatCrossbowCharging deadbeatCrossbowCharging = stack.get(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE);
-        return deadbeatCrossbowCharging.isCharging();
     }
 
     private static float getSpeed(ChargedProjectilesComponent stack) {
@@ -173,28 +204,35 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
 
     @Override
     public boolean onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-        stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.DEFAULT);
         int i = this.getMaxUseTime(stack, user) - remainingUseTicks;
         float f = getPullProgress(i, stack, user);
-        if (f >= 1.0F && !isFullyCharged(stack, user) && loadProjectiles(user, stack)) {
-            CrossbowItem.LoadingSounds loadingSounds = this.getLoadingSounds(stack);
-            loadingSounds.end()
-                    .ifPresent(
-                            sound -> world.playSound(
-                                    null,
-                                    user.getX(),
-                                    user.getY(),
-                                    user.getZ(),
-                                    (SoundEvent)sound.value(),
-                                    user.getSoundCategory(),
-                                    1.0F,
-                                    1.0F / (world.getRandom().nextFloat() * 0.5F + 1.0F) + 0.2F
-                            )
-                    );
+        float s = (float) Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles().size();
+        // Testing if it can charge the crossbow
+        if (f >= (s/AMMO) && s >= 1)
+        {
+            // Creating cooldown with each ammo loaded
+            float cooldown = 0.1F;
+            cooldown = Objects.requireNonNull(stack.get(ModDataComponentTypes.ARBALEST_COOLDOWN)).seconds();
+            ArrayList<ItemStack> list = new ArrayList<>(List.copyOf((Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles())));
+
+            for (ItemStack st : list){
+                cooldown += getCooldown(st);
+            }
+            if (cooldown > 8.0F)
+                cooldown = 8.0F;
+
+            stack.set(ModDataComponentTypes.ARBALEST_COOLDOWN,new ArbalestCooldown(cooldown));
+            // - - -
+            // Setting charge type to CHARGED
+            if (isChamberFull(stack,user))
+                stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.FULLYCHARGED);
+            else
+                stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.CHARGED);
             return true;
-        } else {
-            return false;
         }
+        // Setting charge type to DEFAULT ( could not charge crossbow )
+        stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.DEFAULT);
+        return false;
     }
 
     protected static List<ItemStack> loadRound(ItemStack stack, ItemStack projectileStack, LivingEntity shooter) {
@@ -226,14 +264,32 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         }
     }
 
-    public static boolean isFullyCharged(ItemStack stack, LivingEntity shooter){
+
+    public static boolean isLoaded(ItemStack stack){
+        DeadbeatCrossbowCharging deadbeatCrossbowCharging = stack.getOrDefault(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.DEFAULT);
+        return deadbeatCrossbowCharging.isLoaded();
+    }
+
+    public static boolean isChamberFull(ItemStack stack, LivingEntity shooter){
+
         ChargedProjectilesComponent chargedProjectilesComponent = stack.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
-        return chargedProjectilesComponent.getProjectiles().size() < (shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND);
+        return chargedProjectilesComponent.getProjectiles().size() >= ((shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND) * AMMO);
+    }
+
+    public static boolean isFullyCharged(ItemStack stack){
+        DeadbeatCrossbowCharging deadbeatCrossbowCharging = stack.getOrDefault(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.DEFAULT);
+        return deadbeatCrossbowCharging.isFullyCharged();
     }
 
     public static boolean isCharged(ItemStack stack) {
-        ChargedProjectilesComponent chargedProjectilesComponent = stack.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
-        return !chargedProjectilesComponent.isEmpty();
+        DeadbeatCrossbowCharging deadbeatCrossbowCharging = stack.getOrDefault(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.DEFAULT);
+        return deadbeatCrossbowCharging.isCharged();
+    }
+
+    public static boolean isCharging(ItemStack stack){
+        DeadbeatCrossbowCharging deadbeatCrossbowCharging = stack.get(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE);
+        assert deadbeatCrossbowCharging != null;
+        return deadbeatCrossbowCharging.isCharging();
     }
 
     @Override
@@ -322,12 +378,11 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                 i = -i;
                 int l = j;
 
-                Arbalests.LOGGER.info("NotWind");
                 ProjectileEntity.spawn(
-                    this.createArrowEntity(world, shooter, stack, itemStack, critical),
-                    world,
-                    itemStack,
-                    projectile -> this.shoot(shooter, projectile, l, speed, divergence, k, target)
+                        this.createArrowEntity(world, shooter, stack, itemStack, critical),
+                        world,
+                        itemStack,
+                        projectile -> this.shoot(shooter, projectile, l, speed, divergence, k, target)
                 );
 
                 stack.damage(this.getWeaponStackDamage(itemStack), shooter, LivingEntity.getSlotForHand(hand));
@@ -352,8 +407,6 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             assert temp != null;
             List<ItemStack> tList = temp.getProjectiles();
             int amt = EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, 1);
-            Arbalests.LOGGER.info("size: {}", amt);
-            Arbalests.LOGGER.info("size List: {}", tList.size());
 
             List<ItemStack> l2 = new ArrayList<ItemStack>();
             ChargedProjectilesComponent chargedProjectilesComponent;
@@ -405,14 +458,9 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         if (!world.isClient) {
             CrossbowItem.LoadingSounds loadingSounds = this.getLoadingSounds(stack);
             float f = (float)(stack.getMaxUseTime(user) - remainingUseTicks) / (float)getPullTime(stack, user);
-            Arbalests.LOGGER.info("F : {}, stack: {}, AMMO :{} , st + 1 / AMMO = {} ",
-                    f,
-                    stack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles().size(),
-                    AMMO,
-                    ((float)stack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles().size() + 1F)/AMMO
-                    );
-            if (f >= (((float)(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles().size() + 1F)/AMMO) && f < 1F){
-                Arbalests.LOGGER.info("loading Projectiles...");
+            float s = (float) Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles().size();
+
+            if ( s < AMMO && f >= (( s + 1F)/AMMO)){
                 loadProjectiles(user,stack);
                 loadingSounds.end()
                         .ifPresent(sound -> world.playSound(null, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), SoundCategory.PLAYERS, 1.0F, 0.5F + (f/2)));
@@ -467,28 +515,30 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        if (!isFullyCharged(stack) && !isLoaded(stack)){
+            tooltip.add(Text.translatable("item.arbalests.deadbeat_crossbow.right_click_request").formatted(Formatting.GRAY));
+            tooltip.add(ScreenTexts.SPACE);
+        }
+
+
+
+
         ChargedProjectilesComponent chargedProjectilesComponent = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (chargedProjectilesComponent != null && !chargedProjectilesComponent.isEmpty()) {
             List<ItemStack> itemList = chargedProjectilesComponent.getProjectiles();
-            MutableText itemText = Text.translatable("item.arbalests.deadbeat_crossbow.projectile");
-            int j = 0;
+            tooltip.add(Text.translatable("item.arbalests.deadbeat_crossbow.projectile"));
+
             for (ItemStack itemStack : itemList){
-                if (j > 0){
-                    itemText.append(ScreenTexts.LINE_BREAK);
-                }
-                tooltip.add((itemStack.toHoverableText()));
+                tooltip.add((itemStack.toHoverableText().copy().formatted(Formatting.BLUE)));
                 if (type.isAdvanced() && itemStack.isOf(Items.FIREWORK_ROCKET)) {
                     List<Text> list = Lists.<Text>newArrayList();
                     Items.FIREWORK_ROCKET.appendTooltip(itemStack, context, list, type);
                     if (!list.isEmpty()) {
-                        for (int i = 0; i < list.size(); i++) {
-                            list.set(i, Text.literal("  ").append((Text)list.get(i)).formatted(Formatting.GRAY));
-                        }
+                        list.replaceAll(text -> Text.literal("  ").append((Text) text).formatted(Formatting.GRAY));
                         tooltip.addAll(list);
                     }
                 }
-                j++;
             }
         }
     }
@@ -501,6 +551,36 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     @Override
     public int getRange() {
         return 8;
+    }
+
+    float getCooldown(ItemStack stack){
+        if (stack.isOf(Items.FIREWORK_ROCKET))
+            return CooldownType.ROCKET.getValue();
+        if (stack.isOf(Items.SPECTRAL_ARROW))
+            return CooldownType.SPECTRAL_ARROW.getValue();
+        if (stack.isOf(Items.WIND_CHARGE))
+            return CooldownType.WIND_CHARGE.getValue();
+        if (stack.isOf(Items.ARROW))
+            return CooldownType.ARROW.getValue();
+        return CooldownType.NONE.getValue();
+    }
+
+    public static enum CooldownType{
+        NONE(0.5F),
+        ARROW(1F),
+        WIND_CHARGE(0.5F),
+        SPECTRAL_ARROW(0.8F),
+        ROCKET(0.5F);
+
+        private float value;
+        public float getValue(){
+            return this.value;
+        }
+
+
+        CooldownType(float v) {
+            value = v;
+        }
     }
 
     public static enum ChargeType implements StringIdentifiable {

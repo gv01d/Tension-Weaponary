@@ -13,7 +13,11 @@ import java.util.Optional;
 public record DeadbeatCrossbowCharging(int charging, Optional<Identifier> cooldownGroup) {
 
     public static final DeadbeatCrossbowCharging DEFAULT = new DeadbeatCrossbowCharging(0);
-    public static final DeadbeatCrossbowCharging CHARGED = new DeadbeatCrossbowCharging(1);
+    public static final DeadbeatCrossbowCharging LOADED = new DeadbeatCrossbowCharging(1);
+    public static final DeadbeatCrossbowCharging CHARGING = new DeadbeatCrossbowCharging(2);
+    public static final DeadbeatCrossbowCharging CHARGED = new DeadbeatCrossbowCharging(3);
+    public static final DeadbeatCrossbowCharging FULLYCHARGED = new DeadbeatCrossbowCharging(4);
+
 
     public static final Codec<DeadbeatCrossbowCharging> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
@@ -32,7 +36,19 @@ public record DeadbeatCrossbowCharging(int charging, Optional<Identifier> cooldo
 
     public DeadbeatCrossbowCharging(int charging) {this(charging,Optional.empty());}
 
-    public boolean isCharging() {
+    public boolean isLoaded(){
         return charging == 1;
+    }
+
+    public boolean isCharging() {
+        return charging == 2;
+    }
+
+    public boolean isCharged() {
+        return charging >= 3;
+    }
+
+    public boolean isFullyCharged(){
+        return charging == 4;
     }
 }

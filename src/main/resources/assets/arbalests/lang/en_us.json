@@ -1,5 +1,6 @@
 {
   "item.arbalests.suspicious_substance": "Suspicious Substance",
   "item.arbalests.deadbeat_crossbow": "Deadbeat's Crossbow",
-  "item.arbalests.deadbeat_crossbow.projectile": "Projectiles:"
+  "item.arbalests.deadbeat_crossbow.projectile": "Projectiles:",
+  "item.arbalests.deadbeat_crossbow.right_click_request": "Right click to add ammunition"
 }
