@@ -108,13 +108,11 @@ public class PlayerMovement {
         tempVel = tempVel.normalize();
         tempVel = tempVel.multiply(tempVelLen);
         //
-        player.setVelocity(player. tempVel.x,player.getVelocity().y,tempVel.y);
+
+        Vec2f vel = airAccelerate(wishVelocity,wishSpeed,new Vec2f(tempVel.x,tempVel.y),wishSpeed,acceleration);
 
 
-        Vec2f vel = airAccelerate(wishVelocity,wishSpeed,new Vec2f((float)player.getVelocity().x,(float)player.getVelocity().z),wishSpeed,acceleration);
-
-
-        player.setVelocity(player.getVelocity().x + vel.x,player.getVelocity().y,player.getVelocity().z + vel.y);
+        player.setVelocity(tempVel.x + vel.x,player.getVelocity().y, tempVel.y + vel.y);
 
         player.move(MovementType.SELF, player.getVelocity());
 
