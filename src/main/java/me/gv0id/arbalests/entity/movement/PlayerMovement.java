@@ -10,10 +10,13 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
 
+import java.util.List;
 import java.util.Objects;
 
 import static java.lang.Math.*;
@@ -88,14 +91,25 @@ public class PlayerMovement {
         return travelQuake(player,new Vec2f((float)movementInput.x,(float)movementInput.z));
     }
 
+    float airControlVel = 0.001F;
     public boolean travelQuake(PlayerEntity player, Vec2f movementInput){
         if (player.isOnGround()){
             return false;
         }
 
+
         Vec2f wishVelocity = getMovementDirection(player,movementInput);
         double wishSpeed = (movementInput.x != 0.0 || movementInput.y != 0.0)? player.getMovementSpeed():0.0;
-        wishVelocity.normalize();
+        //
+        Vec2f tempVel = new Vec2f((float) player.getVelocity().x,(float) player.getVelocity().z);
+        float tempVelLen = tempVel.length();
+        float impulse = airControlVel * (1.0F/tempVelLen);
+        tempVel = new Vec2f( (float) player.getVelocity().x + (wishVelocity.x * impulse), (float) player.getVelocity().z +(wishVelocity.y * impulse));
+        tempVel = tempVel.normalize();
+        tempVel = tempVel.multiply(tempVelLen);
+        //
+        player.setVelocity(player. tempVel.x,player.getVelocity().y,tempVel.y);
+
 
         Vec2f vel = airAccelerate(wishVelocity,wishSpeed,new Vec2f((float)player.getVelocity().x,(float)player.getVelocity().z),wishSpeed,acceleration);
 
@@ -233,7 +247,6 @@ public class PlayerMovement {
         if (accelSpeed > addSpeed)
             accelSpeed = addSpeed;
         // - -
-        wishVelocity.multiply((float) accelSpeed);
         return new Vec2f((float )(wishVelocity.x * accelSpeed),(float)(wishVelocity.y * accelSpeed));
 
     }
