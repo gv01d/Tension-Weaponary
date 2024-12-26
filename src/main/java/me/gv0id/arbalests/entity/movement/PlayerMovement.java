@@ -23,8 +23,10 @@ import static java.lang.Math.*;
 
 public class PlayerMovement {
 
-    public double maxVelocity = 40;
-    public double acceleration = 5;
+    public double maxVelocity = 30;
+    public double airSpeed = 0.3; // has to be lower than maxVelocity
+    public double acceleration = 40;
+    float airControlVel = 0.00001F;
 
     public PlayerMovement(){
     }
@@ -91,28 +93,30 @@ public class PlayerMovement {
         return travelQuake(player,new Vec2f((float)movementInput.x,(float)movementInput.z));
     }
 
-    float airControlVel = 0.001F;
     public boolean travelQuake(PlayerEntity player, Vec2f movementInput){
         if (player.isOnGround()){
             return false;
         }
 
 
-        Vec2f wishVelocity = getMovementDirection(player,movementInput);
+        Vec2f wishVelocity = getMovementDirection(player,movementInput).normalize();
         double wishSpeed = (movementInput.x != 0.0 || movementInput.y != 0.0)? player.getMovementSpeed():0.0;
         //
         Vec2f tempVel = new Vec2f((float) player.getVelocity().x,(float) player.getVelocity().z);
-        float tempVelLen = tempVel.length();
-        float impulse = airControlVel * (1.0F/tempVelLen);
-        tempVel = new Vec2f( (float) player.getVelocity().x + (wishVelocity.x * impulse), (float) player.getVelocity().z +(wishVelocity.y * impulse));
-        tempVel = tempVel.normalize();
-        tempVel = tempVel.multiply(tempVelLen);
+        if (tempVel.x != 0 || tempVel.y != 0){
+            float tempVelLen = tempVel.length();
+            float impulse = airControlVel * (1.0F/(tempVelLen + 1F));
+            tempVel = new Vec2f( (float) player.getVelocity().x + (wishVelocity.x * impulse), (float) player.getVelocity().z +(wishVelocity.y * impulse));
+            tempVel = tempVel.normalize();
+            tempVel = tempVel.multiply(tempVelLen);
+        }
         //
 
-        Vec2f vel = airAccelerate(wishVelocity,wishSpeed,new Vec2f(tempVel.x,tempVel.y),wishSpeed,acceleration);
 
 
-        player.setVelocity(tempVel.x + vel.x,player.getVelocity().y, tempVel.y + vel.y);
+        Vec2f vel = airAccelerate(player,wishVelocity,wishSpeed,new Vec2f(tempVel.x,tempVel.y),wishSpeed,acceleration);
+
+        player.setVelocity(tempVel.x + vel.x,player.getVelocity().y,tempVel.y + vel.y);
 
         player.move(MovementType.SELF, player.getVelocity());
 
@@ -226,21 +230,22 @@ public class PlayerMovement {
      * </li>
      * </ul>
      */
-    public Vec2f airAccelerate(Vec2f wishVelocity, double wishSpeedInit, Vec2f velocity, double unchangedWishSpeed, double acceleration){
+    public Vec2f airAccelerate(PlayerEntity player,Vec2f wishVelocity, double wishSpeedInit, Vec2f velocity, double unchangedWishSpeed, double acceleration){
+
         double wishSpeed = wishSpeedInit;
+        double tAirSpeed = player.isSneaking() ? airSpeed/2 : airSpeed;
+        wishSpeed = max(wishSpeed, tAirSpeed);
         wishSpeed = min(wishSpeed, maxVelocity);
         double projectedCurrentSpeed;
         double addSpeed;
         double accelSpeed;
-        // - - -
-        wishVelocity.normalize();
         // - - -
         projectedCurrentSpeed = (velocity.x * wishVelocity.x + velocity.y * wishVelocity.y);
         addSpeed = wishSpeed - projectedCurrentSpeed;
         if (addSpeed <= 0)
             return Vec2f.ZERO;
         // - - -
-        accelSpeed = acceleration * unchangedWishSpeed * 0.1;
+        accelSpeed = acceleration * unchangedWishSpeed * 0.01;
         Arbalests.LOGGER.info("Accel : {}", accelSpeed);
         if (accelSpeed > addSpeed)
             accelSpeed = addSpeed;
