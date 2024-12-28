@@ -10,6 +10,7 @@ public interface ModEntityTypeTags {
 
     TagKey<EntityType<?>> WIND_EXPLOSIVES = of("wind_explosives");
     TagKey<EntityType<?>> RESET_FALL = of("reset_fall");
+    TagKey<EntityType<?>> STRAFE_JUMP = of("strafe_jump");
 
     private static TagKey<EntityType<?>> of(String id) {
         return TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of("arbalests",id));

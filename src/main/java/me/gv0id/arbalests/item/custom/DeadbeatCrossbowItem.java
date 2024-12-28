@@ -154,8 +154,6 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         if(user.getItemCooldownManager().isCoolingDown(itemStack))
             return ActionResult.FAIL;
 
-        Arbalests.LOGGER.info("Cooldown : {}",user.getItemCooldownManager().getCooldownProgress(itemStack, 0.0F));
-
         ChargedProjectilesComponent chargedProjectilesComponent = itemStack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (chargedProjectilesComponent != null && !chargedProjectilesComponent.isEmpty() && isCharged(itemStack)) {
             this.shootAll(world, user, hand, itemStack, getSpeed(chargedProjectilesComponent), 1.0F, null);

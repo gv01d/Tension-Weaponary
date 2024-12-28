@@ -1,6 +1,13 @@
 {
   "item.arbalests.suspicious_substance": "Suspicious Substance",
+
   "item.arbalests.deadbeat_crossbow": "Deadbeat's Crossbow",
   "item.arbalests.deadbeat_crossbow.projectile": "Projectiles:",
-  "item.arbalests.deadbeat_crossbow.right_click_request": "Right click to add ammunition"
+  "item.arbalests.deadbeat_crossbow.right_click_request": "Right click to add ammunition",
+
+  "item.minecraft.potion.effect.strafe_potion" : "Strafe Potion",
+  "item.minecraft.splash_potion.effect.strafe_potion" : "Splash Strafe Potion",
+  "item.minecraft.lingering_potion.effect.strafe_potion" : "Lingering Strafe Potion",
+
+  "effect.arbalests.strafe":"Strafe"
 }

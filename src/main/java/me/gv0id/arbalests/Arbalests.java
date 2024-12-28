@@ -1,10 +1,21 @@
 package me.gv0id.arbalests;
 
+import com.google.common.collect.Multimaps;
+import me.gv0id.arbalests.effect.ModEffects;
 import me.gv0id.arbalests.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 public class Arbalests implements ModInitializer {
 	public static final String MOD_ID = "arbalests";
@@ -17,6 +28,36 @@ public class Arbalests implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ModItems.initialize();
+		ModEffects.registerEffects();
+
 	}
+
+	/*
+	public reg(){
+		ServerLivingEntityEvents.AFTER_DAMAGE.register((LivingEntity entity, DamageSource source, float baseDamageTaken, float damageTaken, boolean blocked) -> {
+			if (blocked) return;
+			var type = entity.getDamageSources().registry.get(DamageTypes.EXPLOSION.getValue());
+			if (type == null) return;
+			if (type != source.getType()) return;
+			entity.getAttributes().addTemporaryModifiers(
+					Multimaps.forMap(
+							new HashMap<>() {{
+								put(
+										EntityAttributes.MOVEMENT_SPEED,
+										new EntityAttributeModifier(
+												Identifier.of(
+														"Arbalets",
+														"disable_strafe"
+												),
+												-1,
+												EntityAttributeModifier.Operation.ADD_VALUE
+										)
+								);
+							}}
+					)
+			);
+		});
+	}
+	*/
 
 }

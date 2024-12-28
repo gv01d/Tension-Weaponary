@@ -28,6 +28,10 @@ public class ModValueLookupTagProvider extends FabricTagProvider.EntityTypeTagPr
                 .add(ModEntityType.WIND_GALE)
                 .add(EntityType.WIND_CHARGE)
                 .add(EntityType.BREEZE_WIND_CHARGE);
+        getOrCreateTagBuilder(ModEntityTypeTags.STRAFE_JUMP)
+                .add(ModEntityType.WIND_GALE)
+                .add(EntityType.WIND_CHARGE)
+                .add(EntityType.BREEZE_WIND_CHARGE);
     }
 }
 

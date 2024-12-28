@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.floats.FloatArrays;
 import it.unimi.dsi.fastutil.floats.FloatSet;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.entity.movement.PlayerMovement;
+import me.gv0id.arbalests.registry.tag.ModEntityTypeTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -51,6 +52,14 @@ public abstract class EntityMixin{
     @Unique
     void Arbalests_getJumpInject(){
     }
+    /*
+    @Inject(method = "onExplodedBy", at = @At("HEAD"))
+    public void onExplodedBy(Entity entity, CallbackInfo ci){
+        if(entity != null && entity.getType().isIn(ModEntityTypeTags.RESET_FALL)){
+            this.quakeStrafeGracePeriod = this.QUAKE_STRAFE_GRACE_PERIOD;
+        }
+    }
+     */
 
     @Inject(method = "setMovement(ZZLnet/minecraft/util/math/Vec3d;)V",
             at = @At("TAIL")
@@ -58,7 +67,7 @@ public abstract class EntityMixin{
     void setMovementInject(boolean onGround, boolean horizontalCollision, Vec3d movement, CallbackInfo ci){
 
         if (onGround) {
-            arbalests_coyoteTime = 5;
+            arbalests_coyoteTime = 0;
         }
         else if (arbalests_coyoteTime > 0){
             arbalests_coyoteTime--;
