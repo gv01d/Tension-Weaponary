@@ -82,7 +82,10 @@ public class ModItems {
         ModPotions.registerPotions();
 
         FabricBrewingRecipeRegistryBuilder.BUILD.register( builder -> {
-            builder.registerPotionRecipe(Potions.WIND_CHARGED, Items.FERMENTED_SPIDER_EYE, ModPotions.STRAFE_POTION);
+            builder.registerPotionRecipe(Potions.WIND_CHARGED, Items.FERMENTED_SPIDER_EYE, ModPotions.UNSTABLE_STRAFE_POTION);
+        });
+        FabricBrewingRecipeRegistryBuilder.BUILD.register( builder -> {
+            builder.registerPotionRecipe(ModPotions.UNSTABLE_STRAFE_POTION, ModItems.TRIAL_ESSENCE, ModPotions.STRAFE_POTION);
         });
     }
 
@@ -100,19 +103,19 @@ public class ModItems {
         return RegistryKey.of(RegistryKeys.ITEM, blockKey.getValue());
     }
 
-    public static Item register(Block block) {
+    private static Item register(Block block) {
         return register(block, BlockItem::new);
     }
 
-    public static Item register(Block block, Item.Settings settings) {
+    private static Item register(Block block, Item.Settings settings) {
         return register(block, BlockItem::new, settings);
     }
 
-    public static Item register(Block block, UnaryOperator<Item.Settings> settingsOperator) {
+    private static Item register(Block block, UnaryOperator<Item.Settings> settingsOperator) {
         return register(block, (BiFunction<Block, Item.Settings, Item>)((blockx, settings) -> new BlockItem(blockx, (Item.Settings)settingsOperator.apply(settings))));
     }
 
-    public static Item register(Block block, Block... blocks) {
+    private static Item register(Block block, Block... blocks) {
         Item item = register(block);
 
         for (Block block2 : blocks) {
@@ -122,11 +125,11 @@ public class ModItems {
         return item;
     }
 
-    public static Item register(Block block, BiFunction<Block, Item.Settings, Item> factory) {
+    private static Item register(Block block, BiFunction<Block, Item.Settings, Item> factory) {
         return register(block, factory, new Item.Settings());
     }
 
-    public static Item register(Block block, BiFunction<Block, Item.Settings, Item> factory, Item.Settings settings) {
+    private static Item register(Block block, BiFunction<Block, Item.Settings, Item> factory, Item.Settings settings) {
         return register(
                 keyOf(block.getRegistryEntry().registryKey()),
                 itemSettings -> (Item)factory.apply(block, itemSettings),
@@ -135,11 +138,11 @@ public class ModItems {
     }
 
     // register itens
-    public static Item register(String id, Function<Item.Settings, Item> factory) {
+    private static Item register(String id, Function<Item.Settings, Item> factory) {
         return register(keyOf(id), factory, new Item.Settings());
     }
 
-    public static Item register(
+    private static Item register(
             String id,
             Function<Item.Settings, Item> factory,
             Item.Settings settings)
@@ -150,19 +153,19 @@ public class ModItems {
         return register(RegistryKey.of(RegistryKeys.ITEM, itemID), factory, settings);
     }
 
-    public static Item register(String id, Item.Settings settings) {
+    private static Item register(String id, Item.Settings settings) {
         return register(keyOf(id), Item::new, settings);
     }
 
-    public static Item register(String id) {
+    private static Item register(String id) {
         return register(keyOf(id), Item::new, new Item.Settings());
     }
 
-    public static Item register(RegistryKey<Item> key, Function<Item.Settings, Item> factory) {
+    private static Item register(RegistryKey<Item> key, Function<Item.Settings, Item> factory) {
         return register(key, factory, new Item.Settings());
     }
 
-    public static Item register(RegistryKey<Item> key, Function<Item.Settings, Item> factory, Item.Settings settings) {
+    private static Item register(RegistryKey<Item> key, Function<Item.Settings, Item> factory, Item.Settings settings) {
         Item item = (Item)factory.apply(settings.registryKey(key));
         if (item instanceof BlockItem blockItem) {
             blockItem.appendBlocks(Item.BLOCK_ITEMS, item);

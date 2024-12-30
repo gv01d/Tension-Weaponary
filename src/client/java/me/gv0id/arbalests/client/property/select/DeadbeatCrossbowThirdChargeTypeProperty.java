@@ -29,14 +29,8 @@ public class DeadbeatCrossbowThirdChargeTypeProperty implements SelectProperty<D
             return DeadbeatCrossbowItem.ChargeType.NONE;
         } else {
             if (chargedProjectilesComponent.getProjectiles().size() >= 3){
-                Item temp = chargedProjectilesComponent.getProjectiles().get(2).getItem();
-                if (temp.equals(Items.SPECTRAL_ARROW))
-                    return DeadbeatCrossbowItem.ChargeType.SPECTRAL_ARROW;
-                if (temp.equals(Items.FIREWORK_ROCKET))
-                    return DeadbeatCrossbowItem.ChargeType.ROCKET;
-                if (temp.equals(Items.WIND_CHARGE))
-                    return DeadbeatCrossbowItem.ChargeType.WIND_CHARGE;
-                return DeadbeatCrossbowItem.ChargeType.ARROW;
+                ItemStack temp = chargedProjectilesComponent.getProjectiles().get(2);
+                return DeadbeatCrossbowItem.getChargeType(temp);
             }
             return DeadbeatCrossbowItem.ChargeType.NONE;
         }

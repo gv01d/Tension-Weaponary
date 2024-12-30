@@ -23,14 +23,16 @@ import java.util.function.Function;
 
 public class WindGaleEntity extends AbstractWindGaleEntity {
     
-    private static float KNOCKBACK_POWER = 2.0F;
+    private float KNOCKBACK_POWER = 1.0F;
     private float EXPLOSION_POWER = 3.0F;
     private static final float MAX_RENDER_DISTANCE_WHEN_NEWLY_SPAWNED = MathHelper.square(3.5F);
     private int deflectCooldown = 5;
 
-    private static final ExplosionBehavior EXPLOSION_BEHAVIOR = new AdvancedExplosionBehavior(
+    public ExplosionBehavior EXPLOSION_BEHAVIOR = new AdvancedExplosionBehavior(
             true, false, Optional.of(KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
     );
+
+
     
     public WindGaleEntity(EntityType<? extends AbstractWindGaleEntity> entityType, World world) {
         super(entityType, world);
@@ -88,7 +90,10 @@ public class WindGaleEntity extends AbstractWindGaleEntity {
 
 
     @Override
-    protected void createExplosion(Vec3d pos) {
+    public void createExplosion(Vec3d pos) {
+        EXPLOSION_BEHAVIOR = new AdvancedExplosionBehavior(
+                true, false, Optional.of(KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
+        );
         this.getWorld()
                 .createExplosion(
                         this,

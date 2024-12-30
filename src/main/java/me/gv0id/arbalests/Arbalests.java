@@ -32,32 +32,4 @@ public class Arbalests implements ModInitializer {
 
 	}
 
-	/*
-	public reg(){
-		ServerLivingEntityEvents.AFTER_DAMAGE.register((LivingEntity entity, DamageSource source, float baseDamageTaken, float damageTaken, boolean blocked) -> {
-			if (blocked) return;
-			var type = entity.getDamageSources().registry.get(DamageTypes.EXPLOSION.getValue());
-			if (type == null) return;
-			if (type != source.getType()) return;
-			entity.getAttributes().addTemporaryModifiers(
-					Multimaps.forMap(
-							new HashMap<>() {{
-								put(
-										EntityAttributes.MOVEMENT_SPEED,
-										new EntityAttributeModifier(
-												Identifier.of(
-														"Arbalets",
-														"disable_strafe"
-												),
-												-1,
-												EntityAttributeModifier.Operation.ADD_VALUE
-										)
-								);
-							}}
-					)
-			);
-		});
-	}
-	*/
-
 }

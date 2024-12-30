@@ -7,9 +7,9 @@
     "ExampleMixin",
     "ExplosionImplMixin",
     "LivingEntityMixin",
-    "ModDataComponentTypesMx",
     "PlayerEntityMixin",
-    "ServerPlayerEntityMixin"
+    "ServerPlayerEntityMixin",
+    "StatusEffectInstanceMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -39,20 +39,9 @@ import static java.lang.Math.PI;
 public abstract class PlayerEntityMixin extends LivingEntityMixin {
     @Shadow
     public abstract boolean isSwimming();
-    @Shadow
-    public abstract void setIgnoreFallDamageFromCurrentExplosion(boolean ignoreFallDamageFromCurrentExplosion);
-
-    @Shadow public abstract void playSound(SoundEvent sound, float volume, float pitch);
 
     @Unique
     float maxAirVelocity = 40;
-    @Unique
-    float airAcceleration = 2;
-
-    @Unique
-    public float quakeStrafeGracePeriod = 0;
-    @Unique
-    public float QUAKE_STRAFE_GRACE_PERIOD = 5;
 
 
 
@@ -66,93 +55,34 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
         if (this.travel(movementInput)) {
             ci.cancel();
         }
-        else{
-            if (quakeStrafeGracePeriod > 0){
-                quakeStrafeGracePeriod--;
-            }
-            else{
-                PlayerEntity player = (PlayerEntity) (Object) this; // TODO : REMOVE THIS AND OTHERS SIMILAR
-                if(quakeStrafeGracePeriod > -10){
-
-
-                    player.getStatusEffects().removeIf(inst -> inst.equals(ModEffects.Strafe) && inst.isAmbient());
-
-                    quakeStrafeGracePeriod = -10;
-                }
-
-                /*
-                if(player.getWorld().isClient && player.getAttributes().hasAttribute(ModEntityAttributes.STRAFE_JUMP)){
-                    if (player.getAttributes().getValue(ModEntityAttributes.STRAFE_JUMP) > 0.0F && quakeStrafeGracePeriod > -9){
-                        player.getAttributes().removeModifiers(
-                                Multimaps.forMap(
-                                        new HashMap<>() {{
-                                            put(
-                                                    ModEntityAttributes.STRAFE_JUMP,
-                                                    new EntityAttributeModifier(
-                                                            Identifier.of(
-                                                                    "arbalets",
-                                                                    "enable_strafe"
-                                                            ),
-                                                            1.0F,
-                                                            EntityAttributeModifier.Operation.ADD_VALUE
-                                                    )
-                                            );
-                                        }}
-                                )
-                        );
-                        quakeStrafeGracePeriod = -10;
-                        Arbalests.LOGGER.info("STRAFE_JUMP negation = {}",player.getAttributes().getValue(ModEntityAttributes.STRAFE_JUMP));
-                    }
-                }
-
-                 */
-            }
-        }
     }
 
     @Unique
     public boolean travel(Vec3d movementInput){
 
         PlayerEntity player = (PlayerEntity)(Object)this;
-        /*
-        if(!player.getAttributes().hasAttribute(ModEntityAttributes.STRAFE_JUMP)){
-            return false;
-        }
-        if (player.getAttributes().getValue(ModEntityAttributes.STRAFE_JUMP) < 1.0F){
-            return false;
-        }
-         */
 
-
-
-
-
-        if (player.isGliding()||
-            player.getAbilities().flying ||
-            player.hasVehicle() ||
-            player.isInSwimmingPose() ||
-            player.isClimbing() ||
-            player.isTouchingWater()  ||// No custom movement when touching water
-            player.isOnGround()
+        if (!player.getWorld().isClient ||
+                player.isGliding() ||
+                player.getAbilities().flying ||
+                player.hasVehicle() ||
+                player.isInSwimmingPose() ||
+                player.isClimbing() ||
+                player.isTouchingWater()  ||
+                player.isOnGround() ||
+                player.isFrozen()
         ) {
             return false;
         }
-        boolean gotIt = false;
-        for (StatusEffectInstance inst : player.getStatusEffects()){
-            if(inst.equals(ModEffects.Strafe)){
-                gotIt = true;
+
+        Collection<StatusEffectInstance> temp = player.getStatusEffects();
+        boolean ret = true;
+        for ( StatusEffectInstance inst : temp ){
+            if(inst.equals(ModEffects.STRAFE)){
+                ret = false;
             }
         }
-
-        quakeStrafeGracePeriod = QUAKE_STRAFE_GRACE_PERIOD;
-        if(!gotIt || !player.getWorld().isClient){
-            return false;
-        }
-
-        double preX = player.getX();
-        double preY = player.getY();
-        double preZ = player.getZ();
-
+        if (ret) return false;
 
         return travelQuake(player,movementInput);
     }
@@ -167,7 +97,6 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
         // - - -
 
         // Vanilla velocity
-        //player.updateVelocity(this.callGetMovementSpeed(f), movementInput);
         float moveSpeed = this.callGetMovementSpeed(f);
         maxAirVelocity = (moveSpeed / (1.0F - g)) + moveSpeed;
         //
@@ -180,11 +109,9 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
         double wishSpeed = new Vec2f(maxAirVelocity,maxAirVelocity).length();
 
         //
-        Vec2f vel = Vec2f.ZERO;
-        vel = airAccelerate(wishVelocity,wishSpeed,tempVel,wishSpeed,new Vec2f(1.0f - g, 1.0f - g).length());
+        Vec2f vel = airAccelerate(wishVelocity,wishSpeed,tempVel,wishSpeed,new Vec2f(1.0f - g, 1.0f - g).length());
         player.setVelocity(tempVel.x + vel.x, player.getVelocity().y, tempVel.y + vel.y);
         // - - -
-
 
         player.move(MovementType.SELF, player.getVelocity());
 

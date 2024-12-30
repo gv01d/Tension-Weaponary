@@ -1,6 +1,6 @@
 {
   "parent" : "item/generated",
   "textures" : {
-    "layer0" : "arbalests:item/suspicious_substance"
+    "layer0" : "arbalests:item/trial_essence"
   }
 }

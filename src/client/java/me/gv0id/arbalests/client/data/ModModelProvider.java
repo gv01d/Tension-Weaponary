@@ -59,18 +59,21 @@ public class ModModelProvider extends FabricModelProvider {
         ItemModel.Unbaked unbaked22 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_firework", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
         ItemModel.Unbaked unbaked23 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_wind_charge", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
         ItemModel.Unbaked unbaked24 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_spectral_arrow", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
+        ItemModel.Unbaked unbaked25 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_snow_ball", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
 
         ItemModel.Unbaked unbaked30 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_second_no_charge", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
         ItemModel.Unbaked unbaked31 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_second_arrow", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
         ItemModel.Unbaked unbaked32 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_second_firework", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
         ItemModel.Unbaked unbaked33 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_second_wind_charge", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
         ItemModel.Unbaked unbaked34 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_second_spectral_arrow", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
+        ItemModel.Unbaked unbaked35 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_second_snow_ball", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
 
         ItemModel.Unbaked unbaked40 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_third_no_charge", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
         ItemModel.Unbaked unbaked41 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_third_arrow", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
         ItemModel.Unbaked unbaked42 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_third_firework", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
         ItemModel.Unbaked unbaked43 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_third_wind_charge", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
         ItemModel.Unbaked unbaked44 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_third_spectral_arrow", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
+        ItemModel.Unbaked unbaked45 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_third_snow_ball", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE));
 
 
         itemModelGenerator.output.accept(item,
@@ -81,7 +84,8 @@ public class ModModelProvider extends FabricModelProvider {
                                 ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.ARROW, unbaked21),
                                 ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.ROCKET, unbaked22),
                                 ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.WIND_CHARGE, unbaked23),
-                                ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.SPECTRAL_ARROW, unbaked24)
+                                ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.SPECTRAL_ARROW, unbaked24),
+                                ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.SNOWBALL, unbaked25)
                                 ),
                         ItemModels.condition(
                                 new DeadbeatCrossbowChargingProperty(),
@@ -99,7 +103,8 @@ public class ModModelProvider extends FabricModelProvider {
                                 ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.ARROW, unbaked31),
                                 ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.ROCKET, unbaked32),
                                 ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.WIND_CHARGE, unbaked33),
-                                ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.SPECTRAL_ARROW, unbaked34)
+                                ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.SPECTRAL_ARROW, unbaked34),
+                                ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.SNOWBALL, unbaked35)
                         ),
                         ItemModels.select(
                                 new DeadbeatCrossbowThirdChargeTypeProperty(),
@@ -107,46 +112,14 @@ public class ModModelProvider extends FabricModelProvider {
                                 ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.ARROW, unbaked41),
                                 ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.ROCKET, unbaked42),
                                 ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.WIND_CHARGE, unbaked43),
-                                ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.SPECTRAL_ARROW, unbaked44)
+                                ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.SPECTRAL_ARROW, unbaked44),
+                                ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.SNOWBALL, unbaked45)
                         )
 
                 )
         );
 
 
-    }
-
-
-
-    public final void registerDeadbeatCrossbow(Item item, ItemModelGenerator itemModelGenerator) {
-        ItemModel.Unbaked unbaked = ItemModels.basic(ModelIds.getItemModelId(item));
-        //ItemModel.Unbaked unbaked = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_standby", ModModels.DEADBEAT_CROSSBOW));
-        ItemModel.Unbaked unbaked2 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_pulling_0", ModModels.DEADBEAT_CROSSBOW));
-        ItemModel.Unbaked unbaked3 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_pulling_1", ModModels.DEADBEAT_CROSSBOW));
-        ItemModel.Unbaked unbaked4 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_pulling_2", ModModels.DEADBEAT_CROSSBOW));
-        ItemModel.Unbaked unbaked5 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_arrow", ModModels.DEADBEAT_CROSSBOW));
-        ItemModel.Unbaked unbaked6 = ItemModels.basic(itemModelGenerator.registerSubModel(item, "_firework", ModModels.DEADBEAT_CROSSBOW));
-        itemModelGenerator.output.accept(item,
-                ItemModels.condition(
-                        new DeadbeatCrossbowChargingProperty(),
-                        ItemModels.rangeDispatch(
-                                new DeadbeatCrossbowPullProperty(),
-                                unbaked2,
-                                new RangeDispatchItemModel.Entry[]{
-                                        ItemModels.rangeDispatchEntry(unbaked3, 0.58F),
-                                        ItemModels.rangeDispatchEntry(unbaked4, 0.9F)
-                                }
-                        ),
-                        ItemModels.select(
-                                new ChargeTypeProperty(),
-                                unbaked,
-                                new SelectItemModel.SwitchCase[]{
-                                        ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.ARROW, unbaked5),
-                                        ItemModels.switchCase(DeadbeatCrossbowItem.ChargeType.ROCKET, unbaked6)
-                                }
-                        )
-                )
-        );
     }
 
 }

@@ -1,6 +1,7 @@
 package me.gv0id.arbalests.client.property.bool;
 
 import com.mojang.serialization.MapCodec;
+import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.item.custom.DeadbeatCrossbowItem;
 import net.minecraft.client.render.item.property.bool.BooleanProperty;
 import net.minecraft.client.world.ClientWorld;
@@ -15,11 +16,8 @@ public class DeadbeatCrossbowChargingProperty implements BooleanProperty {
 
     @Override
     public boolean getValue(ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity user, int seed, ModelTransformationMode modelTransformationMode) {
-        if (user == null) {
-            return false;
-        } else {
-            return DeadbeatCrossbowItem.isCharging(stack) || DeadbeatCrossbowItem.isCharged(stack);
-        }
+        return DeadbeatCrossbowItem.isCharging(stack) || DeadbeatCrossbowItem.isCharged(stack);
+
     }
 
     public MapCodec<DeadbeatCrossbowChargingProperty> getCodec() {

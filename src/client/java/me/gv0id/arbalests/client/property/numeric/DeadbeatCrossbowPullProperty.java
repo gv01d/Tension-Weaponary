@@ -22,7 +22,7 @@ public class DeadbeatCrossbowPullProperty implements NumericProperty{
     }
 
     public float getValue(ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity holder, int seed) {
-        if (holder == null) {
+        if (holder == null || (!DeadbeatCrossbowItem.isLoaded(stack) && !DeadbeatCrossbowItem.isCharging(stack) && !DeadbeatCrossbowItem.isCharged(stack) )) {
             return 0.0F;
         } else {
             int i = DeadbeatCrossbowItem.getPullTime(stack, holder);

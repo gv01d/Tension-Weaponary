@@ -1,6 +1,6 @@
 {
   "model" : {
     "type": "minecraft:model",
-    "model" : "arbalests:item/suspicious_substance"
+    "model" : "arbalests:item/trial_essence"
   }
 }

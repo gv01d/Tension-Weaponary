@@ -28,14 +28,8 @@ public class DeadbeatCrossbowChargeTypeProperty implements SelectProperty<Deadbe
         if (chargedProjectilesComponent == null || chargedProjectilesComponent.isEmpty()) {
             return DeadbeatCrossbowItem.ChargeType.NONE;
         } else {
-            Item temp = chargedProjectilesComponent.getProjectiles().getFirst().getItem();
-            if (temp.equals(Items.SPECTRAL_ARROW))
-                return DeadbeatCrossbowItem.ChargeType.SPECTRAL_ARROW;
-            if (temp.equals(Items.FIREWORK_ROCKET))
-                return DeadbeatCrossbowItem.ChargeType.ROCKET;
-            if (temp.equals(Items.WIND_CHARGE))
-                return DeadbeatCrossbowItem.ChargeType.WIND_CHARGE;
-            return DeadbeatCrossbowItem.ChargeType.ARROW;
+            ItemStack temp = chargedProjectilesComponent.getProjectiles().getFirst();
+            return DeadbeatCrossbowItem.getChargeType(temp);
         }
     }
 

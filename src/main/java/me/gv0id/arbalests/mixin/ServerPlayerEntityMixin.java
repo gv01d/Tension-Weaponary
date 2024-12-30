@@ -36,38 +36,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
         if (entity != null && entity.getType().isIn(ModEntityTypeTags.STRAFE_JUMP)){
             boolean gotIt = false;
             for (StatusEffectInstance inst : this.getStatusEffects()){
-                if(inst.equals(ModEffects.Strafe)){
+                if(inst.equals(ModEffects.STRAFE)){
                     gotIt = true;
                 }
             }
             if (!gotIt) {
-                this.addStatusEffect(new StatusEffectInstance(ModEffects.Strafe,1200,0,true,true,true));
+                this.addStatusEffect(new StatusEffectInstance(ModEffects.STRAFE,5,0,true,true,true));
             }
         }
-        /*
-        if (entity != null && entity.getType().isIn(ModEntityTypeTags.STRAFE_JUMP) && this.getAttributes().hasAttribute(ModEntityAttributes.STRAFE_JUMP)){
-            this.getAttributes().resetToBaseValue(ModEntityAttributes.STRAFE_JUMP);
-            if (this.getAttributes().getValue(ModEntityAttributes.STRAFE_JUMP) < 1.0F){
-                this.getAttributes().addTemporaryModifiers(
-                        Multimaps.forMap(
-                                new HashMap<>() {{
-                                    put(
-                                            ModEntityAttributes.STRAFE_JUMP,
-                                            new EntityAttributeModifier(
-                                                    Identifier.of(
-                                                            "arbalets",
-                                                            "enable_strafe"
-                                                    ),
-                                                    1.0F,
-                                                    EntityAttributeModifier.Operation.ADD_VALUE
-                                            )
-                                    );
-                                }}
-                        )
-                );
-            }
-            Arbalests.LOGGER.info("STRAFE_JUMP = {}",this.getAttributes().getValue(ModEntityAttributes.STRAFE_JUMP));
-        }
-         */
     }
 }

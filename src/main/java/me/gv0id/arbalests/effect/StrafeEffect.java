@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.effect;
 
+import me.gv0id.arbalests.particle.ModParticles;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
@@ -7,7 +8,7 @@ import net.minecraft.server.world.ServerWorld;
 
 public class StrafeEffect extends StatusEffect {
     protected StrafeEffect(StatusEffectCategory category, int color) {
-        super(category, color);
+        super(category, color, ModParticles.STRAFE);
     }
 
     @Override

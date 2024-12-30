@@ -12,7 +12,7 @@ public class ModBoolProperties {
     }
 
 
-    public static void inicialization(){
+    public static void initialization(){
         BooleanProperties.ID_MAPPER.put(Identifier.of("arbalests","deadbeat_crossbow/charging"), DeadbeatCrossbowChargingProperty.CODEC);
     }
 

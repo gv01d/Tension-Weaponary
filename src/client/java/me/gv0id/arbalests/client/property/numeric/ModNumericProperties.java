@@ -11,7 +11,7 @@ public class ModNumericProperties {
     public ModNumericProperties() {
     }
 
-    public static void inicialization(){
+    public static void initialization(){
         NumericProperties.ID_MAPPER.put(Identifier.of("arbalests","deadbeat_crossbow/pull"), DeadbeatCrossbowPullProperty.CODEC);
     }
 }

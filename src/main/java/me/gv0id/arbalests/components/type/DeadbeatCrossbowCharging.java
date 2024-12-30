@@ -45,10 +45,14 @@ public record DeadbeatCrossbowCharging(int charging, Optional<Identifier> cooldo
     }
 
     public boolean isCharged() {
-        return charging >= 3;
+        return charging == 3 || charging == 4;
     }
 
     public boolean isFullyCharged(){
         return charging == 4;
+    }
+
+    public int getValue(){
+        return this.charging;
     }
 }
