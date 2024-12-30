@@ -16,25 +16,25 @@ import net.minecraft.item.ModelTransformationMode;
 import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
-public class DeadbeatCrossbowChargeTypeProperty implements SelectProperty<DeadbeatCrossbowItem.ChargeType> {
-    public static final Type<DeadbeatCrossbowChargeTypeProperty, DeadbeatCrossbowItem.ChargeType> TYPE = Type.create(
-            MapCodec.unit(new DeadbeatCrossbowChargeTypeProperty()), DeadbeatCrossbowItem.ChargeType.CODEC
+public class DeadbeatCrossbowChargeTypeProperty implements SelectProperty<DeadbeatCrossbowItem.Projectiles> {
+    public static final Type<DeadbeatCrossbowChargeTypeProperty, DeadbeatCrossbowItem.Projectiles> TYPE = Type.create(
+            MapCodec.unit(new DeadbeatCrossbowChargeTypeProperty()), DeadbeatCrossbowItem.Projectiles.CODEC
     );
 
-    public DeadbeatCrossbowItem.ChargeType getValue(
+    public DeadbeatCrossbowItem.Projectiles getValue(
             ItemStack itemStack, @Nullable ClientWorld clientWorld, @Nullable LivingEntity livingEntity, int i, ModelTransformationMode modelTransformationMode
     ) {
         ChargedProjectilesComponent chargedProjectilesComponent = (ChargedProjectilesComponent)itemStack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (chargedProjectilesComponent == null || chargedProjectilesComponent.isEmpty()) {
-            return DeadbeatCrossbowItem.ChargeType.NONE;
+            return DeadbeatCrossbowItem.Projectiles.NONE;
         } else {
             ItemStack temp = chargedProjectilesComponent.getProjectiles().getFirst();
-            return DeadbeatCrossbowItem.getChargeType(temp);
+            return DeadbeatCrossbowItem.getProjectileData(temp);
         }
     }
 
     @Override
-    public Type<DeadbeatCrossbowChargeTypeProperty, DeadbeatCrossbowItem.ChargeType> getType() {
+    public Type<DeadbeatCrossbowChargeTypeProperty, DeadbeatCrossbowItem.Projectiles> getType() {
         return TYPE;
     }
 }

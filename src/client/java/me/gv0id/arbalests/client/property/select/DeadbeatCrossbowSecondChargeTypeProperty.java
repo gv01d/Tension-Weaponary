@@ -16,28 +16,28 @@ import net.minecraft.item.ModelTransformationMode;
 import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
-public class DeadbeatCrossbowSecondChargeTypeProperty implements SelectProperty<DeadbeatCrossbowItem.ChargeType> {
-    public static final Type<DeadbeatCrossbowSecondChargeTypeProperty, DeadbeatCrossbowItem.ChargeType> TYPE = Type.create(
-            MapCodec.unit(new DeadbeatCrossbowSecondChargeTypeProperty()), DeadbeatCrossbowItem.ChargeType.CODEC
+public class DeadbeatCrossbowSecondChargeTypeProperty implements SelectProperty<DeadbeatCrossbowItem.Projectiles> {
+    public static final Type<DeadbeatCrossbowSecondChargeTypeProperty, DeadbeatCrossbowItem.Projectiles> TYPE = Type.create(
+            MapCodec.unit(new DeadbeatCrossbowSecondChargeTypeProperty()), DeadbeatCrossbowItem.Projectiles.CODEC
     );
 
-    public DeadbeatCrossbowItem.ChargeType getValue(
+    public DeadbeatCrossbowItem.Projectiles getValue(
             ItemStack itemStack, @Nullable ClientWorld clientWorld, @Nullable LivingEntity livingEntity, int i, ModelTransformationMode modelTransformationMode
     ) {
         ChargedProjectilesComponent chargedProjectilesComponent = (ChargedProjectilesComponent)itemStack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (chargedProjectilesComponent == null || chargedProjectilesComponent.isEmpty()) {
-            return DeadbeatCrossbowItem.ChargeType.NONE;
+            return DeadbeatCrossbowItem.Projectiles.NONE;
         } else {
             if (chargedProjectilesComponent.getProjectiles().size() >= 2) {
                 ItemStack temp = chargedProjectilesComponent.getProjectiles().get(1);
-                return DeadbeatCrossbowItem.getChargeType(temp);
+                return DeadbeatCrossbowItem.getProjectileData(temp);
             }
-            return DeadbeatCrossbowItem.ChargeType.NONE;
+            return DeadbeatCrossbowItem.Projectiles.NONE;
         }
     }
 
     @Override
-    public Type<DeadbeatCrossbowSecondChargeTypeProperty, DeadbeatCrossbowItem.ChargeType> getType() {
+    public Type<DeadbeatCrossbowSecondChargeTypeProperty, DeadbeatCrossbowItem.Projectiles> getType() {
         return TYPE;
     }
 }

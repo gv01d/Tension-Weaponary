@@ -22,12 +22,16 @@ public class DeadbeatCrossbowPullProperty implements NumericProperty{
     }
 
     public float getValue(ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity holder, int seed) {
-        if (holder == null || (!DeadbeatCrossbowItem.isLoaded(stack) && !DeadbeatCrossbowItem.isCharging(stack) && !DeadbeatCrossbowItem.isCharged(stack) )) {
+        if (holder == null) {
+            if (DeadbeatCrossbowItem.isCharged(stack))
+                return 1.0F;
             return 0.0F;
-        } else {
-            int i = DeadbeatCrossbowItem.getPullTime(stack, holder);
-            return (float) UseDurationProperty.getTicksUsedSoFar(stack, holder) / (float)i;
         }
+        if (!DeadbeatCrossbowItem.isLoaded(stack) && !DeadbeatCrossbowItem.isCharging(stack) && !DeadbeatCrossbowItem.isCharged(stack) )
+            return 0.0F;
+        int i = DeadbeatCrossbowItem.getPullTime(stack, holder);
+        return (float) UseDurationProperty.getTicksUsedSoFar(stack, holder) / (float)i;
+
     }
 
     public MapCodec<DeadbeatCrossbowPullProperty> getCodec() {

@@ -1,12 +1,10 @@
 package me.gv0id.arbalests.entity.projectile;
 
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.FlyingItemEntity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
+import net.minecraft.entity.projectile.thrown.SnowballEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.registry.Registries;
@@ -31,6 +29,7 @@ public abstract class AbstractWindGaleEntity extends ExplosiveProjectileEntity i
             true, false, Optional.empty(), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
     );
     public static final double field_52224 = 0.25;
+    protected Entity lastDeflectedEntity;
 
     public AbstractWindGaleEntity(EntityType<? extends AbstractWindGaleEntity> entityType, World world) {
         super(entityType, world);
@@ -71,12 +70,17 @@ public abstract class AbstractWindGaleEntity extends ExplosiveProjectileEntity i
         if (entity instanceof AbstractWindGaleEntity) {
             return false;
         } else {
-            return entity.getType() == EntityType.END_CRYSTAL ? false : super.canHit(entity);
+            return entity.getType() == EntityType.END_CRYSTAL || entity.getType() == EntityType.SNOWBALL ? false : super.canHit(entity);
         }
     }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
+        if (entityHitResult.getEntity() instanceof SnowballEntity || entityHitResult.getEntity() instanceof SnowProjectileEntity){
+            this.iceExplosion(this.getPos(),entityHitResult.getEntity());
+            this.discard();
+            super.onEntityHit(entityHitResult);
+        }
         super.onEntityHit(entityHitResult);
         if (this.getWorld() instanceof ServerWorld serverWorld) {
             LivingEntity livingEntity2 = this.getOwner() instanceof LivingEntity livingEntity ? livingEntity : null;
@@ -154,5 +158,8 @@ public abstract class AbstractWindGaleEntity extends ExplosiveProjectileEntity i
         } else {
             super.tick();
         }
+    }
+
+    public void iceExplosion(Vec3d pos, Entity entity){
     }
 }

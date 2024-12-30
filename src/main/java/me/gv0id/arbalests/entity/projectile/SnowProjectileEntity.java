@@ -1,11 +1,12 @@
 package me.gv0id.arbalests.entity.projectile;
 
+import me.gv0id.arbalests.Arbalests;
+import me.gv0id.arbalests.particle.ModParticles;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityStatuses;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.mob.BlazeEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.WindChargeEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,11 +14,30 @@ import net.minecraft.item.Items;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.EntityTypeTags;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
+import net.minecraft.world.explosion.AdvancedExplosionBehavior;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 public class SnowProjectileEntity extends ThrownItemEntity {
+    private static final float ICE_KNOCKBACK_POWER = 3.0F;
+    private final float ICE_EXPLOSION_POWER = 2.0F;
+    private static AdvancedExplosionBehavior EXPLOSION_BEHAVIOR = new AdvancedExplosionBehavior(
+                false, true, Optional.of(ICE_KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
+            );
+    private Entity lastDeflectedEntity;
+
     public SnowProjectileEntity(EntityType<? extends SnowProjectileEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -29,6 +49,57 @@ public class SnowProjectileEntity extends ThrownItemEntity {
     public SnowProjectileEntity(World world, double x, double y, double z, ItemStack stack) {
         super(EntityType.SNOWBALL, x, y, z, world, stack);
     }
+
+    @Override
+    protected ProjectileDeflection hitOrDeflect(HitResult hitResult) {
+        if (hitResult.getType() == HitResult.Type.ENTITY) {
+            EntityHitResult entityHitResult = (EntityHitResult)hitResult;
+            Entity entity = entityHitResult.getEntity();
+
+            if (entity instanceof WindGaleEntity|| entity instanceof WindChargeEntity){
+                iceExplosion(entity.getPos(),this);
+                entity.discard();
+            }
+
+            ProjectileDeflection projectileDeflection = entity.getProjectileDeflection(this);
+            if (projectileDeflection != ProjectileDeflection.NONE) {
+                if (entity != this.lastDeflectedEntity && this.deflect(projectileDeflection, entity, this.getOwner(), false)) {
+                    this.lastDeflectedEntity = entity;
+                }
+
+                return projectileDeflection;
+            }
+        } else if (this.deflectsAgainstWorldBorder() && hitResult instanceof BlockHitResult blockHitResult && blockHitResult.isAgainstWorldBorder()) {
+            ProjectileDeflection projectileDeflection2 = ProjectileDeflection.SIMPLE;
+            if (this.deflect(projectileDeflection2, null, this.getOwner(), false)) {
+                this.setVelocity(this.getVelocity().multiply(0.2));
+                return projectileDeflection2;
+            }
+        }
+
+        this.onCollision(hitResult);
+        return ProjectileDeflection.NONE;
+    }
+
+    public void iceExplosion(Vec3d pos, Entity entity){
+        this.getWorld()
+                .createExplosion(
+                        entity,
+                        null,
+                        EXPLOSION_BEHAVIOR,
+                        pos.getX(),
+                        pos.getY(),
+                        pos.getZ(),
+                        ICE_EXPLOSION_POWER,
+                        false,
+                        World.ExplosionSourceType.TRIGGER,
+                        ModParticles.SNOW_GUST,
+                        ModParticles.SNOW_GUST,
+                        SoundEvents.ENTITY_WIND_CHARGE_WIND_BURST
+                );
+        entity.discard();
+    }
+
 
     @Override
     protected Item getDefaultItem() {
@@ -55,8 +126,10 @@ public class SnowProjectileEntity extends ThrownItemEntity {
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
         Entity entity = entityHitResult.getEntity();
+
         int f = entity.isFrozen() ? (int) Math.min(400, entity.getFrozenTicks() * 2) : 200;
         int i = (entity.isFrozen() ? 2 : 1 ) * (entity instanceof BlazeEntity ? 5 : 2);
+        entity.extinguish();
         entity.addVelocity(this.getVelocity().multiply(0.2));
         entity.setFrozenTicks(f);
         entity.serverDamage(this.getDamageSources().thrown(this, this.getOwner()), (float)i);

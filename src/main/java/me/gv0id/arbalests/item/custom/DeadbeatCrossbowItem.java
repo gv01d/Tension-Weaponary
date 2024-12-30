@@ -7,8 +7,10 @@ import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
 import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
+import me.gv0id.arbalests.entity.projectile.EggProjectileEntity;
 import me.gv0id.arbalests.entity.projectile.SnowProjectileEntity;
 import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
+import me.gv0id.arbalests.registry.tag.ModItemTypeTags;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
@@ -20,12 +22,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
+import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.SnowballEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.*;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -54,9 +58,7 @@ import java.util.function.Predicate;
 public class DeadbeatCrossbowItem extends RangedWeaponItem {
     public static final int ROUND = 1;
     public static final int AMMO = 3;
-    public static final Predicate<ItemStack> DEADBEAT_CROSSBOW_HELD_PROJECTILES = CROSSBOW_HELD_PROJECTILES
-            .or(stack -> stack.isOf(Items.WIND_CHARGE))
-            .or(stack -> stack.isOf(Items.SNOWBALL));
+
 
 
     protected static List<ItemStack> repeaterLoad(ItemStack stack, ItemStack projectileStack, LivingEntity shooter) {
@@ -148,7 +150,8 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
 
         ChargedProjectilesComponent chargedProjectilesComponent = itemStack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (chargedProjectilesComponent != null && !chargedProjectilesComponent.isEmpty() && isCharged(itemStack)) {
-            this.shootAll(world, user, hand, itemStack, getSpeed(chargedProjectilesComponent), 1.0F, null);
+            // TODO : NEED SUPPORT FOR MULTISHOOT ON GETPROJECTILESDATA
+            this.shootAll(world, user, hand, itemStack, getProjectileData(chargedProjectilesComponent.getProjectiles().getFirst()).speed, 1.0F, null);
 
             // ------------------------------------------ //
             // Cooldown Manager
@@ -168,7 +171,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                     itemStack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.DEFAULT);
                 }
                 else{
-                    float cooldown = getCooldown(temp);
+                    float cooldown = getProjectileData(temp).cooldown;
                     if (cooldown > 0){
                         itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(cooldown));
                         UseCooldownComponent useCooldownComponent = itemStack.get(DataComponentTypes.USE_COOLDOWN);
@@ -189,7 +192,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             }
             // ------------------------------------------ //
             return ActionResult.SUCCESS;
-        } else if (!user.getProjectileType(itemStack).isEmpty()) {
+        } else if (!user.getProjectileType(itemStack).isEmpty() || !itemStack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles().isEmpty()) {
             this.charged = false;
             this.loaded = false;
             // ------------------------------------------ //
@@ -218,7 +221,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             ArrayList<ItemStack> list = new ArrayList<>(List.copyOf((Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles())));
 
             for (ItemStack st : list){
-                cooldown += getCooldown(st);
+                cooldown += getProjectileData(st).cooldown;
             }
             if (cooldown > 8.0F)
                 cooldown = 8.0F;
@@ -334,14 +337,14 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     protected ProjectileEntity createArrowEntity(World world, LivingEntity shooter, ItemStack weaponStack, ItemStack projectileStack, boolean critical) {
         if (projectileStack.isOf(Items.FIREWORK_ROCKET)) {
             return new FireworkRocketEntity(world, projectileStack, shooter, shooter.getX(), shooter.getEyeY() - 0.15F, shooter.getZ(), true);
-        }
-        else if(projectileStack.isOf(Items.WIND_CHARGE))
-        {
-            Entity ent = shooter;
-            return new WindGaleEntity(ent,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),1.8F,3F);
+        } else if(projectileStack.isOf(Items.WIND_CHARGE)) {
+            return new WindGaleEntity(shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),1.8F,3F);
         } else if (projectileStack.isOf(Items.SNOWBALL)) {
-            return new SnowProjectileEntity(world,shooter,projectileStack);
-
+            return new SnowProjectileEntity(world, shooter, projectileStack);
+        }else if(projectileStack.isOf(Items.EGG)){
+            return new EggProjectileEntity(world,shooter,projectileStack);
+        }else if(projectileStack.isOf(Items.ENDER_PEARL)){
+            return new EnderPearlEntity(world,shooter,projectileStack);
         } else {
             ProjectileEntity projectileEntity = super.createArrowEntity(world, shooter, weaponStack, projectileStack, critical);
             if (projectileEntity instanceof PersistentProjectileEntity persistentProjectileEntity) {
@@ -473,6 +476,9 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             float s = (float) Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles().size();
 
             if ( s < AMMO && f >= (( s + 1F)/AMMO)){
+                if (user.getProjectileType(stack).isEmpty()){
+                    return;
+                }
                 stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.CHARGING);
                 loadProjectiles(user,stack);
                 loadingSounds.end()
@@ -565,93 +571,90 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     public int getRange() {
         return 8;
     }
-    private static float getSpeed(ChargedProjectilesComponent chargedProjectilesComponent) {
-        ItemStack stack = chargedProjectilesComponent.getProjectiles().getFirst(); // TODO : NEED SUPPORT FOR MULTISHOOT
-        if (stack.isOf(Items.FIREWORK_ROCKET))
-            return ProjectileSpeed.ROCKET.getSpeed();
-        if (stack.isOf(Items.SPECTRAL_ARROW))
-            return ProjectileSpeed.SPECTRAL_ARROW.getSpeed();
-        if (stack.isOf(Items.WIND_CHARGE))
-            return ProjectileSpeed.WIND_CHARGE.getSpeed();
-        if (stack.isOf(Items.SNOWBALL))
-            return ProjectileSpeed.SNOWBALL.getSpeed();
-        if (stack.isOf(Items.ARROW))
-            return ProjectileSpeed.ARROW.getSpeed();
-        return ProjectileSpeed.NONE.getSpeed();
-    }
-
-    public enum ProjectileSpeed{
-        NONE(3.15F),
-        ARROW(3.0F),
-        WIND_CHARGE(3.5F),
-        SPECTRAL_ARROW(3.5F),
-        ROCKET(1.6F),
-        SNOWBALL(4.0F);
-
-        private final float speed;
-        public float getSpeed(){ return this.speed; }
-        ProjectileSpeed(float speed){ this.speed = speed; }
-    }
 
 
-    float getCooldown(ItemStack stack){
-        if (stack.isOf(Items.FIREWORK_ROCKET))
-            return CooldownType.ROCKET.getValue();
-        if (stack.isOf(Items.SPECTRAL_ARROW))
-            return CooldownType.SPECTRAL_ARROW.getValue();
-        if (stack.isOf(Items.WIND_CHARGE))
-            return CooldownType.WIND_CHARGE.getValue();
-        if (stack.isOf(Items.SNOWBALL))
-            return CooldownType.SNOWBALL.getValue();
-        if (stack.isOf(Items.ARROW))
-            return CooldownType.ARROW.getValue();
-        return CooldownType.NONE.getValue();
-    }
+    public static Projectiles getProjectileData(ItemStack stack){
+        if (stack.isIn(ModItemTypeTags.DEADBEAT_PROJECTILE)){
+            // Normal Projectiles
+            if (stack.isOf(Items.ARROW))
+                return Projectiles.ARROW;
+            if (stack.isOf(Items.TIPPED_ARROW))
+                return Projectiles.TIPPED_ARROW;
+            if (stack.isOf(Items.SPECTRAL_ARROW))
+                return Projectiles.SPECTRAL_ARROW;
+            if (stack.isOf(Items.FIREWORK_ROCKET))
+                return Projectiles.ROCKET;
+            if (stack.isOf(Items.WIND_CHARGE))
+                return Projectiles.WIND_CHARGE;
+            if (stack.isOf(Items.SNOWBALL))
+                return Projectiles.SNOWBALL;
+            if (stack.isOf(Items.EGG))
+                return Projectiles.EGG;
+            if (stack.isOf(Items.ENDER_PEARL))
+                return Projectiles.ENDER_PEARL;
+            // Discs
+            if (stack.isIn(ModItemTypeTags.DISCS))
+                return Projectiles.DISC;
 
-    public enum CooldownType{
-        NONE(0.5F),
-        ARROW(1F),
-        WIND_CHARGE(0.5F),
-        SPECTRAL_ARROW(0.8F),
-        ROCKET(0.5F),
-        SNOWBALL(0.0F);
-
-        private final float value;
-        public float getValue(){
-            return this.value;
         }
-
-
-        CooldownType(float v) {
-            value = v;
-        }
+        return Projectiles.NONE;
     }
 
-    public static ChargeType getChargeType(ItemStack stack){
-        if (stack.isOf(Items.SPECTRAL_ARROW))
-            return ChargeType.SPECTRAL_ARROW;
-        if (stack.isOf(Items.FIREWORK_ROCKET))
-            return ChargeType.ROCKET;
-        if (stack.isOf(Items.WIND_CHARGE))
-            return ChargeType.WIND_CHARGE;
-        if (stack.isOf(Items.SNOWBALL))
-            return ChargeType.SNOWBALL;
-        return ChargeType.ARROW;
-    }
+    public enum Projectiles implements StringIdentifiable {
+        NONE(null,"none",1.0F,3.0F),
+        ARROW(Items.ARROW, "arrow", 0.9F, 3.0F),
+        TIPPED_ARROW(Items.TIPPED_ARROW,"tipped_arrow", 1.0F, 2.5F),
+        SPECTRAL_ARROW(Items.SPECTRAL_ARROW,"spectral_arrow",1.0F, 3.2F),
+        ROCKET(Items.FIREWORK_ROCKET,"rocket",0.8F,1.6F),
+        WIND_CHARGE(Items.WIND_CHARGE,"wind_charge", 0.5F, 3.5F),
+        SNOWBALL(Items.SNOWBALL,"snowball", 0.0F, 5.0F),
+        EGG(Items.EGG,"egg",0.0F, 6.0F),
+        ENDER_PEARL(Items.ENDER_PEARL,"ender_pearl", 2.0F, 5.0F),
+        DISC(ModItemTypeTags.DISCS, 0.5F, 4.0F);
 
-    public enum ChargeType implements StringIdentifiable {
-        NONE("none"),
-        ARROW("arrow"),
-        WIND_CHARGE("wind_charge"),
-        SPECTRAL_ARROW("spectral_arrow"),
-        ROCKET("rocket"),
-        SNOWBALL("snowball");
+        public static final EnumCodec<Projectiles> CODEC = StringIdentifiable.createCodec(Projectiles::values);
+        Item item;
+        TagKey<Item> tagKey;
+        String name;
+        float cooldown;
+        float speed;
 
-        public static final EnumCodec<ChargeType> CODEC = StringIdentifiable.createCodec(ChargeType::values);
-        private final String name;
-
-        private ChargeType(final String name) {
+        Projectiles(final String name){
             this.name = name;
+        }
+
+        Projectiles(Item item, String name, float cooldown, float speed){
+            this.item = item;
+            this.name = name;
+            this.cooldown = cooldown;
+            this.speed = speed;
+        }
+        Projectiles(TagKey<Item> itemTagKey, float cooldown, float speed){
+            this.item = null;
+            this.name = null;
+            this.tagKey = itemTagKey;
+            this.cooldown = cooldown;
+            this.speed = speed;
+        }
+
+        public float getSpeed() {
+            return speed;
+        }
+
+        public float getCooldown() {
+            return cooldown;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Item getItem() {
+            return item;
+        }
+
+        public TagKey<Item> getTagKey() {
+            return tagKey;
         }
 
         @Override
@@ -659,6 +662,8 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             return this.name;
         }
     }
+
+    public static final Predicate<ItemStack> DEADBEAT_CROSSBOW_HELD_PROJECTILES = stack -> stack.isIn(ModItemTypeTags.DEADBEAT_PROJECTILE);
 
     public static record LoadingSounds(Optional<RegistryEntry<SoundEvent>> start, Optional<RegistryEntry<SoundEvent>> mid, Optional<RegistryEntry<SoundEvent>> end) {
         public static final Codec<CrossbowItem.LoadingSounds> CODEC = RecordCodecBuilder.create(

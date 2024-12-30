@@ -1,7 +1,6 @@
 package me.gv0id.arbalests.effect;
 
 import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
-import me.gv0id.arbalests.particle.ModParticles;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;

@@ -5,6 +5,7 @@ import com.mojang.authlib.GameProfile;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.effect.ModEffects;
 import me.gv0id.arbalests.entity.attribute.ModEntityAttributes;
+import me.gv0id.arbalests.entity.projectile.SnowProjectileEntity;
 import me.gv0id.arbalests.registry.tag.ModEntityTypeTags;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -43,6 +44,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
             if (!gotIt) {
                 this.addStatusEffect(new StatusEffectInstance(ModEffects.STRAFE,5,0,true,true,true));
             }
+        }
+        if (entity instanceof SnowProjectileEntity){
+            this.setFrozenTicks(200);
         }
     }
 }
