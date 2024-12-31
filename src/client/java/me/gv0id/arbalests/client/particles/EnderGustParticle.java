@@ -2,21 +2,18 @@ package me.gv0id.arbalests.client.particles;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.particle.v1.FabricSpriteProvider;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.util.math.MathHelper;
-import org.jetbrains.annotations.Nullable;
 
-public class SnowGustParticle extends SpriteBillboardParticle {
+public class EnderGustParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
-    protected SnowGustParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
+    protected EnderGustParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.setSpriteForAge(spriteProvider);
-        this.maxAge = 18;
+        this.maxAge = 10;
         this.scale = 4.0F;
         this.setBoundingBoxSpacing(1.0F, 1.0F);
     }
@@ -48,7 +45,7 @@ public class SnowGustParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            return new SnowGustParticle(clientWorld, d, e, f, this.spriteProvider);
+            return new EnderGustParticle(clientWorld, d, e, f, this.spriteProvider);
         }
     }
 
@@ -61,7 +58,7 @@ public class SnowGustParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            Particle particle = new SnowGustParticle(clientWorld, d, e, f, this.field_50230);
+            Particle particle = new EnderGustParticle(clientWorld, d, e, f, this.field_50230);
             particle.scale(0.15F);
             return particle;
         }

@@ -45,8 +45,5 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
                 this.addStatusEffect(new StatusEffectInstance(ModEffects.STRAFE,5,0,true,true,true));
             }
         }
-        if (entity instanceof SnowProjectileEntity){
-            this.setFrozenTicks(200);
-        }
     }
 }

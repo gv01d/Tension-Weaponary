@@ -52,7 +52,8 @@ public class ModValueLookupItemTagProvider extends FabricTagProvider.ItemTagProv
                         Items.WIND_CHARGE,
                         Items.SNOWBALL,
                         Items.EGG,
-                        Items.ENDER_PEARL
+                        Items.ENDER_PEARL,
+                        Items.FIRE_CHARGE
                 )
                 .addTag(ModItemTypeTags.DISCS);
     }

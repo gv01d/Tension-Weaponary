@@ -7,6 +7,7 @@ import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
 import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
+import me.gv0id.arbalests.entity.projectile.CustomEnderPearlEntity;
 import me.gv0id.arbalests.entity.projectile.EggProjectileEntity;
 import me.gv0id.arbalests.entity.projectile.SnowProjectileEntity;
 import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
@@ -132,25 +133,22 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     public ActionResult use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
 
-        if (!world.isClient()){
-            Arbalests.LOGGER.info("run by server");
-        }
-
         if(user.getItemCooldownManager().isCoolingDown(itemStack))
             return ActionResult.FAIL;
 
         ChargedProjectilesComponent chargedProjectilesComponent = itemStack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (chargedProjectilesComponent != null && !chargedProjectilesComponent.isEmpty() && isCharged(itemStack)) {
             // TODO : NEED SUPPORT FOR MULTISHOOT ON GETPROJECTILESDATA
+            ArbalestCooldown arbalestCooldown = itemStack.get(ModDataComponentTypes.ARBALEST_COOLDOWN);
+            ArrayList<ItemStack> tempList = new ArrayList<>(List.copyOf(Objects.requireNonNull(itemStack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles()));
+
             this.shootAll(world, user, hand, itemStack, getProjectileData(chargedProjectilesComponent.getProjectiles().getFirst()).speed, 1.0F, null);
 
             // ------------------------------------------ //
             // Cooldown Manager
 
-            ArbalestCooldown arbalestCooldown = itemStack.get(ModDataComponentTypes.ARBALEST_COOLDOWN);
-            ArrayList<ItemStack> tempList = new ArrayList<>(Objects.requireNonNull(itemStack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles());
+            ItemStack Projectile = tempList.getFirst();
             if (!tempList.isEmpty()){
-                ItemStack temp = tempList.getFirst();
 
                 // THERE IS SOME DESYNC, SO THIS NEVER GETS CALLED ON SERVER GOING INTO THE ELSE
                 if (chargedProjectilesComponent.getProjectiles().size() < 2) {
@@ -162,7 +160,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                     itemStack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.DEFAULT);
                 }
                 else{
-                    float cooldown = getProjectileData(temp).cooldown;
+                    float cooldown = getProjectileData(Projectile).cooldown;
                     if (cooldown > 0){
                         itemStack.set(DataComponentTypes.USE_COOLDOWN,new UseCooldownComponent(cooldown));
                         UseCooldownComponent useCooldownComponent = itemStack.get(DataComponentTypes.USE_COOLDOWN);
@@ -335,7 +333,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         }else if(projectileStack.isOf(Items.EGG)){
             return new EggProjectileEntity(world,shooter,projectileStack);
         }else if(projectileStack.isOf(Items.ENDER_PEARL)){
-            return new EnderPearlEntity(world,shooter,projectileStack);
+            return new CustomEnderPearlEntity(world,shooter,projectileStack);
         } else {
             ProjectileEntity projectileEntity = super.createArrowEntity(world, shooter, weaponStack, projectileStack, critical);
             if (projectileEntity instanceof PersistentProjectileEntity persistentProjectileEntity) {
@@ -377,6 +375,8 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                 float k = h + i * (float)((j + 1) / 2) * g;
                 i = -i;
                 int l = j;
+
+                Arbalests.LOGGER.info("Speed : {}",speed);
 
                 ProjectileEntity.spawn(
                         this.createArrowEntity(world, shooter, stack, itemStack, critical),
@@ -583,6 +583,8 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                 return Projectiles.EGG;
             if (stack.isOf(Items.ENDER_PEARL))
                 return Projectiles.ENDER_PEARL;
+            if (stack.isOf(Items.FIRE_CHARGE))
+                return Projectiles.FIREBALL;
             // Discs
             if (stack.isIn(ModItemTypeTags.DISCS))
                 return Projectiles.DISC;
@@ -597,10 +599,11 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         TIPPED_ARROW(Items.TIPPED_ARROW,"tipped_arrow", 1.0F, 2.5F),
         SPECTRAL_ARROW(Items.SPECTRAL_ARROW,"spectral_arrow",1.0F, 3.2F),
         ROCKET(Items.FIREWORK_ROCKET,"rocket",0.8F,1.6F),
-        WIND_CHARGE(Items.WIND_CHARGE,"wind_charge", 0.5F, 3.5F),
+        WIND_CHARGE(Items.WIND_CHARGE,"wind_charge", 0.2F, 2.5F),
         SNOWBALL(Items.SNOWBALL,"snowball", 0.0F, 5.0F),
         EGG(Items.EGG,"egg",0.0F, 6.0F),
         ENDER_PEARL(Items.ENDER_PEARL,"ender_pearl", 2.0F, 5.0F),
+        FIREBALL(Items.FIRE_CHARGE,"fire_charge", 1.0F, 3.2F),
         DISC(ModItemTypeTags.DISCS, 0.5F, 4.0F);
 
         public static final EnumCodec<Projectiles> CODEC = StringIdentifiable.createCodec(Projectiles::values);
