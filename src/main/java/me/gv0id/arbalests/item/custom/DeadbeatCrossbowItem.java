@@ -535,18 +535,18 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
 
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        ChargedProjectilesComponent chargedProjectilesComponent = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (!isFullyCharged(stack) && !isLoaded(stack)){
             tooltip.add(Text.translatable("item.arbalests.deadbeat_crossbow.right_click_request").formatted(Formatting.GRAY));
+
+            assert chargedProjectilesComponent != null;
+            if (!chargedProjectilesComponent.getProjectiles().isEmpty())
             tooltip.add(ScreenTexts.SPACE);
         }
 
-
-
-
-        ChargedProjectilesComponent chargedProjectilesComponent = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (chargedProjectilesComponent != null && !chargedProjectilesComponent.isEmpty()) {
             List<ItemStack> itemList = chargedProjectilesComponent.getProjectiles();
-            tooltip.add(Text.translatable("item.arbalests.deadbeat_crossbow.projectile"));
+            tooltip.add(Text.translatable("item.arbalests.deadbeat_crossbow.projectile").formatted(Formatting.DARK_PURPLE));
 
             for (ItemStack itemStack : itemList){
                 tooltip.add((itemStack.toHoverableText().copy().formatted(Formatting.BLUE)));
