@@ -12,18 +12,15 @@ import me.gv0id.arbalests.entity.projectile.SnowProjectileEntity;
 import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
 import me.gv0id.arbalests.registry.tag.ModItemTypeTags;
 import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
-import net.minecraft.entity.projectile.thrown.SnowballEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.*;
 import net.minecraft.item.consume.UseAction;
@@ -38,7 +35,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.math.MathHelper;
@@ -66,9 +62,9 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             return List.of();
         } else {
             int i = shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND;
-            int s = i + stack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles().size();
+            int s = i + Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles().size();
             List<ItemStack> list = new ArrayList<>(s);
-            list.addAll(stack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles());
+            list.addAll(Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles());
             ItemStack itemStack = projectileStack.copy();
 
             for (int j = 0; j < i; j++) {
@@ -94,7 +90,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                     list.add(otherStack.split(1));
                     float f = ((float) list.size()) / AMMO;
                     loadingSounds.end()
-                            .ifPresent(sound -> player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), (SoundEvent) sound.value(), SoundCategory.PLAYERS, 1.0F, 0.5F + (f / 2)));
+                            .ifPresent(sound -> player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),sound.value(), SoundCategory.PLAYERS, 1.0F, 0.5F + (f / 2)));
 
                     stack.set(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.of(list));
                     if (isChamberFull(stack, player))
@@ -109,14 +105,9 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     }
 
     private static final float DEFAULT_PULL_TIME = 3.0F;
-    public static final int RANGE = 8;
+    public static final int ENTITY_RANGE = 8;
     private boolean charged = false;
     private boolean loaded = false;
-    private static final float CHARGE_PROGRESS = 0.1F;
-    private static final float LOAD_PROGRESS = 0.5F;
-    private static final float DEFAULT_SPEED = 3.15F;
-    private static final float FIREWORK_ROCKET_SPEED = 1.6F;
-    public static final float field_49258 = 1.6F;
     private static final CrossbowItem.LoadingSounds DEFAULT_LOADING_SOUNDS = new CrossbowItem.LoadingSounds(
             Optional.of(SoundEvents.ITEM_CROSSBOW_LOADING_START),
             Optional.of(SoundEvents.ITEM_CROSSBOW_LOADING_MIDDLE),
@@ -192,7 +183,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             }
             // ------------------------------------------ //
             return ActionResult.SUCCESS;
-        } else if (!user.getProjectileType(itemStack).isEmpty() || !itemStack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles().isEmpty()) {
+        } else if (!user.getProjectileType(itemStack).isEmpty() || !Objects.requireNonNull(itemStack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles().isEmpty()) {
             this.charged = false;
             this.loaded = false;
             // ------------------------------------------ //
@@ -569,7 +560,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
 
     @Override
     public int getRange() {
-        return 8;
+        return ENTITY_RANGE;
     }
 
 
