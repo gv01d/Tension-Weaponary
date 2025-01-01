@@ -14,6 +14,7 @@ public class ModParticles{
     public static final ModParticleType STRAFE = register("strafe", true);
     public static final ModParticleType SNOW_GUST = register("snow_gust", true);
     public static final ModParticleType ENDER_GUST = register("ender_gust", true);
+    public static final ModParticleType FIRE_GUST = register("fire_gust", true);
 
 
     //public static final ParticleType<SimpleParticleType> STRAFE = register("strafe", FabricParticleTypes.simple());

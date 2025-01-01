@@ -50,10 +50,10 @@ public class EnderGustParticle extends SpriteBillboardParticle {
     }
 
     @Environment(EnvType.CLIENT)
-    public static class SnowGustFactory implements ParticleFactory<SimpleParticleType> {
+    public static class SmallFactory implements ParticleFactory<SimpleParticleType> {
         private final SpriteProvider field_50230;
 
-        public SnowGustFactory(SpriteProvider spriteProvider) {
+        public SmallFactory(SpriteProvider spriteProvider) {
             this.field_50230 = spriteProvider;
         }
 

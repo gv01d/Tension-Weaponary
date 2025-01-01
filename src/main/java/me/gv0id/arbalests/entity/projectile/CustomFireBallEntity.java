@@ -1,11 +1,13 @@
 package me.gv0id.arbalests.entity.projectile;
 
 import me.gv0id.arbalests.entity.ModEntityType;
+import me.gv0id.arbalests.particle.ModParticles;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.projectile.AbstractFireballEntity;
 import net.minecraft.entity.projectile.FireballEntity;
+import net.minecraft.entity.projectile.WindChargeEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
@@ -13,6 +15,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
@@ -26,9 +29,12 @@ import java.util.function.Function;
 public class CustomFireBallEntity extends AbstractFireballEntity {
     private float EXPLOSION_POWER = 1;
     private float KNOCKBACK_POWER = 1.0F;
+    private float FIRE_EXPLOSION_POWER = 4;
+    private float FIRE_KNOCKBACK_POWER = 5.0F;
     public ExplosionBehavior EXPLOSION_BEHAVIOR = new AdvancedExplosionBehavior(
             true, false, Optional.of(KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
     );
+    private Entity lastDeflectedEntity;
 
     /*
     public CustomFireBallEntity(EntityType<? extends CustomFireBallEntity> entityType, World world) {
@@ -55,6 +61,39 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
     }
 
     @Override
+    protected ProjectileDeflection hitOrDeflect(HitResult hitResult) {
+        if (hitResult.getType() == HitResult.Type.ENTITY) {
+            EntityHitResult entityHitResult = (EntityHitResult)hitResult;
+            Entity entity = entityHitResult.getEntity();
+
+            if (entity instanceof WindGaleEntity|| entity instanceof WindChargeEntity){
+                fireExplosion(entity.getPos(),this);
+                entity.discard();
+                this.discard();
+                return ProjectileDeflection.NONE;
+            }
+
+            ProjectileDeflection projectileDeflection = entity.getProjectileDeflection(this);
+            if (projectileDeflection != ProjectileDeflection.NONE) {
+                if (entity != this.lastDeflectedEntity && this.deflect(projectileDeflection, entity, this.getOwner(), false)) {
+                    this.lastDeflectedEntity = entity;
+                }
+
+                return projectileDeflection;
+            }
+        } else if (this.deflectsAgainstWorldBorder() && hitResult instanceof BlockHitResult blockHitResult && blockHitResult.isAgainstWorldBorder()) {
+            ProjectileDeflection projectileDeflection2 = ProjectileDeflection.SIMPLE;
+            if (this.deflect(projectileDeflection2, null, this.getOwner(), false)) {
+                this.setVelocity(this.getVelocity().multiply(0.2));
+                return projectileDeflection2;
+            }
+        }
+
+        this.onCollision(hitResult);
+        return ProjectileDeflection.NONE;
+    }
+
+    @Override
     protected void onCollision(HitResult hitResult) {
         super.onCollision(hitResult);
         if (this.getWorld() instanceof ServerWorld serverWorld) {
@@ -77,6 +116,26 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
             );
             this.discard();
         }
+    }
+
+    public void fireExplosion(Vec3d pos, Entity me){
+        EXPLOSION_BEHAVIOR = new AdvancedExplosionBehavior(
+                true, true, Optional.of(FIRE_KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
+        );
+        this.getWorld().createExplosion(
+                this,
+                null,
+                EXPLOSION_BEHAVIOR,
+                pos.getX(),
+                pos.getY(),
+                pos.getZ(),
+                (float)this.FIRE_EXPLOSION_POWER,
+                true,
+                World.ExplosionSourceType.TRIGGER,
+                ModParticles.FIRE_GUST,
+                ModParticles.FIRE_GUST,
+                SoundEvents.ENTITY_GENERIC_EXPLODE
+        );
     }
 
     @Override
