@@ -5,6 +5,7 @@ import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -19,14 +20,6 @@ public class ModEntityType {
                     .dropsNothing()
                     .dimensions(0.3125F, 0.3125F)
                     .eyeHeight(0.0F)
-                    .maxTrackingRange(4)
-                    .trackingTickInterval(10)
-    );
-    public static final EntityType<CustomFireBallEntity> FIREBALL = register(
-            "fire_ball",
-            EntityType.Builder.<CustomFireBallEntity>create(CustomFireBallEntity::new, SpawnGroup.MISC)
-                    .dropsNothing()
-                    .dimensions(1.0F, 1.0F)
                     .maxTrackingRange(4)
                     .trackingTickInterval(10)
     );

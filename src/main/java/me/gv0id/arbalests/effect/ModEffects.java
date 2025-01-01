@@ -14,7 +14,7 @@ public class ModEffects {
 
 
     public static final RegistryEntry<StatusEffect> STRAFE = registerStatusEffect(
-            "strafe", new StrafeEffect(StatusEffectCategory.BENEFICIAL,0x29ffa9).addAttributeModifier(EntityAttributes.SAFE_FALL_DISTANCE, Identifier.of(Arbalests.MOD_ID,"effect.strafe"), 2.0, EntityAttributeModifier.Operation.ADD_VALUE)
+            "strafe", new StrafeEffect(StatusEffectCategory.BENEFICIAL,0x29ffa9).addAttributeModifier(EntityAttributes.SAFE_FALL_DISTANCE, Identifier.of(Arbalests.MOD_ID,"effect.strafe"), 10.0, EntityAttributeModifier.Operation.ADD_VALUE)
     );
     public static final RegistryEntry<StatusEffect> UNSTABLE_STRAFE_EXPLOSION = registerStatusEffect(
             "unstable_strafe_explosion", new InstantExplosionStatusEffect(StatusEffectCategory.NEUTRAL, 0xe5ff8f)

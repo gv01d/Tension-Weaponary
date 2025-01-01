@@ -5,6 +5,7 @@ import com.mojang.authlib.GameProfile;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.effect.ModEffects;
 import me.gv0id.arbalests.entity.attribute.ModEntityAttributes;
+import me.gv0id.arbalests.entity.projectile.CustomFireBallEntity;
 import me.gv0id.arbalests.entity.projectile.SnowProjectileEntity;
 import me.gv0id.arbalests.registry.tag.ModEntityTypeTags;
 import net.minecraft.entity.Entity;
@@ -34,7 +35,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
     @Inject(method = "onExplodedBy", at = @At("TAIL"))
     void onExplodeResetFall(Entity entity, CallbackInfo ci){
         this.setIgnoreFallDamageFromCurrentExplosion(entity != null && entity.getType().isIn(ModEntityTypeTags.RESET_FALL));
-        if (entity != null && entity.getType().isIn(ModEntityTypeTags.STRAFE_JUMP)){
+        if (entity != null && (entity.getType().isIn(ModEntityTypeTags.STRAFE_JUMP) || entity instanceof CustomFireBallEntity)){
             boolean gotIt = false;
             for (StatusEffectInstance inst : this.getStatusEffects()){
                 if(inst.equals(ModEffects.STRAFE)){

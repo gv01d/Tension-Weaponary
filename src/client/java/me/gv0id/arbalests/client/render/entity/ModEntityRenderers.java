@@ -21,8 +21,7 @@ public class ModEntityRenderers implements ClientModInitializer {
 
     static{
         register(ModEntityType.WIND_GALE, WindGaleEntityRenderer::new);
-        register(ModEntityType.FIREBALL, context -> new FlyingItemEntityRenderer<CustomFireBallEntity>(context, 3.0F, true));
-    }
+        }
 
     @Override
     public void onInitializeClient() {

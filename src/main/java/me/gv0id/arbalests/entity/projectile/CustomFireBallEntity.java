@@ -5,11 +5,14 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.projectile.AbstractFireballEntity;
+import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
@@ -27,22 +30,28 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
             true, false, Optional.of(KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
     );
 
+    /*
     public CustomFireBallEntity(EntityType<? extends CustomFireBallEntity> entityType, World world) {
         super(entityType, world);
     }
+    */
 
     public CustomFireBallEntity(World world, LivingEntity owner, Vec3d velocity, int explosionPower) {
-        super(ModEntityType.FIREBALL, owner, velocity, world);
+        super(EntityType.FIREBALL, owner, velocity, world);
         this.EXPLOSION_POWER = explosionPower;
     }
 
     public CustomFireBallEntity(Entity owner, World world, double x, double y, double z, Vec3d velocity,float knockback,float explosionPower) {
-        super(ModEntityType.FIREBALL, x, y, z, velocity, world);
+        super(EntityType.FIREBALL, x, y, z, velocity, world);
         this.setOwner(owner);
         this.refreshPositionAndAngles(x, y, z, this.getYaw(), this.getPitch());
         this.refreshPosition();
         KNOCKBACK_POWER = knockback;
         EXPLOSION_POWER = explosionPower;
+    }
+
+    public CustomFireBallEntity(EntityType<FireballEntity> fireballEntityEntityType, World world) {
+        super(fireballEntityEntityType, world);
     }
 
     @Override
@@ -54,13 +63,17 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
             );
             this.getWorld().createExplosion(
                     this,
-
+                    null,
+                    EXPLOSION_BEHAVIOR,
                     this.getX(),
                     this.getY(),
                     this.getZ(),
                     (float)this.EXPLOSION_POWER,
                     true,
-                    World.ExplosionSourceType.TRIGGER
+                    World.ExplosionSourceType.TRIGGER,
+                    ParticleTypes.GUST_EMITTER_SMALL,
+                    ParticleTypes.GUST_EMITTER_LARGE,
+                    SoundEvents.ENTITY_WIND_CHARGE_WIND_BURST
             );
             this.discard();
         }

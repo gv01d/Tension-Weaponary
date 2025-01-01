@@ -333,7 +333,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         } else if(projectileStack.isOf(Items.ENDER_PEARL)) {
             return new CustomEnderPearlEntity(world, shooter, projectileStack);
         } else if(projectileStack.isOf(Items.FIRE_CHARGE)){
-            return new CustomFireBallEntity(shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),1.8F,2F);
+            return new CustomFireBallEntity(shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),2.8F,2F);
         } else {
             ProjectileEntity projectileEntity = super.createArrowEntity(world, shooter, weaponStack, projectileStack, critical);
             if (projectileEntity instanceof PersistentProjectileEntity persistentProjectileEntity) {
