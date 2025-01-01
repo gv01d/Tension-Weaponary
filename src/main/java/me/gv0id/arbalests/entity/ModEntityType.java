@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.entity;
 
+import me.gv0id.arbalests.entity.projectile.CustomFireBallEntity;
 import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -18,6 +19,14 @@ public class ModEntityType {
                     .dropsNothing()
                     .dimensions(0.3125F, 0.3125F)
                     .eyeHeight(0.0F)
+                    .maxTrackingRange(4)
+                    .trackingTickInterval(10)
+    );
+    public static final EntityType<CustomFireBallEntity> FIREBALL = register(
+            "fire_ball",
+            EntityType.Builder.<CustomFireBallEntity>create(CustomFireBallEntity::new, SpawnGroup.MISC)
+                    .dropsNothing()
+                    .dimensions(1.0F, 1.0F)
                     .maxTrackingRange(4)
                     .trackingTickInterval(10)
     );

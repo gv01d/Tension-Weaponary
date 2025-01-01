@@ -7,10 +7,7 @@ import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
 import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
-import me.gv0id.arbalests.entity.projectile.CustomEnderPearlEntity;
-import me.gv0id.arbalests.entity.projectile.EggProjectileEntity;
-import me.gv0id.arbalests.entity.projectile.SnowProjectileEntity;
-import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
+import me.gv0id.arbalests.entity.projectile.*;
 import me.gv0id.arbalests.registry.tag.ModItemTypeTags;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.component.DataComponentTypes;
@@ -19,6 +16,7 @@ import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.GhastEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
@@ -330,10 +328,12 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             return new WindGaleEntity(shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),1.8F,3F);
         } else if (projectileStack.isOf(Items.SNOWBALL)) {
             return new SnowProjectileEntity(world, shooter, projectileStack);
-        }else if(projectileStack.isOf(Items.EGG)){
+        } else if(projectileStack.isOf(Items.EGG)){
             return new EggProjectileEntity(world,shooter,projectileStack);
-        }else if(projectileStack.isOf(Items.ENDER_PEARL)){
-            return new CustomEnderPearlEntity(world,shooter,projectileStack);
+        } else if(projectileStack.isOf(Items.ENDER_PEARL)) {
+            return new CustomEnderPearlEntity(world, shooter, projectileStack);
+        } else if(projectileStack.isOf(Items.FIRE_CHARGE)){
+            return new CustomFireBallEntity(shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),1.8F,2F);
         } else {
             ProjectileEntity projectileEntity = super.createArrowEntity(world, shooter, weaponStack, projectileStack, critical);
             if (projectileEntity instanceof PersistentProjectileEntity persistentProjectileEntity) {
@@ -375,8 +375,6 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                 float k = h + i * (float)((j + 1) / 2) * g;
                 i = -i;
                 int l = j;
-
-                Arbalests.LOGGER.info("Speed : {}",speed);
 
                 ProjectileEntity.spawn(
                         this.createArrowEntity(world, shooter, stack, itemStack, critical),

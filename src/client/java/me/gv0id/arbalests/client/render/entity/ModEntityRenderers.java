@@ -2,10 +2,11 @@ package me.gv0id.arbalests.client.render.entity;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import me.gv0id.arbalests.entity.ModEntityType;
+import me.gv0id.arbalests.entity.projectile.CustomFireBallEntity;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.WindChargeEntityRenderer;
+import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 
@@ -20,6 +21,7 @@ public class ModEntityRenderers implements ClientModInitializer {
 
     static{
         register(ModEntityType.WIND_GALE, WindGaleEntityRenderer::new);
+        register(ModEntityType.FIREBALL, context -> new FlyingItemEntityRenderer<CustomFireBallEntity>(context, 3.0F, true));
     }
 
     @Override
