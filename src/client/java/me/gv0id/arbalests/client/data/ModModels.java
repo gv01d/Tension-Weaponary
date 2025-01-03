@@ -11,6 +11,8 @@ public class ModModels {
     public static final Model DEADBEAT_CROSSBOW_CHARGE;
     public static final Model DEADBEAT_CROSSBOW_MAIN_CHARGE;
 
+
+
     public ModModels() {
     }
 

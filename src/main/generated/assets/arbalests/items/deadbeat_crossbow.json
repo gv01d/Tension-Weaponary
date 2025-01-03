@@ -15,7 +15,13 @@
           {
             "model": {
               "type": "minecraft:model",
-              "model": "arbalests:item/deadbeat_crossbow_tipped_arrow"
+              "model": "arbalests:item/deadbeat_crossbow_tipped_arrow",
+              "tints": [
+                {
+                  "type": "arbalests:main_charge_potion",
+                  "default": -13083194
+                }
+              ]
             },
             "when": "tipped_arrow"
           },
@@ -127,7 +133,13 @@
           {
             "model": {
               "type": "minecraft:model",
-              "model": "arbalests:item/deadbeat_crossbow_second_tipped_arrow"
+              "model": "arbalests:item/deadbeat_crossbow_second_tipped_arrow",
+              "tints": [
+                {
+                  "type": "arbalests:second_charge_potion",
+                  "default": -13083194
+                }
+              ]
             },
             "when": "tipped_arrow"
           },
@@ -200,7 +212,13 @@
           {
             "model": {
               "type": "minecraft:model",
-              "model": "arbalests:item/deadbeat_crossbow_third_tipped_arrow"
+              "model": "arbalests:item/deadbeat_crossbow_third_tipped_arrow",
+              "tints": [
+                {
+                  "type": "arbalests:third_charge_potion",
+                  "default": -13083194
+                }
+              ]
             },
             "when": "tipped_arrow"
           },

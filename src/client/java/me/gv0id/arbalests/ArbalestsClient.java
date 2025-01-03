@@ -4,6 +4,7 @@ import me.gv0id.arbalests.client.property.bool.ModBoolProperties;
 import me.gv0id.arbalests.client.property.numeric.ModNumericProperties;
 import me.gv0id.arbalests.client.property.select.ModSelectProperties;
 import me.gv0id.arbalests.client.particles.ModParticles;
+import me.gv0id.arbalests.client.render.item.tint.ModTintSource;
 import net.fabricmc.api.ClientModInitializer;
 
 public class ArbalestsClient implements ClientModInitializer {
@@ -13,5 +14,6 @@ public class ArbalestsClient implements ClientModInitializer {
 		ModBoolProperties.initialization();
 		ModSelectProperties.initialization();
 		ModParticles.initialization();
+		ModTintSource.initialization();
 	}
 }

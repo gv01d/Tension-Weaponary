@@ -1,6 +1,7 @@
 {
   "parent": "arbalests:item/deadbeat_charge",
   "textures": {
-    "layer0": "arbalests:item/deadbeat_crossbow_third_tipped_arrow"
+    "layer0": "arbalests:item/deadbeat_crossbow_third_tipped_arrow_head",
+    "layer1": "arbalests:item/deadbeat_crossbow_third_tipped_arrow_base"
   }
 }

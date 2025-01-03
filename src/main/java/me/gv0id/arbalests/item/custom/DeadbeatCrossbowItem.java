@@ -591,7 +591,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     public enum Projectiles implements StringIdentifiable {
         NONE(null,"none",1.0F,3.0F, DeadbeatCrossbowItem::createArrow),
         ARROW(Items.ARROW, "arrow", 0.9F, 3.0F, DeadbeatCrossbowItem::createArrow),
-        TIPPED_ARROW(Items.TIPPED_ARROW,"tipped_arrow", 1.0F, 2.5F, DeadbeatCrossbowItem::createArrow),
+        TIPPED_ARROW(Items.TIPPED_ARROW, 1.0F, 2.5F, DeadbeatCrossbowItem::createArrow, "POTION", "head", "base"),
         SPECTRAL_ARROW(Items.SPECTRAL_ARROW,"spectral_arrow",1.0F, 3.2F, DeadbeatCrossbowItem::createArrow),
 
         ROCKET(Items.FIREWORK_ROCKET,"firework",0.8F,1.6F,
@@ -638,7 +638,10 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         float cooldown;
         float speed;
         ProjectileInterface projectileBuilder;
-        boolean colection;
+        boolean colection = false;
+        boolean tinted = false;
+        String tintSourceEnumName;
+        String[] layers;
 
         Projectiles(Item item, String name, float cooldown, float speed, ProjectileInterface projectileBuilder){
             this.item = item;
@@ -646,8 +649,18 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             this.cooldown = cooldown;
             this.speed = speed;
             this.projectileBuilder = projectileBuilder;
-            this.colection = false;
         }
+
+        Projectiles(Item item, float cooldown, float speed, ProjectileInterface projectileBuilder, String tintSourceEnumName, String... layerSuffix){
+            this.item = item;
+            this.cooldown = cooldown;
+            this.speed = speed;
+            this.projectileBuilder = projectileBuilder;
+            this.tintSourceEnumName = tintSourceEnumName;
+            this.tinted = true;
+            this.layers = layerSuffix;
+        }
+
         Projectiles(TagKey<Item> itemTagKey, float cooldown, float speed){
             this.item = null;
             this.name = null;
@@ -682,6 +695,18 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
 
         public boolean isColection() {
             return colection;
+        }
+
+        public boolean isTinted(){
+            return tinted;
+        }
+
+        public String getTintSourceEnumName(){
+            return tintSourceEnumName;
+        }
+
+        public String[] getLayers(){
+            return layers;
         }
 
         @Override
