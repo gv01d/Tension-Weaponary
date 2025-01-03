@@ -1,0 +1,6 @@
+{
+  "parent": "arbalests:item/deadbeat_main_charge",
+  "textures": {
+    "layer0": "arbalests:item/deadbeat_crossbow_ender_pearl"
+  }
+}

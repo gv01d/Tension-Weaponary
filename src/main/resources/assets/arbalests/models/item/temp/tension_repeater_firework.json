@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/tension_repeater",
-  "textures": {
-    "layer0": "arbalests:item/tension_repeater_firework"
-  }
-}

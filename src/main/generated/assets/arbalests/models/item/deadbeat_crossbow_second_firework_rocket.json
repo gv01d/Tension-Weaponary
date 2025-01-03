@@ -1,0 +1,6 @@
+{
+  "parent": "arbalests:item/deadbeat_charge",
+  "textures": {
+    "layer0": "arbalests:item/deadbeat_crossbow_second_firework_rocket"
+  }
+}

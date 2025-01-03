@@ -1,0 +1,6 @@
+{
+  "parent": "arbalests:item/deadbeat_crossbow",
+  "textures": {
+    "layer0": "arbalests:item/deadbeat_crossbow_pulling_1"
+  }
+}

@@ -3,7 +3,6 @@ package me.gv0id.arbalests.item.custom;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
 import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
@@ -16,10 +15,8 @@ import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.GhastEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
-import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.*;
 import net.minecraft.item.consume.UseAction;
@@ -322,26 +319,26 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
 
     @Override
     protected ProjectileEntity createArrowEntity(World world, LivingEntity shooter, ItemStack weaponStack, ItemStack projectileStack, boolean critical) {
-        if (projectileStack.isOf(Items.FIREWORK_ROCKET)) {
-            return new FireworkRocketEntity(world, projectileStack, shooter, shooter.getX(), shooter.getEyeY() - 0.15F, shooter.getZ(), true);
-        } else if(projectileStack.isOf(Items.WIND_CHARGE)) {
-            return new WindGaleEntity(shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),1.8F,3F);
-        } else if (projectileStack.isOf(Items.SNOWBALL)) {
-            return new SnowProjectileEntity(world, shooter, projectileStack);
-        } else if(projectileStack.isOf(Items.EGG)){
-            return new EggProjectileEntity(world,shooter,projectileStack);
-        } else if(projectileStack.isOf(Items.ENDER_PEARL)) {
-            return new CustomEnderPearlEntity(world, shooter, projectileStack);
-        } else if(projectileStack.isOf(Items.FIRE_CHARGE)){
-            return new CustomFireBallEntity(shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),2.8F,2F);
-        } else {
-            ProjectileEntity projectileEntity = super.createArrowEntity(world, shooter, weaponStack, projectileStack, critical);
-            if (projectileEntity instanceof PersistentProjectileEntity persistentProjectileEntity) {
-                persistentProjectileEntity.setSound(SoundEvents.ITEM_CROSSBOW_HIT);
-            }
 
-            return projectileEntity;
+        Projectiles[] list = (Projectiles.values());
+
+        for (Projectiles projectile : list){
+            if (projectileStack.isOf(projectile.item)){
+                return projectile.projectileBuilder.create(world,shooter,weaponStack,projectileStack,critical);
+            }
         }
+        return Projectiles.NONE.projectileBuilder.create(world,shooter,weaponStack,projectileStack,critical);
+    }
+
+    protected static ProjectileEntity createArrow(World world, LivingEntity shooter, ItemStack weaponStack, ItemStack projectileStack, boolean critical){
+        ArrowItem arrowItem2 = projectileStack.getItem() instanceof ArrowItem arrowItem ? arrowItem : (ArrowItem)Items.ARROW;
+        PersistentProjectileEntity persistentProjectileEntity = arrowItem2.createArrow(world, projectileStack, shooter, weaponStack);
+        if (critical) {
+            persistentProjectileEntity.setCritical(true);
+        }
+        persistentProjectileEntity.setSound(SoundEvents.ITEM_CROSSBOW_HIT);
+
+        return persistentProjectileEntity;
     }
 
     @Override
@@ -592,16 +589,46 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     }
 
     public enum Projectiles implements StringIdentifiable {
-        NONE(null,"none",1.0F,3.0F),
-        ARROW(Items.ARROW, "arrow", 0.9F, 3.0F),
-        TIPPED_ARROW(Items.TIPPED_ARROW,"tipped_arrow", 1.0F, 2.5F),
-        SPECTRAL_ARROW(Items.SPECTRAL_ARROW,"spectral_arrow",1.0F, 3.2F),
-        ROCKET(Items.FIREWORK_ROCKET,"rocket",0.8F,1.6F),
-        WIND_CHARGE(Items.WIND_CHARGE,"wind_charge", 0.2F, 2.5F),
-        SNOWBALL(Items.SNOWBALL,"snowball", 0.0F, 5.0F),
-        EGG(Items.EGG,"egg",0.0F, 6.0F),
-        ENDER_PEARL(Items.ENDER_PEARL,"ender_pearl", 2.0F, 5.0F),
-        FIREBALL(Items.FIRE_CHARGE,"fire_charge", 1.0F, 3.2F),
+        NONE(null,"none",1.0F,3.0F, DeadbeatCrossbowItem::createArrow),
+        ARROW(Items.ARROW, "arrow", 0.9F, 3.0F, DeadbeatCrossbowItem::createArrow),
+        TIPPED_ARROW(Items.TIPPED_ARROW,"tipped_arrow", 1.0F, 2.5F, DeadbeatCrossbowItem::createArrow),
+        SPECTRAL_ARROW(Items.SPECTRAL_ARROW,"spectral_arrow",1.0F, 3.2F, DeadbeatCrossbowItem::createArrow),
+
+        ROCKET(Items.FIREWORK_ROCKET,"firework",0.8F,1.6F,
+                (world,shooter,weaponStack, projectileStack, critical) -> new FireworkRocketEntity(
+                        world, projectileStack, shooter, shooter.getX(), shooter.getEyeY() - 0.15F, shooter.getZ(), true
+                )
+        ),
+
+        WIND_CHARGE(Items.WIND_CHARGE,"wind_charge", 0.2F, 2.5F,
+                (world,shooter,weaponStack, projectileStack, critical) -> new WindGaleEntity(
+                        shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),1.8F,3F
+                )
+        ),
+
+        SNOWBALL(Items.SNOWBALL,"snowball", 0.0F, 5.0F,
+                (world,shooter,weaponStack, projectileStack, critical) -> new SnowProjectileEntity(
+                        world, shooter, projectileStack
+                )
+        ),
+
+        EGG(Items.EGG,"egg",0.0F, 6.0F,
+                (world,shooter,weaponStack, projectileStack, critical) -> new EggProjectileEntity(
+                        world,shooter,projectileStack
+                )
+        ),
+
+        ENDER_PEARL(Items.ENDER_PEARL,"ender_pearl", 2.0F, 5.0F,
+                (world,shooter,weaponStack, projectileStack, critical) -> new CustomEnderPearlEntity(
+                        world, shooter, projectileStack
+                )
+        ),
+
+        FIREBALL(Items.FIRE_CHARGE,"fire_charge", 1.0F, 3.2F,
+                (world,shooter,weaponStack, projectileStack, critical) -> new CustomFireBallEntity(
+                        shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),2.8F,2F
+                )
+        ),
         DISC(ModItemTypeTags.DISCS, 0.5F, 4.0F);
 
         public static final EnumCodec<Projectiles> CODEC = StringIdentifiable.createCodec(Projectiles::values);
@@ -610,16 +637,16 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         String name;
         float cooldown;
         float speed;
+        ProjectileInterface projectileBuilder;
+        boolean colection;
 
-        Projectiles(final String name){
-            this.name = name;
-        }
-
-        Projectiles(Item item, String name, float cooldown, float speed){
+        Projectiles(Item item, String name, float cooldown, float speed, ProjectileInterface projectileBuilder){
             this.item = item;
             this.name = name;
             this.cooldown = cooldown;
             this.speed = speed;
+            this.projectileBuilder = projectileBuilder;
+            this.colection = false;
         }
         Projectiles(TagKey<Item> itemTagKey, float cooldown, float speed){
             this.item = null;
@@ -627,6 +654,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             this.tagKey = itemTagKey;
             this.cooldown = cooldown;
             this.speed = speed;
+            this.colection = true;
         }
 
         public float getSpeed() {
@@ -638,7 +666,10 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         }
 
         public String getName() {
-            return name;
+            if (this.item == null)
+                return "none";
+            String[] list = item.getName().toString().replaceAll("'", "").split("\\.");
+            return (item.toString().split(":"))[1];
         }
 
         public Item getItem() {
@@ -649,11 +680,24 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             return tagKey;
         }
 
+        public boolean isColection() {
+            return colection;
+        }
+
         @Override
         public String asString() {
-            return this.name;
+            if (this.item == null)
+                return "none";
+            String[] list = item.getName().toString().replaceAll("'", "").split("\\.");
+            return (item.toString().split(":"))[1];
         }
     }
+
+    @FunctionalInterface
+    interface ProjectileInterface {
+        ProjectileEntity create(World world, LivingEntity shooter, ItemStack weaponStack, ItemStack projectileStack, boolean critical);
+    }
+
 
     public static final Predicate<ItemStack> DEADBEAT_CROSSBOW_HELD_PROJECTILES = stack -> stack.isIn(ModItemTypeTags.DEADBEAT_PROJECTILE);
 

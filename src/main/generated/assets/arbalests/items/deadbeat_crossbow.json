@@ -1,0 +1,265 @@
+{
+  "model": {
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:select",
+        "cases": [
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_arrow"
+            },
+            "when": "arrow"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_tipped_arrow"
+            },
+            "when": "tipped_arrow"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_spectral_arrow"
+            },
+            "when": "spectral_arrow"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_firework_rocket"
+            },
+            "when": "firework_rocket"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_wind_charge"
+            },
+            "when": "wind_charge"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_snowball"
+            },
+            "when": "snowball"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_egg"
+            },
+            "when": "egg"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_ender_pearl"
+            },
+            "when": "ender_pearl"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_fire_charge"
+            },
+            "when": "fire_charge"
+          }
+        ],
+        "fallback": {
+          "type": "minecraft:model",
+          "model": "arbalests:item/deadbeat_crossbow_none"
+        },
+        "property": "arbalests:deadbeat_crossbow/charge_type"
+      },
+      {
+        "type": "minecraft:condition",
+        "on_false": {
+          "type": "minecraft:model",
+          "model": "arbalests:item/deadbeat_crossbow"
+        },
+        "on_true": {
+          "type": "minecraft:range_dispatch",
+          "entries": [
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "arbalests:item/deadbeat_crossbow_pulling_1"
+              },
+              "threshold": 0.3
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "arbalests:item/deadbeat_crossbow_pulling_2"
+              },
+              "threshold": 0.6
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "arbalests:item/deadbeat_crossbow_pulling_3"
+              },
+              "threshold": 0.95
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "arbalests:item/deadbeat_crossbow_pulling_0"
+          },
+          "property": "arbalests:deadbeat_crossbow/pull"
+        },
+        "property": "arbalests:deadbeat_crossbow/charging"
+      },
+      {
+        "type": "minecraft:select",
+        "cases": [
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_arrow"
+            },
+            "when": "arrow"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_tipped_arrow"
+            },
+            "when": "tipped_arrow"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_spectral_arrow"
+            },
+            "when": "spectral_arrow"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_firework_rocket"
+            },
+            "when": "firework_rocket"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_wind_charge"
+            },
+            "when": "wind_charge"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_snowball"
+            },
+            "when": "snowball"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_egg"
+            },
+            "when": "egg"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_ender_pearl"
+            },
+            "when": "ender_pearl"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_fire_charge"
+            },
+            "when": "fire_charge"
+          }
+        ],
+        "fallback": {
+          "type": "minecraft:model",
+          "model": "arbalests:item/deadbeat_crossbow_second_none"
+        },
+        "property": "arbalests:deadbeat_crossbow/second_charge_type"
+      },
+      {
+        "type": "minecraft:select",
+        "cases": [
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_arrow"
+            },
+            "when": "arrow"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_tipped_arrow"
+            },
+            "when": "tipped_arrow"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_spectral_arrow"
+            },
+            "when": "spectral_arrow"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_firework_rocket"
+            },
+            "when": "firework_rocket"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_wind_charge"
+            },
+            "when": "wind_charge"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_snowball"
+            },
+            "when": "snowball"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_egg"
+            },
+            "when": "egg"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_ender_pearl"
+            },
+            "when": "ender_pearl"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_fire_charge"
+            },
+            "when": "fire_charge"
+          }
+        ],
+        "fallback": {
+          "type": "minecraft:model",
+          "model": "arbalests:item/deadbeat_crossbow_third_none"
+        },
+        "property": "arbalests:deadbeat_crossbow/third_charge_type"
+      }
+    ]
+  }
+}
