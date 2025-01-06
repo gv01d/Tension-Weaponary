@@ -73,6 +73,146 @@
               "model": "arbalests:item/deadbeat_crossbow_fire_charge"
             },
             "when": "fire_charge"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_13"
+            },
+            "when": "music_disc_13"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_11"
+            },
+            "when": "music_disc_11"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_blocks"
+            },
+            "when": "music_disc_blocks"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_cat"
+            },
+            "when": "music_disc_cat"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_5"
+            },
+            "when": "music_disc_5"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_chirp"
+            },
+            "when": "music_disc_chirp"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_creator"
+            },
+            "when": "music_disc_creator"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_creator_music_box"
+            },
+            "when": "music_disc_creator_music_box"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_far"
+            },
+            "when": "music_disc_far"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_mall"
+            },
+            "when": "music_disc_mall"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_mellohi"
+            },
+            "when": "music_disc_mellohi"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_otherside"
+            },
+            "when": "music_disc_otherside"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_pigstep"
+            },
+            "when": "music_disc_pigstep"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_precipice"
+            },
+            "when": "music_disc_precipice"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_relic"
+            },
+            "when": "music_disc_relic"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_stal"
+            },
+            "when": "music_disc_stal"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_strad"
+            },
+            "when": "music_disc_strad"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_wait"
+            },
+            "when": "music_disc_wait"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_music_disc_ward"
+            },
+            "when": "music_disc_ward"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_nether_star"
+            },
+            "when": "nether_star"
           }
         ],
         "fallback": {
@@ -191,6 +331,146 @@
               "model": "arbalests:item/deadbeat_crossbow_second_fire_charge"
             },
             "when": "fire_charge"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_13"
+            },
+            "when": "music_disc_13"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_11"
+            },
+            "when": "music_disc_11"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_blocks"
+            },
+            "when": "music_disc_blocks"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_cat"
+            },
+            "when": "music_disc_cat"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_5"
+            },
+            "when": "music_disc_5"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_chirp"
+            },
+            "when": "music_disc_chirp"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_creator"
+            },
+            "when": "music_disc_creator"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_creator_music_box"
+            },
+            "when": "music_disc_creator_music_box"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_far"
+            },
+            "when": "music_disc_far"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_mall"
+            },
+            "when": "music_disc_mall"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_mellohi"
+            },
+            "when": "music_disc_mellohi"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_otherside"
+            },
+            "when": "music_disc_otherside"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_pigstep"
+            },
+            "when": "music_disc_pigstep"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_precipice"
+            },
+            "when": "music_disc_precipice"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_relic"
+            },
+            "when": "music_disc_relic"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_stal"
+            },
+            "when": "music_disc_stal"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_strad"
+            },
+            "when": "music_disc_strad"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_wait"
+            },
+            "when": "music_disc_wait"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_music_disc_ward"
+            },
+            "when": "music_disc_ward"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_nether_star"
+            },
+            "when": "nether_star"
           }
         ],
         "fallback": {
@@ -270,6 +550,146 @@
               "model": "arbalests:item/deadbeat_crossbow_third_fire_charge"
             },
             "when": "fire_charge"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_13"
+            },
+            "when": "music_disc_13"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_11"
+            },
+            "when": "music_disc_11"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_blocks"
+            },
+            "when": "music_disc_blocks"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_cat"
+            },
+            "when": "music_disc_cat"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_5"
+            },
+            "when": "music_disc_5"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_chirp"
+            },
+            "when": "music_disc_chirp"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_creator"
+            },
+            "when": "music_disc_creator"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_creator_music_box"
+            },
+            "when": "music_disc_creator_music_box"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_far"
+            },
+            "when": "music_disc_far"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_mall"
+            },
+            "when": "music_disc_mall"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_mellohi"
+            },
+            "when": "music_disc_mellohi"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_otherside"
+            },
+            "when": "music_disc_otherside"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_pigstep"
+            },
+            "when": "music_disc_pigstep"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_precipice"
+            },
+            "when": "music_disc_precipice"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_relic"
+            },
+            "when": "music_disc_relic"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_stal"
+            },
+            "when": "music_disc_stal"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_strad"
+            },
+            "when": "music_disc_strad"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_wait"
+            },
+            "when": "music_disc_wait"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_music_disc_ward"
+            },
+            "when": "music_disc_ward"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_nether_star"
+            },
+            "when": "nether_star"
           }
         ],
         "fallback": {
