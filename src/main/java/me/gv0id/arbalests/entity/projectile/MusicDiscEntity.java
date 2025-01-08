@@ -21,6 +21,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.Validate;
@@ -68,7 +69,7 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         Entity entity = entityHitResult.getEntity();
         float f = 8.0F;
         Entity entity2 = this.getOwner();
-        DamageSource damageSource = this.getDamageSources().trident(this, (Entity)(entity2 == null ? this : entity2));
+        DamageSource damageSource = this.getDamageSources().trident(this, (entity2 == null ? this : entity2));
         if (this.getWorld() instanceof ServerWorld serverWorld) {
             f = EnchantmentHelper.getDamage(serverWorld, this.getWeaponStack(), entity, damageSource, f);
         }
@@ -124,40 +125,21 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         this.getDataTracker().set(ROTATION, value % 8);
     }
 
-    protected void setFacing(Direction facing) {
-        Validate.notNull(facing);
-        this.facing = facing;
-        if (facing.getAxis().isHorizontal()) {
-            this.setPitch(0.0F);
-            this.setYaw((float)(this.facing.getHorizontalQuarterTurns() * 90));
-        } else {
-            this.setPitch((float)(-90 * facing.getDirection().offset()));
-            this.setYaw(0.0F);
-        }
-
-        this.prevPitch = this.getPitch();
-        this.prevYaw = this.getYaw();
-    }
-
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         ItemStack itemStack;
         if (nbt.contains("Item", NbtElement.COMPOUND_TYPE)) {
             NbtCompound nbtCompound = nbt.getCompound("Item");
-            itemStack = (ItemStack)ItemStack.fromNbt(this.getRegistryManager(), nbtCompound).orElse(ItemStack.EMPTY);
+            itemStack = ItemStack.fromNbt(this.getRegistryManager(), nbtCompound).orElse(ItemStack.EMPTY);
         } else {
             itemStack = ItemStack.EMPTY;
         }
-
-        ItemStack itemStack2 = this.getStack();
 
         this.setHeldItemStack(itemStack);
         if (!itemStack.isEmpty()) {
             this.setRotation(nbt.getByte("ItemRotation"));
         }
-
-        this.setFacing(Direction.byId(nbt.getByte("Facing")));
     }
 
     @Override
@@ -167,8 +149,6 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
             nbt.put("Item", this.getStack().toNbt(this.getRegistryManager()));
             nbt.putByte("ItemRotation", (byte)this.getRotation());
         }
-
-        nbt.putByte("Facing", (byte)this.facing.getId());
     }
 
     @Override

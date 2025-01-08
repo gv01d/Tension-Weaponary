@@ -4,6 +4,7 @@ import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
 import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
+import me.gv0id.arbalests.item.custom.CopperDiscItem;
 import me.gv0id.arbalests.item.custom.DeadbeatCrossbowItem;
 import me.gv0id.arbalests.item.potion.ModPotions;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -66,6 +67,15 @@ public class ModItems {
                     .enchantable(1)
                     .useCooldown(1)
                     .component(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.DEFAULT)
+    );
+
+    public static final Item COPPER_DISC = register(
+            "copper_disc",
+            CopperDiscItem::new,
+            new Item.Settings()
+                    .maxCount(1)
+                    .rarity(Rarity.UNCOMMON)
+                    .component(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.DEFAULT)
     );
 
     // ----------------------------------------------------------------------------------------------------------

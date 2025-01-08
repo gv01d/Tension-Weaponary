@@ -15,7 +15,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ModelTransformationMode;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 
@@ -33,34 +32,11 @@ public class MusicDiscEntityRenderer extends EntityRenderer<MusicDiscEntity,Musi
     public void render(MusicDiscEntityState musicDiscEntityState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         super.render(musicDiscEntityState, matrixStack, vertexConsumerProvider, i);
         matrixStack.push();
-        Direction direction = musicDiscEntityState.facing;
-        Vec3d vec3d = this.getPositionOffset(musicDiscEntityState);
-        matrixStack.translate(-vec3d.getX(), -vec3d.getY(), -vec3d.getZ());
-        double d = 0.46875;
-        matrixStack.translate((double)direction.getOffsetX() * 0.46875, (double)direction.getOffsetY() * 0.46875, (double)direction.getOffsetZ() * 0.46875);
-        float f;
-        float g;
-        if (direction.getAxis().isHorizontal()) {
-            f = 0.0F;
-            g = 180.0F - direction.getPositiveHorizontalDegrees();
-        } else {
-            f = (float)(-90 * direction.getDirection().offset());
-            g = 180.0F;
-        }
 
-        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(f));
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(g));
-        if (!musicDiscEntityState.invisible) {
-            matrixStack.push();
-            matrixStack.translate(-0.5F, -0.5F, -0.5F);
-            matrixStack.pop();
-        }
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(musicDiscEntityState.yaw - 90.0F));
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(musicDiscEntityState.pitch + 90.0F));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
 
-        if (musicDiscEntityState.invisible) {
-            matrixStack.translate(0.0F, 0.0F, 0.5F);
-        } else {
-            matrixStack.translate(0.0F, 0.0F, 0.4375F);
-        }
 
         if (!musicDiscEntityState.itemRenderState.isEmpty()) {
             matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float)musicDiscEntityState.rotation * 360.0F / 8.0F));
@@ -81,11 +57,10 @@ public class MusicDiscEntityRenderer extends EntityRenderer<MusicDiscEntity,Musi
         return state.glow ? BlockStatesLoader.GLOW_ITEM_FRAME_MODEL_ID : BlockStatesLoader.ITEM_FRAME_MODEL_ID;
     }
 
+
     @Override
     public Vec3d getPositionOffset(MusicDiscEntityState itemFrameEntityRenderState) {
-        return new Vec3d(
-                (double)((float)itemFrameEntityRenderState.facing.getOffsetX() * 0.3F), -0.25, (double)((float)itemFrameEntityRenderState.facing.getOffsetZ() * 0.3F)
-        );
+        return Vec3d.ZERO;
     }
 
     @Override
@@ -96,7 +71,9 @@ public class MusicDiscEntityRenderer extends EntityRenderer<MusicDiscEntity,Musi
     @Override
     public void updateRenderState(MusicDiscEntity musicDiscEntity, MusicDiscEntityState musicDiscEntityState, float f) {
         super.updateRenderState(musicDiscEntity, musicDiscEntityState, f);
-        musicDiscEntityState.facing = musicDiscEntity.getHorizontalFacing();
+        musicDiscEntityState.yaw = musicDiscEntity.getLerpedYaw(f);
+        musicDiscEntityState.pitch = musicDiscEntity.getLerpedPitch(f);
+        musicDiscEntityState.direction = musicDiscEntity.getVelocity().normalize();
         ItemStack itemStack = musicDiscEntity.getStack();
         this.itemModelManager.updateForNonLivingEntity(musicDiscEntityState.itemRenderState, itemStack, ModelTransformationMode.FIXED, musicDiscEntity);
         musicDiscEntityState.rotation = musicDiscEntity.getRotation();

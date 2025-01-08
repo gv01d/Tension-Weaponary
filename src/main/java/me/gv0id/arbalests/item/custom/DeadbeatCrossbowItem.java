@@ -8,6 +8,7 @@ import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
 import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
 import me.gv0id.arbalests.entity.projectile.*;
+import me.gv0id.arbalests.item.ModItems;
 import me.gv0id.arbalests.registry.tag.ModItemTypeTags;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.component.DataComponentTypes;
@@ -612,6 +613,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         D_STRAD(Items.MUSIC_DISC_STRAD, "DISC"),
         D_WAIT(Items.MUSIC_DISC_WAIT, "DISC"),
         D_WARD(Items.MUSIC_DISC_WARD, "DISC"),
+        COPPER_DISC(ModItems.COPPER_DISC, "DISC"),
         DISC(ModItemTypeTags.DISCS, 0.5F, 4.0F,
                 (world,shooter,weaponStack, projectileStack, critical) ->
                 new MusicDiscEntity(world,shooter, projectileStack)),

@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.client.data.tag;
 
+import me.gv0id.arbalests.item.ModItems;
 import me.gv0id.arbalests.registry.tag.ModItemTypeTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
@@ -24,6 +25,7 @@ public class ModValueLookupItemTagProvider extends FabricTagProvider.ItemTagProv
     protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
         getOrCreateTagBuilder(ModItemTypeTags.DISCS)
                 .add(
+                        ModItems.COPPER_DISC,
                         Items.MUSIC_DISC_13,
                         Items.MUSIC_DISC_11,
                         Items.MUSIC_DISC_BLOCKS,

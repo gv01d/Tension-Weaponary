@@ -40,6 +40,13 @@ public class ModModelProvider extends FabricModelProvider {
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
         this.registerDeadbeatCrossbow2(ModItems.DEADBEAT_CROSSBOW,itemModelGenerator);
+        this.registerCopperDisc(ModItems.COPPER_DISC,itemModelGenerator);
+    }
+
+    public final void registerCopperDisc(Item item, ItemModelGenerator itemModelGenerator){
+        ItemModel.Unbaked unbaked = ItemModels.basic(ModelIds.getItemModelId(item));
+
+        itemModelGenerator.output.accept(item,unbaked);
     }
 
     public final void registerDeadbeatCrossbow2(Item item, ItemModelGenerator itemModelGenerator){
@@ -59,9 +66,6 @@ public class ModModelProvider extends FabricModelProvider {
         for (DeadbeatCrossbowItem.Projectiles projectile : projArray){
             Arbalests.LOGGER.info("Generated charge name: _{}", projectile.getName());
             if (i > 0 && !projectile.isCollection() && !projectile.isTinted()) {
-                if (projectile.isPartOfCollection()){
-                    Arbalests.LOGGER.info("the part where he kills you");
-                }
                 mainChargeList.add(ItemModels.switchCase(projectile, ItemModels.basic(itemModelGenerator
                                                 .registerSubModel(item, "_" + projectile.getName(), ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE)
                                         )
