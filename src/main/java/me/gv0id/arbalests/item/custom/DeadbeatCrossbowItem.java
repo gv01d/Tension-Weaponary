@@ -594,41 +594,27 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                         shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),2.8F,2F
                 )
         ),
-        D13(Items.MUSIC_DISC_13, "DISC"),
-        D11(Items.MUSIC_DISC_11,"DISC"),
-        D_BLOCKS(Items.MUSIC_DISC_BLOCKS, "DISC"),
-        D_CAT(Items.MUSIC_DISC_CAT,"DISC"),
-        D_5(Items.MUSIC_DISC_5, "DISC"),
-        D_CHIRP(Items.MUSIC_DISC_CHIRP, "DISC"),
-        D_CREATOR(Items.MUSIC_DISC_CREATOR, "DISC"),
-        D_CREATOR_MUSIC_BOX(Items.MUSIC_DISC_CREATOR_MUSIC_BOX,"DISC"),
-        D_FAR(Items.MUSIC_DISC_FAR, "DISC"),
-        D_MALL(Items.MUSIC_DISC_MALL, "DISC"),
-        D_MELLOHI(Items.MUSIC_DISC_MELLOHI, "DISC"),
-        D_OTHERSIDE(Items.MUSIC_DISC_OTHERSIDE, "DISC"),
-        D_PIGSTEP(Items.MUSIC_DISC_PIGSTEP, "DISC"),
-        D_PRECIPICE(Items.MUSIC_DISC_PRECIPICE, "DISC"),
-        D_RELIC(Items.MUSIC_DISC_RELIC, "DISC"),
-        D_STAL(Items.MUSIC_DISC_STAL, "DISC"),
-        D_STRAD(Items.MUSIC_DISC_STRAD, "DISC"),
-        D_WAIT(Items.MUSIC_DISC_WAIT, "DISC"),
-        D_WARD(Items.MUSIC_DISC_WARD, "DISC"),
-        COPPER_DISC(ModItems.COPPER_DISC, "DISC"),
-        DISC(ModItemTypeTags.DISCS, 0.5F, 4.0F,
+        COPPER_DISC(ModItems.COPPER_DISC, 0.5F, 4.0F,
                 (world,shooter,weaponStack, projectileStack, critical) ->
-                new MusicDiscEntity(world,shooter, projectileStack)),
+                        new MusicDiscEntity(world,shooter, projectileStack)),
         NETHER_STAR(Items.NETHER_STAR, 2F,1F,DeadbeatCrossbowItem::createArrow);
 
         public static final EnumCodec<Projectiles> CODEC = StringIdentifiable.createCodec(Projectiles::values);
         Item item = null;
+        Enum any = null;
+        Item parent = null;
         TagKey<Item> tagKey = null;
         String enumName;
         float cooldown = 0;
         float speed = 0;
+
         ProjectileInterface projectileBuilder;
+
         boolean collection = false;
         boolean tinted = false;
         boolean partOfCollection = false;
+        boolean variation = false;
+
         String tintSourceEnumName;
         String[] layers = null;
 
@@ -649,6 +635,8 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             this.layers = layerSuffix;
         }
 
+
+
         Projectiles(TagKey<Item> itemTagKey, float cooldown, float speed, ProjectileInterface projectileBuilder){
             this.item = null;
             this.tagKey = itemTagKey;
@@ -662,6 +650,12 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             this.item = item;
             this.enumName = enumName;
             this.partOfCollection = true;
+        }
+
+        Projectiles(Item parent, Item item){
+            this.item = item;
+
+            variation = true;
         }
 
         public float getSpeed() {

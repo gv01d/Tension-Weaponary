@@ -1,8 +1,10 @@
 package me.gv0id.arbalests.client.data;
 
 import me.gv0id.arbalests.Arbalests;
+import me.gv0id.arbalests.client.property.bool.CopperDiscChargedProperty;
 import me.gv0id.arbalests.client.property.bool.DeadbeatCrossbowChargingProperty;
 import me.gv0id.arbalests.client.property.numeric.DeadbeatCrossbowPullProperty;
+import me.gv0id.arbalests.client.property.select.CopperDiscVariationTypeProperty;
 import me.gv0id.arbalests.client.property.select.DeadbeatCrossbowChargeTypeProperty;
 import me.gv0id.arbalests.client.property.select.DeadbeatCrossbowSecondChargeTypeProperty;
 import me.gv0id.arbalests.client.property.select.DeadbeatCrossbowThirdChargeTypeProperty;
@@ -10,6 +12,7 @@ import me.gv0id.arbalests.client.render.item.tint.MainChargePotionTintSource;
 import me.gv0id.arbalests.client.render.item.tint.SecondChargePotionTintSource;
 import me.gv0id.arbalests.client.render.item.tint.ThirdChargePotionTintSource;
 import me.gv0id.arbalests.item.ModItems;
+import me.gv0id.arbalests.item.custom.CopperDiscItem;
 import me.gv0id.arbalests.item.custom.DeadbeatCrossbowItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -46,7 +49,29 @@ public class ModModelProvider extends FabricModelProvider {
     public final void registerCopperDisc(Item item, ItemModelGenerator itemModelGenerator){
         ItemModel.Unbaked unbaked = ItemModels.basic(ModelIds.getItemModelId(item));
 
-        itemModelGenerator.output.accept(item,unbaked);
+        ArrayList<SelectItemModel.SwitchCase<CopperDiscItem.Music>> varList = new ArrayList<>();
+
+        CopperDiscItem.Music[] projArray = CopperDiscItem.Music.values();
+
+        for (CopperDiscItem.Music music : projArray){
+                varList.add(
+                        ItemModels.switchCase(music, ItemModels
+                                .basic(itemModelGenerator.registerSubModel(item,"_" + music.asString(), ModModels.COPPER_DISC)))
+                );
+        }
+
+        itemModelGenerator.output.accept(item,
+                ItemModels.condition(
+                        new CopperDiscChargedProperty(),
+                        ItemModels.select(
+                                new CopperDiscVariationTypeProperty(),
+                                unbaked,
+                                varList
+                        ),
+                        unbaked
+                )
+
+        );
     }
 
     public final void registerDeadbeatCrossbow2(Item item, ItemModelGenerator itemModelGenerator){

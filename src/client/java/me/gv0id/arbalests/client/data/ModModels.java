@@ -10,6 +10,7 @@ public class ModModels {
     public static final Model DEADBEAT_CROSSBOW;
     public static final Model DEADBEAT_CROSSBOW_CHARGE;
     public static final Model DEADBEAT_CROSSBOW_MAIN_CHARGE;
+    public static final Model COPPER_DISC;
 
 
 
@@ -24,5 +25,6 @@ public class ModModels {
         DEADBEAT_CROSSBOW = item("deadbeat_crossbow", TextureKey.LAYER0);
         DEADBEAT_CROSSBOW_CHARGE = item("deadbeat_charge",  TextureKey.LAYER0);
         DEADBEAT_CROSSBOW_MAIN_CHARGE = item("deadbeat_main_charge",  TextureKey.LAYER0);
+        COPPER_DISC = item("copper_disc",  TextureKey.LAYER0);
     }
 }
