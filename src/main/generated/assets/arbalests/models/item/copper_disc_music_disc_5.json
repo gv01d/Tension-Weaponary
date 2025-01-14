@@ -1,0 +1,6 @@
+{
+  "parent": "arbalests:item/copper_disc",
+  "textures": {
+    "layer0": "arbalests:item/copper_disc_music_disc_5"
+  }
+}

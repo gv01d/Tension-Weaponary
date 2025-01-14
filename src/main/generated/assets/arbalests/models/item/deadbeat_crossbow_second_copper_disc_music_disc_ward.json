@@ -1,0 +1,6 @@
+{
+  "parent": "arbalests:item/deadbeat_main_charge",
+  "textures": {
+    "layer0": "arbalests:item/deadbeat_crossbow_second_copper_disc_music_disc_ward"
+  }
+}
