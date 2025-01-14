@@ -1,0 +1,23 @@
+{
+  "minecraft:recipes/decorations/crafting_table": {
+    "criteria": {
+      "unlock_right_away": "2024-12-26 01:59:36 -0300"
+    },
+    "done": true
+  },
+  "minecraft:adventure/adventuring_time": {
+    "criteria": {
+      "minecraft:sparse_jungle": "2024-12-28 00:21:21 -0300",
+      "minecraft:river": "2024-12-28 00:23:06 -0300",
+      "minecraft:plains": "2024-12-26 01:59:37 -0300"
+    },
+    "done": false
+  },
+  "minecraft:adventure/who_needs_rockets": {
+    "criteria": {
+      "who_needs_rockets": "2024-12-28 00:25:03 -0300"
+    },
+    "done": true
+  },
+  "DataVersion": 4189
+}
