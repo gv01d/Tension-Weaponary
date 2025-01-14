@@ -596,7 +596,8 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         ),
         COPPER_DISC(ModItems.COPPER_DISC, 0.5F, 4.0F,
                 (world,shooter,weaponStack, projectileStack, critical) ->
-                        new MusicDiscEntity(world,shooter, projectileStack)),
+                        new MusicDiscEntity(world,shooter, projectileStack),
+                "MUSIC"),
         NETHER_STAR(Items.NETHER_STAR, 2F,1F,DeadbeatCrossbowItem::createArrow);
 
         public static final EnumCodec<Projectiles> CODEC = StringIdentifiable.createCodec(Projectiles::values);
@@ -615,7 +616,6 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         boolean partOfCollection = false;
         boolean variation = false;
 
-        String tintSourceEnumName;
         String[] layers = null;
 
         Projectiles(Item item, float cooldown, float speed, ProjectileInterface projectileBuilder){
@@ -630,10 +630,20 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             this.cooldown = cooldown;
             this.speed = speed;
             this.projectileBuilder = projectileBuilder;
-            this.tintSourceEnumName = tintSourceEnumName;
+            this.enumName = tintSourceEnumName;
             this.tinted = true;
             this.layers = layerSuffix;
         }
+
+        Projectiles(Item item, float cooldown, float speed, ProjectileInterface projectileBuilder, String variationEnumName){
+            this.item = item;
+            this.cooldown = cooldown;
+            this.speed = speed;
+            this.projectileBuilder = projectileBuilder;
+            this.enumName = variationEnumName;
+            this.variation = true;
+        }
+
 
 
 
@@ -652,16 +662,9 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             this.partOfCollection = true;
         }
 
-        Projectiles(Item parent, Item item){
-            this.item = item;
-
-            variation = true;
-        }
-
         public float getSpeed() {
             return speed;
         }
-
         public float getCooldown() {
             return cooldown;
         }
@@ -675,7 +678,6 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         public Item getItem() {
             return item;
         }
-
         public TagKey<Item> getTagKey() {
             return tagKey;
         }
@@ -683,17 +685,16 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         public boolean isCollection() {
             return collection;
         }
-
-        public boolean isPartOfCollection(){
-            return partOfCollection;
-        }
-
+        public boolean isPartOfCollection() {return partOfCollection;}
         public boolean isTinted(){
             return tinted;
         }
+        public boolean isVariation(){
+            return variation;
+        }
 
-        public String getTintSourceEnumName(){
-            return tintSourceEnumName;
+        public String getEnumName(){
+            return enumName;
         }
 
         public String[] getLayers(){

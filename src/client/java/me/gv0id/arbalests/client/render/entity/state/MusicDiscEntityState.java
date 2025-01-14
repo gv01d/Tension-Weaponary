@@ -9,7 +9,7 @@ import net.minecraft.util.math.Vec3d;
 @Environment(EnvType.CLIENT)
 public class MusicDiscEntityState extends EntityRenderState {
     public final ItemRenderState itemRenderState = new ItemRenderState();
-    public int rotation;
+    public float rotation;
     public boolean glow;
     public float pitch;
     public float yaw;

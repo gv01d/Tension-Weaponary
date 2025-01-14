@@ -1,6 +1,8 @@
 {
   "item.arbalests.suspicious_substance": "Suspicious Substance",
   "item.arbalests.copper_disc": "Copper Disc",
+  "item.arbalests.copper_disc.right_click_request": "Right click to add Music Disc",
+  "item.arbalests.copper_disc.music": "Music Discs:",
 
   "item.arbalests.deadbeat_crossbow": "Deadbeat's Crossbow",
   "item.arbalests.deadbeat_crossbow.projectile": "Projectiles:",

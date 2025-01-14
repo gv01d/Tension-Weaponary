@@ -25,7 +25,7 @@ public class ModValueLookupItemTagProvider extends FabricTagProvider.ItemTagProv
     protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
         getOrCreateTagBuilder(ModItemTypeTags.DISCS)
                 .add(
-                        ModItems.COPPER_DISC,
+
                         Items.MUSIC_DISC_13,
                         Items.MUSIC_DISC_11,
                         Items.MUSIC_DISC_BLOCKS,
@@ -56,8 +56,8 @@ public class ModValueLookupItemTagProvider extends FabricTagProvider.ItemTagProv
                         Items.EGG,
                         Items.ENDER_PEARL,
                         Items.FIRE_CHARGE,
-                        Items.NETHER_STAR
-                )
-                .addTag(ModItemTypeTags.DISCS);
+                        Items.NETHER_STAR,
+                        ModItems.COPPER_DISC
+                );
     }
 }

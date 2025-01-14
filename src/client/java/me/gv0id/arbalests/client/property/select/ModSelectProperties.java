@@ -17,5 +17,6 @@ public class ModSelectProperties {
         SelectProperties.ID_MAPPER.put(Identifier.of("arbalests","deadbeat_crossbow/second_charge_type"), DeadbeatCrossbowSecondChargeTypeProperty.TYPE);
         SelectProperties.ID_MAPPER.put(Identifier.of("arbalests","deadbeat_crossbow/third_charge_type"), DeadbeatCrossbowThirdChargeTypeProperty.TYPE);
         SelectProperties.ID_MAPPER.put(Arbalests.identifierOf("copper_disc/music"), CopperDiscVariationTypeProperty.TYPE);
+        SelectProperties.ID_MAPPER.put(Arbalests.identifierOf("deadbeat_crossbow/copper_disc_music"), CopperDiscProjectileVariationTypeProperty.TYPE);
     }
 }

@@ -39,7 +39,7 @@ public class MusicDiscEntityRenderer extends EntityRenderer<MusicDiscEntity,Musi
 
 
         if (!musicDiscEntityState.itemRenderState.isEmpty()) {
-            matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float)musicDiscEntityState.rotation * 360.0F / 8.0F));
+            matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(musicDiscEntityState.rotation));
             int j = this.getLight(musicDiscEntityState.glow, 15728880, i);
             matrixStack.scale(0.5F, 0.5F, 0.5F);
             musicDiscEntityState.itemRenderState.render(matrixStack, vertexConsumerProvider, j, OverlayTexture.DEFAULT_UV);
