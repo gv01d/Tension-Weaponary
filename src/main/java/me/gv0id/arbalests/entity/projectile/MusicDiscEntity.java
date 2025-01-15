@@ -4,6 +4,7 @@ import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.entity.damage.ModDamageTypes;
 import me.gv0id.arbalests.item.ModItems;
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.JukeboxBlock;
@@ -68,9 +69,11 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         if (this.inGroundTime > 4) {
             this.dealtDamage = 0;
         }
-        else {
+        if (this.inGroundTime < 1){
             float rotation = this.getDataTracker().get(ROTATION);
             this.getDataTracker().set(ROTATION, (rotation + (float)(ROTATION_SPEED * (this.getVelocity().length()/10F))) % 360);
+
+            this.setVelocity(this.getVelocity().add(0,Math.min( (float)(ROTATION_SPEED * (this.getVelocity().lengthSquared()) / 1000), 0.04),0));
         }
 
         super.tick();
@@ -80,6 +83,26 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
     @Override
     protected EntityHitResult getEntityCollision(Vec3d currentPosition, Vec3d nextPosition) {
         return this.dealtDamage < 1 ? null : super.getEntityCollision(currentPosition, nextPosition);
+    }
+
+    public Vec3d bounce( BlockHitResult blockHitResult, Vec3d pos,Vec3d entityVel, double bounceStrenght){
+        Vec3d center = blockHitResult.getBlockPos().toCenterPos();
+        Vec3d center1 = BlockPos.ofFloored(pos).toCenterPos();
+
+        if (center.y - center1.y != 0){
+            entityVel = entityVel.multiply(1,-bounceStrenght,1);
+            Arbalests.LOGGER.info("Z bounce");
+        }
+        if (center.x - center1.x != 0){
+            entityVel = entityVel.multiply(-bounceStrenght,1,1);
+            Arbalests.LOGGER.info("X bounce");
+        }
+        if (center.z - center1.z != 0){
+            entityVel = entityVel.multiply(1,1,-bounceStrenght);
+            Arbalests.LOGGER.info("Y bounce");
+        }
+
+        return entityVel;
     }
 
     @Override
@@ -126,7 +149,16 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
             }
         }
 
+        Vec3d vel = this.getVelocity();
         super.onBlockHit(blockHitResult);
+
+        if (vel.lengthSquared() > 1 && dealtDamage > 0){
+            Arbalests.LOGGER.info("B4 : {}",vel);
+            this.setVelocity(bounce(blockHitResult, this.getPos(),vel, 0.5));
+            this.setInGround(false);
+            dealtDamage--;
+            Arbalests.LOGGER.info("After : {}",this.getVelocity());
+        }
     }
 
     @Override

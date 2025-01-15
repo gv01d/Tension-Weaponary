@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
+import me.gv0id.arbalests.entity.projectile.MusicDiscEntity;
 import me.gv0id.arbalests.item.ModItems;
 import me.gv0id.arbalests.registry.tag.ModItemTypeTags;
 import net.minecraft.block.Block;
@@ -15,18 +16,19 @@ import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.component.type.JukeboxPlayableComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.thrown.EggEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.*;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ClickType;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -38,6 +40,7 @@ import java.util.function.Predicate;
 
 public class CopperDiscItem extends Item {
     public Predicate<ItemStack> DISCS = stack -> stack.isIn(ModItemTypeTags.DISCS);
+    public float POWER = 1.0F;
     public final int AMOUNT = 1;
 
 
@@ -52,9 +55,17 @@ public class CopperDiscItem extends Item {
     @Override
     public boolean onStackClicked(ItemStack stack, Slot slot, ClickType clickType, PlayerEntity player){
         ChargedProjectilesComponent chargedProjectilesComponent = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
-        if (chargedProjectilesComponent == null || chargedProjectilesComponent.isEmpty()) return super.onStackClicked(stack,slot,clickType,player);
-
         ItemStack slotStack = slot.getStack();
+        if (chargedProjectilesComponent == null || chargedProjectilesComponent.isEmpty()) {
+
+            if (clickType.equals(ClickType.RIGHT) && !slotStack.isEmpty() && DISCS.test(slotStack)){
+                stack.set(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.of(slot.takeStack(1)));
+                return true;
+            }
+
+            return super.onStackClicked(stack,slot,clickType,player);
+        }
+
         if (!slotStack.isEmpty()) return super.onStackClicked(stack,slot,clickType,player);
 
         if (clickType.equals(ClickType.RIGHT)){
@@ -85,6 +96,24 @@ public class CopperDiscItem extends Item {
             }
         }
         return false;
+    }
+
+    @Override
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
+        ItemStack itemStack = user.getStackInHand(hand);
+        if (user.isCreative()){
+            itemStack.set(DataComponentTypes.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
+        }
+        world.playSound(
+                null, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F)
+        );
+        if (world instanceof ServerWorld serverWorld) {
+            ProjectileEntity.spawnWithVelocity(MusicDiscEntity::new, serverWorld, itemStack, user, 0.0F, POWER, 1.0F);
+        }
+
+        user.incrementStat(Stats.USED.getOrCreateStat(this));
+        itemStack.decrementUnlessCreative(1, user);
+        return ActionResult.CONSUME;
     }
 
     @Override
