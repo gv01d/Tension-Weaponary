@@ -122,9 +122,11 @@ public class ModModelProvider extends FabricModelProvider {
             else if (projectile.isVariation()){
                 Arbalests.LOGGER.info("<Var> Generated charge name: _{}", projectile.getName());
 
-                mainChargeList.add(unbaked_variation_builder(item, "_", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE, projectile, itemModelGenerator, VarSourceEnum.valueOf(projectile.getEnumName())));
-                secondChargeList.add(unbaked_variation_builder(item, "_second_", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE, projectile, itemModelGenerator, VarSourceEnum.valueOf(projectile.getEnumName())));
-                thirdChargeList.add(unbaked_variation_builder(item, "_third_", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE, projectile, itemModelGenerator, VarSourceEnum.valueOf(projectile.getEnumName())));
+                VarSourceEnum temp = VarSourceEnum.valueOf(projectile.getEnumName());
+
+                mainChargeList.add(unbaked_variation_builder(item, "_", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE, projectile, itemModelGenerator, temp, temp.variationSelectProperty));
+                secondChargeList.add(unbaked_variation_builder(item, "_second_", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE, projectile, itemModelGenerator, temp, temp.variationSelectProperty2));
+                thirdChargeList.add(unbaked_variation_builder(item, "_third_", ModModels.DEADBEAT_CROSSBOW_MAIN_CHARGE, projectile, itemModelGenerator, temp, temp.variationSelectProperty3));
             }
             i++;
         }
@@ -225,7 +227,8 @@ public class ModModelProvider extends FabricModelProvider {
             Model parent,
             DeadbeatCrossbowItem.Projectiles projectile,
             ItemModelGenerator itemModelGenerator,
-            VarSourceEnum varSourceEnum
+            VarSourceEnum varSourceEnum,
+            SelectProperty<ItemVariation> variationSelectProperty
     ) {
         ArrayList<SelectItemModel.SwitchCase<ItemVariation>> variationList = new ArrayList<>();
 
@@ -243,7 +246,7 @@ public class ModModelProvider extends FabricModelProvider {
         return ItemModels.switchCase(
                 projectile,
                 ItemModels.select(
-                        varSourceEnum.getVariationSelectProperty(),
+                        variationSelectProperty,
                         unbaked,
                         variationList
                 )
@@ -301,7 +304,10 @@ public class ModModelProvider extends FabricModelProvider {
     }
 
     public enum VarSourceEnum{
-        MUSIC(ModItems.COPPER_DISC, new CopperDiscProjectileVariationTypeProperty(),
+        MUSIC(ModItems.COPPER_DISC,
+                new CopperDiscProjectileVariationTypeProperty(),
+                new CopperDiscSecondProjectileVariationTypeProperty(),
+                new CopperDiscThirdProjectileVariationTypeProperty(),
                 ItemVariation.D13,
                 ItemVariation.D11,
                 ItemVariation.D_BLOCKS,
@@ -325,16 +331,26 @@ public class ModModelProvider extends FabricModelProvider {
 
         Item item = null;
         ItemVariation[] variationItems;
-        SelectProperty<?> variationSelectProperty;
+        SelectProperty<ItemVariation> variationSelectProperty;
+        SelectProperty<ItemVariation> variationSelectProperty2;
+        SelectProperty<ItemVariation> variationSelectProperty3;
 
-        VarSourceEnum( Item item, SelectProperty<?> variationSelectProperty, ItemVariation ...variationItems){
+        VarSourceEnum( Item item, SelectProperty<ItemVariation> variationSelectProperty,SelectProperty<ItemVariation> variationSelectProperty2,SelectProperty<ItemVariation> variationSelectProperty3, ItemVariation ...variationItems){
             this.item = item;
             this.variationSelectProperty = variationSelectProperty;
+            this.variationSelectProperty2 = variationSelectProperty2;
+            this.variationSelectProperty3 = variationSelectProperty3;
             this.variationItems = variationItems;
         }
 
-        public <T> SelectProperty<T> getVariationSelectProperty() {
-            return (SelectProperty<T>) variationSelectProperty;
+        public SelectProperty<ItemVariation> getVariationSelectProperty1(int n) {
+            return variationSelectProperty;
+        }
+        public SelectProperty<ItemVariation> getVariationSelectProperty2(int n) {
+            return variationSelectProperty2;
+        }
+        public SelectProperty<ItemVariation> getVariationSelectProperty3(int n) {
+            return variationSelectProperty3;
         }
     }
 

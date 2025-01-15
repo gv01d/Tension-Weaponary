@@ -12,42 +12,22 @@ import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.Items;
+import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.item.*;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.*;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public class ModItems {
-    public static Item pv_register(String id) {
-        // create identifier
-        Identifier itemID = Identifier.of(Arbalests.MOD_ID, id);
-
-        // create key
-        RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, itemID);
-
-        // create item settings
-        Item.Settings settings = new Item.Settings()
-                .registryKey(key);
-
-        // register item
-        Item registeredItem = Registry.register(Registries.ITEM, key, new Item(settings));
-
-        // return item
-        return registeredItem;
-    }
-
-    // ----------------------------------------------------------------------------------------------------------
 
     public static final Item TRIAL_ESSENCE = register(
             "trial_essence",
@@ -80,14 +60,49 @@ public class ModItems {
 
     // ----------------------------------------------------------------------------------------------------------
 
+    public static ArrayList<Item> discList = new ArrayList<>(
+            List.of(
+                    Items.MUSIC_DISC_13,
+                    Items.MUSIC_DISC_11,
+                    Items.MUSIC_DISC_BLOCKS,
+                    Items.MUSIC_DISC_CAT,
+                    Items.MUSIC_DISC_5,
+                    Items.MUSIC_DISC_CHIRP,
+                    Items.MUSIC_DISC_CREATOR,
+                    Items.MUSIC_DISC_CREATOR_MUSIC_BOX,
+                    Items.MUSIC_DISC_FAR,
+                    Items.MUSIC_DISC_MALL,
+                    Items.MUSIC_DISC_MELLOHI,
+                    Items.MUSIC_DISC_OTHERSIDE,
+                    Items.MUSIC_DISC_PIGSTEP,
+                    Items.MUSIC_DISC_PRECIPICE,
+                    Items.MUSIC_DISC_RELIC,
+                    Items.MUSIC_DISC_STAL,
+                    Items.MUSIC_DISC_STRAD,
+                    Items.MUSIC_DISC_WAIT,
+                    Items.MUSIC_DISC_WARD
+            )
+    );
+
     public static void initialize() {
         // Get the event for modifying entries in the ingredients group.
         // And register an event handler that adds our suspicious item to the ingredients group.
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
                 .register((itemGroup) -> itemGroup.add(ModItems.TRIAL_ESSENCE));
-
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT)
-                .register((itemGroup) -> itemGroup.add(ModItems.DEADBEAT_CROSSBOW));
+                .register((itemGroup) -> {
+                    itemGroup.addAfter(Items.CROSSBOW,ModItems.DEADBEAT_CROSSBOW);
+                    itemGroup.add(ModItems.COPPER_DISC);
+                    for (Item item : discList){
+
+                        ItemStack temp = ModItems.COPPER_DISC.getDefaultStack();
+                        temp.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.of(item.getDefaultStack()));
+
+                        itemGroup.add(temp);
+                    }
+                });
+
+
 
         ModPotions.registerPotions();
 
