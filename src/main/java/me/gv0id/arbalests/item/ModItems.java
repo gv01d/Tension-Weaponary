@@ -10,13 +10,17 @@ import me.gv0id.arbalests.item.potion.ModPotions;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ChargedProjectilesComponent;
-import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.component.type.*;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.*;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.*;
+import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
@@ -55,8 +59,23 @@ public class ModItems {
             new Item.Settings()
                     .maxCount(1)
                     .rarity(Rarity.UNCOMMON)
-                    .useCooldown(0.5F)
+                    //.useCooldown(0.5F)
                     .component(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.DEFAULT)
+                    .attributeModifiers(AttributeModifiersComponent.builder()
+                            .add(
+                                    EntityAttributes.ATTACK_DAMAGE,
+                                    new EntityAttributeModifier(
+                                            Item.BASE_ATTACK_DAMAGE_MODIFIER_ID, 3, EntityAttributeModifier.Operation.ADD_VALUE
+                                    ),
+                                    AttributeModifierSlot.MAINHAND
+                            )
+                            .add(
+                                    EntityAttributes.ATTACK_SPEED,
+                                    new EntityAttributeModifier(Item.BASE_ATTACK_SPEED_MODIFIER_ID, -1.5, EntityAttributeModifier.Operation.ADD_VALUE),
+                                    AttributeModifierSlot.MAINHAND
+                            )
+                            .build())
+
     );
 
     // ----------------------------------------------------------------------------------------------------------

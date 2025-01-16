@@ -108,7 +108,8 @@ public class CopperDiscItem extends Item {
                 null, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F)
         );
         if (world instanceof ServerWorld serverWorld) {
-            ProjectileEntity.spawnWithVelocity(MusicDiscEntity::new, serverWorld, itemStack, user, 0.0F, POWER, 1.0F);
+            ProjectileEntity.spawnWithVelocity((world1, owner, stack) -> new MusicDiscEntity(world1, owner, stack, 3, true, false),
+                    serverWorld, itemStack, user, 0.0F, POWER, 2.0F);
         }
 
         user.incrementStat(Stats.USED.getOrCreateStat(this));
