@@ -94,8 +94,6 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
                 boolean b = this.getWorld().getBlockState(this.getBlockPos()).isAir();
                 boolean a = this.getWorld().getBlockState(BlockPos.ofFloored(this.getPos().add(0D,1D,0D))).isAir();
                 double blockLevel = this.getPos().y - this.getBlockY();
-                float test = this.getPitch();
-                double ajustedPitch = Math.abs(Math.abs(this.getPitch()) - 90);
                 if (Math.abs(this.getPitch()) < 45 && (b || (!b && blockLevel > 0.1 && a))){
                     this.setVelocity(this.getVelocity().multiply(1,-BOUNCE_STRENGHT,1));
                 }
