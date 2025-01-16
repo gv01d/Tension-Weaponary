@@ -26,8 +26,8 @@ public class ModEntityType {
             "music_disc_entity",
             EntityType.Builder.<MusicDiscEntity>create(MusicDiscEntity::new, SpawnGroup.MISC)
                     .dropsNothing()
-                    .dimensions(0.5F, 0.1F)
-                    .eyeHeight(0.0F)
+                    .dimensions(0.3F, 0.3F)
+                    .eyeHeight(0.2F)
                     .maxTrackingRange(4)
                     .trackingTickInterval(10)
     );

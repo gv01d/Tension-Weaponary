@@ -40,6 +40,8 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
     private Entity lastAffected = null;
     public boolean interactedWithJukebox = false;
     public boolean BOOMERANG = false;
+    public boolean wasInWater = false;
+    public double BOUNCE_STRENGHT = 0.5;
     public float LIFE_CYCLE = 10;
     public float countDown = LIFE_CYCLE;
 
@@ -87,6 +89,21 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
 
     @Override
     public void tick() {
+        if (this.isTouchingWater()){
+            if (!wasInWater){
+                boolean b = this.getWorld().getBlockState(this.getBlockPos()).isAir();
+                boolean a = this.getWorld().getBlockState(BlockPos.ofFloored(this.getPos().add(0D,1D,0D))).isAir();
+                double blockLevel = this.getPos().y - this.getBlockY();
+                float test = this.getPitch();
+                double ajustedPitch = Math.abs(Math.abs(this.getPitch()) - 90);
+                if (Math.abs(this.getPitch()) < 45 && (b || (!b && blockLevel > 0.1 && a))){
+                    this.setVelocity(this.getVelocity().multiply(1,-BOUNCE_STRENGHT,1));
+                }
+            }
+
+            wasInWater = true;
+        }
+
         if (this.inGroundTime > 4) {
             this.dealtDamage = 0;
         }
@@ -136,24 +153,17 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         return this.dealtDamage < 1 ? null : super.getEntityCollision(currentPosition, nextPosition);
     }
 
-    public Vec3d bounce( BlockHitResult blockHitResult, Vec3d pos,Vec3d entityVel, double bounceStrenght){
-        Vec3d center = blockHitResult.getBlockPos().toCenterPos();
-        Vec3d center1 = BlockPos.ofFloored(pos).toCenterPos();
+    public Vec3d bounce( BlockHitResult blockHitResult,Vec3d entityVel, double bounceStrenght){
 
-        if (center.y - center1.y != 0){
-            entityVel = entityVel.multiply(1,-bounceStrenght,1);
-            Arbalests.LOGGER.info("Z bounce");
-        }
-        if (center.x - center1.x != 0){
-            entityVel = entityVel.multiply(-bounceStrenght,1,1);
-            Arbalests.LOGGER.info("X bounce");
-        }
-        if (center.z - center1.z != 0){
-            entityVel = entityVel.multiply(1,1,-bounceStrenght);
-            Arbalests.LOGGER.info("Y bounce");
-        }
+        Vec3d DdirVec = blockHitResult.getSide().getDoubleVector();
+        Arbalests.LOGGER.info( "DdirVec : {}", DdirVec);
+        Arbalests.LOGGER.info("Test X : {}", (Math.signum(entityVel.x)));
 
-        return entityVel;
+        return entityVel.multiply(
+                (DdirVec.x == 0) || (Math.signum(entityVel.x) == DdirVec.x) ? 1 : -1,
+                (DdirVec.y == 0) || (Math.signum(entityVel.y) == DdirVec.y) ? 1 : -1,
+                (DdirVec.z == 0) || (Math.signum(entityVel.z) == DdirVec.z) ? 1 : -1
+        ).multiply(bounceStrenght);
     }
 
     @Override
@@ -201,12 +211,14 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
             }
         }
 
+        Vec3d eyePos = this.getEyePos();
         Vec3d vel = this.getVelocity();
         super.onBlockHit(blockHitResult);
 
         if (vel.lengthSquared() > 0.5 && dealtDamage > 0){
             Arbalests.LOGGER.info("B4 : {}",vel);
-            this.setVelocity(bounce(blockHitResult, this.getPos(),vel, 0.5));
+            this.setPitch(getPitch() + 20F * (float)(Math.random() > 0.5 ? -1 : 1));
+            this.setVelocity(bounce(blockHitResult,vel, BOUNCE_STRENGHT));
             this.setInGround(false);
             dealtDamage--;
             Arbalests.LOGGER.info("After : {}",this.getVelocity());

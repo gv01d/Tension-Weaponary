@@ -33,6 +33,8 @@ public class MusicDiscEntityRenderer extends EntityRenderer<MusicDiscEntity,Musi
         super.render(musicDiscEntityState, matrixStack, vertexConsumerProvider, i);
         matrixStack.push();
 
+        matrixStack.translate(0,0.15,0);
+
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(musicDiscEntityState.yaw - 90.0F));
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(musicDiscEntityState.pitch + 90.0F));
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
