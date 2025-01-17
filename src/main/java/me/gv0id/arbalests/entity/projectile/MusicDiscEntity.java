@@ -28,7 +28,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,6 +46,13 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
     public double BOUNCE_STRENGHT = 0.5;
     public float LIFE_CYCLE = 10;
     public float countDown = LIFE_CYCLE;
+    public float MAX_DAMAGE = 6;
+    public float pDmg = 2;
+
+    public Box defaultBoundingBox;
+
+    public float PARRY_TIME = 3;
+    public float parryCountDown = PARRY_TIME;
 
     private static final TrackedData<ItemStack> ITEM_STACK = DataTracker.registerData(MusicDiscEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
     private static final TrackedData<Float> ROTATION = DataTracker.registerData(MusicDiscEntity.class, TrackedDataHandlerRegistry.FLOAT);
@@ -53,6 +62,7 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
 
     public MusicDiscEntity(EntityType<? extends MusicDiscEntity> entityType, World world) {
         super(entityType, world);
+        defaultBoundingBox = this.getBoundingBox();
     }
 
     public MusicDiscEntity(World world, LivingEntity owner, ItemStack stack) {
@@ -60,6 +70,7 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         setStack(stack);
         this.dataTracker.set(ITEM_STACK,stack);
         setAsStackHolder(stack);
+        defaultBoundingBox = this.getBoundingBox();
     }
 
     public MusicDiscEntity(World world, LivingEntity owner, ItemStack stack,int hitAmount, boolean boomerang, boolean gravity) {
@@ -70,6 +81,7 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         this.dealtDamage = hitAmount;
         this.BOOMERANG = boomerang;
         this.setNoGravity(!gravity);
+        defaultBoundingBox = this.getBoundingBox();
     }
 
     @Override
@@ -80,6 +92,7 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
     public MusicDiscEntity(World world, double x, double y, double z, ItemStack stack) {
         super(ModEntityType.MUSIC_DISC, x, y, z, world, stack, stack);
         setAsStackHolder(stack);
+        defaultBoundingBox = this.getBoundingBox();
     }
 
     private boolean isOwnerAlive() {
@@ -115,7 +128,7 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         Entity owner = this.getOwner();
         if ( BOOMERANG && (dealtDamage < 1 || countDown < 1) && owner != null){
             if (!this.isOwnerAlive()) {
-                if (this.getWorld() instanceof ServerWorld serverWorld && this.pickupType == PersistentProjectileEntity.PickupPermission.ALLOWED) {
+                if (this.getWorld() instanceof ServerWorld serverWorld && this.pickupType == PickupPermission.ALLOWED) {
                     this.dropStack(serverWorld, this.asItemStack(), 0.1F);
                 }
 
@@ -125,11 +138,18 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
                     this.discard();
                     return;
                 }
+                if (parryCountDown < PARRY_TIME) {
+                    parryCountDown++;
+                }
+                else {
+
+                }
 
                 this.setNoClip(true);
-                Vec3d vec3d = owner.getEyePos().subtract(this.getPos());
+                Vec3d vec3d = owner.getEyePos().add(owner.getFacing().getDoubleVector().multiply(0.5)).subtract(this.getEyePos());
                 this.setPos(this.getX(), this.getY() + vec3d.y * 0.015 * (double)returnSpeed, this.getZ());
                 double d = 0.05 * (double)returnSpeed;
+                if (this.distanceTo(owner) <= 2) this.setVelocity(this.getVelocity().multiply(0.05));
                 this.setVelocity(this.getVelocity().multiply(0.95).add(vec3d.normalize().multiply(d)));
                 if (this.returnTimer == 0) {
                     this.playSound(SoundEvents.ITEM_TRIDENT_RETURN, 10.0F, 1.0F);
@@ -162,6 +182,25 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
                 (DdirVec.y == 0) || (Math.signum(entityVel.y) == DdirVec.y) ? 1 : -1,
                 (DdirVec.z == 0) || (Math.signum(entityVel.z) == DdirVec.z) ? 1 : -1
         ).multiply(bounceStrenght);
+    }
+
+    @Override
+    protected void onDeflected(@Nullable Entity deflector, boolean fromAttack) {
+        super.onDeflected(deflector, fromAttack);
+        dealtDamage = 3;
+        countDown = LIFE_CYCLE * 2;
+        lastAffected = null;
+        if (pDmg < MAX_DAMAGE){
+            pDmg++;
+        }
+        this.setVelocity(this.getVelocity().multiply(1.3));
+        this.setNoClip(false);
+        this.setBoundingBox(defaultBoundingBox);
+    }
+
+    @Override
+    public boolean canBeHitByProjectile() {
+        return super.canBeHitByProjectile();
     }
 
     @Override
@@ -226,14 +265,35 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         }
     }
 
+    public class EntityDist implements Comparator<EntityDist>{
+
+        EntityDist(Entity entity, double distance){
+            this.entity = entity;
+            this.distance = distance;
+        }
+
+        Entity entity;
+        double distance;
+
+        public EntityDist() {
+        }
+
+        @Override
+        public int compare(EntityDist entityDist, EntityDist t1) {
+            return (int) Math.signum((entityDist.distance - t1.distance));
+        }
+    }
+
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         Entity entity = entityHitResult.getEntity();
         if (entity.equals(lastAffected))
             return;
 
+        countDown = LIFE_CYCLE;
+        Entity lastTarget = lastAffected;
         lastAffected = entity;
-        float f = 3.0F;
+        float f = pDmg;
         Entity entity2 = this.getOwner();
         DamageSource damageSource = this.getDamageSources().trident(entity, (entity2 == null ? this : entity2));
         if (this.getWorld() instanceof ServerWorld serverWorld) {
@@ -261,39 +321,65 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         HashMap<Float, Entity> hashMap = new HashMap<>();
 
         Arbalests.LOGGER.info("Entities near: {}", entities);
-
-        Float min = null;
-        float dis;
-        for (Entity entity1 : entities){
-            if (!entity1.equals(entity) && !entity1.equals(this) && entity1 instanceof LivingEntity){
-                dis = entity1.distanceTo(this);
-                if (min == null) min = dis;
-                if (min > dis) min = dis;
-                hashMap.put(dis, entity1);
+        if (dealtDamage > 0){
+            Float min = null;
+            float dis;
+            ArrayList<EntityDist> entList = new ArrayList<EntityDist>();
+            for (Entity entity1 : entities){
+                dis = 0;
+                if (!entity1.equals(entity) && !entity1.equals(this) && entity1 instanceof LivingEntity){
+                    if (entity1.equals(lastTarget)) dis = 10;
+                    dis += entity1.distanceTo(this);
+                    if (min == null) min = dis;
+                    if (min > dis) min = dis;
+                    hashMap.put(dis, entity1);
+                    entList.add(new EntityDist(entity1, dis));
+                }
             }
-        }
+
+            entList.sort(new EntityDist());
 
 
-        Vec3d vec3d;
-        if (min != null){
-            Entity target = hashMap.get(min);
-            Arbalests.LOGGER.info("Selected <{}> : {} ", min , target);
-            Vec3d targetPos = new Vec3d(target.getPos().x, (target.getPos().y + target.getEyePos().y) / 2, target.getPos().z);
-            double vel = this.getVelocity().length();
-            vec3d = targetPos.add(this.getPos().negate()).normalize().multiply(vel * 1);
+            Vec3d vec3d;
+
+            Entity target = null;
+            Vec3d targetPos = null;
+            for (EntityDist entD : entList){
+                targetPos = new Vec3d(entD.entity.getEyePos().x, (entD.entity.getPos().y + entD.entity.getEyePos().y) / 2, entD.entity.getEyePos().z);
+                BlockHitResult blockHitResult = this.getWorld().raycast(new RaycastContext(this.getEyePos(), targetPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE,this));
+                if (blockHitResult.getType() == HitResult.Type.ENTITY || blockHitResult.getType() == HitResult.Type.MISS){
+                    target = entD.entity;
+                    break;
+                }
+            }
+            if (target != null){
+                double vel = this.getVelocity().length();
+                vec3d = targetPos.add(this.getPos().negate()).normalize().multiply(vel * 1);
+            }
+            else {
+                this.deflect(ProjectileDeflection.SIMPLE, entity, this.getOwner(), false);
+                vec3d = this.getVelocity().multiply(0.1, 0.3, 0.1);
+                countDown = 0;
+            }
+
+            this.setVelocity(vec3d);
+            this.playSound(SoundEvents.ITEM_TRIDENT_HIT, 1.0F, 1.0F);
         }
         else {
-            this.deflect(ProjectileDeflection.SIMPLE, entity, this.getOwner(), false);
-            vec3d = this.getVelocity().multiply(0.1, 0.3, 0.1);
+            countDown = 0;
         }
 
-        this.setVelocity(vec3d);
-        this.playSound(SoundEvents.ITEM_TRIDENT_HIT, 1.0F, 1.0F);
     }
 
     @Override
     protected boolean tryPickup(PlayerEntity player) {
-        return super.tryPickup(player) || this.isNoClip() && this.isOwner(player) && player.getInventory().insertStack(this.asItemStack());
+        if (parryCountDown <= 0){
+            return super.tryPickup(player) || this.isNoClip() && this.isOwner(player) && player.getInventory().insertStack(this.asItemStack());
+        }
+        Box temp = this.defaultBoundingBox.expand(2,2,2);
+        this.setBoundingBox(temp);
+        this.parryCountDown -= 2;
+        return false;
     }
 
     @Override
@@ -358,7 +444,7 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
 
     @Override
     public void age() {
-        if (this.pickupType != PersistentProjectileEntity.PickupPermission.ALLOWED) {
+        if (this.pickupType != PickupPermission.ALLOWED) {
             super.age();
         }
     }
