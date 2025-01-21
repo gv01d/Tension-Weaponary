@@ -223,6 +223,13 @@
           {
             "model": {
               "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_end_crystal"
+            },
+            "when": "end_crystal"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
               "model": "arbalests:item/deadbeat_crossbow_nether_star"
             },
             "when": "nether_star"
@@ -494,6 +501,13 @@
           {
             "model": {
               "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_end_crystal"
+            },
+            "when": "end_crystal"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
               "model": "arbalests:item/deadbeat_crossbow_second_nether_star"
             },
             "when": "nether_star"
@@ -722,6 +736,13 @@
               "property": "arbalests:deadbeat_crossbow/copper_disc_third_music"
             },
             "when": "copper_disc"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_end_crystal"
+            },
+            "when": "end_crystal"
           },
           {
             "model": {

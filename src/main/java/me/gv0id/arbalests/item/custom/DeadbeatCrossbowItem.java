@@ -17,6 +17,7 @@ import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
 import net.minecraft.inventory.StackReference;
@@ -598,7 +599,11 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                 (world,shooter,weaponStack, projectileStack, critical) ->
                         new MusicDiscEntity(world,shooter, projectileStack),
                 "MUSIC"),
+        CRYSTAL(Items.END_CRYSTAL, 4F,0.5F,
+                (world,shooter,weaponStack, projectileStack, critical) ->
+                new EndCrystalProjectileEntity(world, shooter)),
         NETHER_STAR(Items.NETHER_STAR, 2F,1F,DeadbeatCrossbowItem::createArrow);
+
 
         public static final EnumCodec<Projectiles> CODEC = StringIdentifiable.createCodec(Projectiles::values);
         Item item = null;

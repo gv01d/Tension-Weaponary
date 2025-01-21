@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.entity;
 
+import me.gv0id.arbalests.entity.projectile.EndCrystalProjectileEntity;
 import me.gv0id.arbalests.entity.projectile.MusicDiscEntity;
 import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
 import net.minecraft.entity.Entity;
@@ -28,6 +29,15 @@ public class ModEntityType {
                     .dropsNothing()
                     .dimensions(0.3F, 0.3F)
                     .eyeHeight(0.2F)
+                    .maxTrackingRange(4)
+                    .trackingTickInterval(10)
+    );
+    public static final  EntityType<EndCrystalProjectileEntity> END_CRYSTAL_PROJECTILE = register(
+            "end_crystal_projectile",
+            EntityType.Builder.<EndCrystalProjectileEntity>create(EndCrystalProjectileEntity::new, SpawnGroup.MISC)
+                    .dropsNothing()
+                    .dimensions(1.2F,1.2F)
+                    .eyeHeight(0.6F)
                     .maxTrackingRange(4)
                     .trackingTickInterval(10)
     );

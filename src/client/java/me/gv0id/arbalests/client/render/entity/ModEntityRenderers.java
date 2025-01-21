@@ -25,6 +25,7 @@ public class ModEntityRenderers implements ClientModInitializer {
     public void onInitializeClient() {
         EntityRendererRegistry.register(ModEntityType.WIND_GALE, WindGaleEntityRenderer::new);
         EntityRendererRegistry.register(ModEntityType.MUSIC_DISC, MusicDiscEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntityType.END_CRYSTAL_PROJECTILE, EndCrystalProjectileEntityRenderer::new);
     }
 
 }

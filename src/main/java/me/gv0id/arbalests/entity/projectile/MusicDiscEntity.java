@@ -19,6 +19,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -190,6 +191,10 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         dealtDamage = 3;
         countDown = LIFE_CYCLE * 2;
         lastAffected = null;
+
+        if(deflector instanceof ProjectileEntity projectile) this.setOwner(projectile.getOwner());
+        if(deflector instanceof LivingEntity livingEntity) this.setOwner(livingEntity);
+
         if (pDmg < MAX_DAMAGE){
             pDmg++;
         }
@@ -373,7 +378,7 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
 
     @Override
     protected boolean tryPickup(PlayerEntity player) {
-        if (parryCountDown <= 0){
+        if (parryCountDown <= 0 || !BOOMERANG){
             return super.tryPickup(player) || this.isNoClip() && this.isOwner(player) && player.getInventory().insertStack(this.asItemStack());
         }
         Box temp = this.defaultBoundingBox.expand(2,2,2);
