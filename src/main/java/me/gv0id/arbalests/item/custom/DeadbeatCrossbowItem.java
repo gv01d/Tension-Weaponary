@@ -102,6 +102,15 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             if (!isFullyCharged(stack)) {
                 ChargedProjectilesComponent chargedProjectilesComponent = stack.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.DEFAULT);
                 List<ItemStack> list = new ArrayList<>(List.copyOf(chargedProjectilesComponent.getProjectiles()));
+                int slots = AMMO;
+                for (ItemStack stack1 : list){
+                    slots -= getProjectileData(stack1).slots;
+                }
+
+                if (getProjectileData(otherStack).slots > slots){
+                    return false;
+                }
+
                 if (list.size() < AMMO) {
                     CrossbowItem.LoadingSounds loadingSounds = this.getLoadingSounds(stack);
                     list.add(otherStack.split(1));
@@ -242,6 +251,16 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             int i = shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND;
             int s = i + Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles().size();
             List<ItemStack> list = new ArrayList<>(s);
+
+            int slots = AMMO;
+            for (ItemStack stack1 : list){
+                slots -= getProjectileData(stack1).slots;
+            }
+
+            if (getProjectileData(projectileStack).slots > slots){
+                return list;
+            }
+
             list.addAll(Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles());
             ItemStack itemStack = projectileStack.copy();
 
@@ -450,6 +469,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                 if (user.getProjectileType(stack).isEmpty()){
                     return;
                 }
+
                 stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.CHARGING);
                 loadProjectiles(user,stack);
                 loadingSounds.end()
@@ -508,11 +528,20 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         ChargedProjectilesComponent chargedProjectilesComponent = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (!isFullyCharged(stack) && !isLoaded(stack)){
-            tooltip.add(Text.translatable("item.arbalests.deadbeat_crossbow.right_click_request").formatted(Formatting.GRAY));
 
             assert chargedProjectilesComponent != null;
-            if (!chargedProjectilesComponent.getProjectiles().isEmpty())
-                tooltip.add(ScreenTexts.SPACE);
+            List<ItemStack> list = new ArrayList<>(List.copyOf(chargedProjectilesComponent.getProjectiles()));
+            int slots = AMMO;
+            for (ItemStack stack1 : list){
+                slots -= getProjectileData(stack1).slots;
+            }
+            if (slots > 0){
+                tooltip.add(Text.translatable("item.arbalests.deadbeat_crossbow.right_click_request").formatted(Formatting.GRAY));
+
+                if (!chargedProjectilesComponent.getProjectiles().isEmpty())
+                    tooltip.add(ScreenTexts.SPACE);
+            }
+
         }
 
         if (chargedProjectilesComponent != null && !chargedProjectilesComponent.isEmpty()) {
@@ -599,9 +628,10 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                 (world,shooter,weaponStack, projectileStack, critical) ->
                         new MusicDiscEntity(world,shooter, projectileStack),
                 "MUSIC"),
-        CRYSTAL(Items.END_CRYSTAL, 4F,0.5F,
+        CRYSTAL(Items.END_CRYSTAL, 4F,1.0F, 3,
                 (world,shooter,weaponStack, projectileStack, critical) ->
                 new EndCrystalProjectileEntity(world, shooter)),
+
         NETHER_STAR(Items.NETHER_STAR, 2F,1F,DeadbeatCrossbowItem::createArrow);
 
 
@@ -611,8 +641,10 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         Item parent = null;
         TagKey<Item> tagKey = null;
         String enumName;
+
         float cooldown = 0;
         float speed = 0;
+        int slots = 1;
 
         ProjectileInterface projectileBuilder;
 
@@ -628,6 +660,13 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             this.cooldown = cooldown;
             this.speed = speed;
             this.projectileBuilder = projectileBuilder;
+        }
+        Projectiles(Item item, float cooldown, float speed, int slots, ProjectileInterface projectileBuilder){
+            this.item = item;
+            this.cooldown = cooldown;
+            this.speed = speed;
+            this.projectileBuilder = projectileBuilder;
+            this.slots = slots;
         }
 
         Projectiles(Item item, float cooldown, float speed, ProjectileInterface projectileBuilder, String tintSourceEnumName, String... layerSuffix){

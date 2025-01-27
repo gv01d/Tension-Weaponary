@@ -8,6 +8,7 @@
     "ExplosionImplMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",
+    "ProjectileEntityMixin",
     "ServerPlayerEntityMixin",
     "StatusEffectInstanceMixin"
   ],

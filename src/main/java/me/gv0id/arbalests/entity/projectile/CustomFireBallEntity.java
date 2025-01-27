@@ -10,10 +10,16 @@ import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.entity.projectile.WindChargeEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -100,6 +106,33 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
             EXPLOSION_BEHAVIOR = new AdvancedExplosionBehavior(
                     true, true, Optional.of(KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
             );
+
+            Vec3d vec3d = this.getPos();
+            float pow = this.EXPLOSION_POWER;
+            SimpleParticleType simpleParticleType = ParticleTypes.EXPLOSION;
+            SimpleParticleType simpleParticleType1 = ParticleTypes.EXPLOSION_EMITTER;
+            World.ExplosionSourceType explosionSourceType = World.ExplosionSourceType.TRIGGER;
+
+            if (hitResult.getType() == HitResult.Type.ENTITY ){
+                Entity entity = ((EntityHitResult) hitResult).getEntity();
+                if (!entity.isOnGround() && !entity.isTouchingWater()){
+                    serverWorld.spawnParticles(ModParticles.LIGHT_FLASH, vec3d.x,vec3d.y,vec3d.z,1,0,0,0,0);
+                    simpleParticleType = simpleParticleType1 = ModParticles.RED_BOOM;
+                    Vec3d vec3d1 = entity.getVelocity();
+                    entity.setVelocity(vec3d1.x,Math.max(0, vec3d1.y),vec3d1.z);
+                    pow *= 1.5F;
+                    explosionSourceType = World.ExplosionSourceType.TNT;
+
+                    RegistryEntry<SoundEvent> registryEntry = RegistryEntry.of(SoundEvents.ITEM_TOTEM_USE);
+                    for (ServerPlayerEntity serverPlayerEntity : serverWorld.getPlayers()){
+                        serverPlayerEntity.networkHandler.sendPacket(new PlaySoundS2CPacket(registryEntry, SoundCategory.PLAYERS,vec3d.x,vec3d.y,vec3d.z,5F,0.5f, serverWorld.getRandom().nextLong()));
+                    }
+                }
+            }
+
+            //serverWorld.spawnParticles(ModParticles.RED_BOOM, vec3d.x,vec3d.y,vec3d.z,1,0,0,0,0);
+
+
             this.getWorld().createExplosion(
                     this,
                     null,
@@ -107,12 +140,12 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
                     this.getX(),
                     this.getY(),
                     this.getZ(),
-                    (float)this.EXPLOSION_POWER,
+                    pow,
                     true,
-                    World.ExplosionSourceType.TRIGGER,
-                    ParticleTypes.GUST_EMITTER_SMALL,
-                    ParticleTypes.GUST_EMITTER_LARGE,
-                    SoundEvents.ENTITY_WIND_CHARGE_WIND_BURST
+                    explosionSourceType,
+                    simpleParticleType,
+                    simpleParticleType1,
+                    SoundEvents.ENTITY_GENERIC_EXPLODE
             );
             this.discard();
         }

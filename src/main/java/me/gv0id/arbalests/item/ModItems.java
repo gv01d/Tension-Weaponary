@@ -59,6 +59,7 @@ public class ModItems {
             new Item.Settings()
                     .maxCount(1)
                     .rarity(Rarity.UNCOMMON)
+                    .maxDamage(300)
                     //.useCooldown(0.5F)
                     .component(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.DEFAULT)
                     .attributeModifiers(AttributeModifiersComponent.builder()

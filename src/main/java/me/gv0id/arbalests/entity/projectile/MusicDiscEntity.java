@@ -3,6 +3,8 @@ package me.gv0id.arbalests.entity.projectile;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.item.ModItems;
+import me.gv0id.arbalests.particle.ModParticles;
+import me.gv0id.arbalests.particle.StreakParticleEffect;
 import net.minecraft.block.Block;
 import net.minecraft.block.JukeboxBlock;
 import net.minecraft.block.entity.JukeboxBlockEntity;
@@ -24,6 +26,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.particle.EntityEffectParticleEffect;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.particle.TrailParticleEffect;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -49,6 +54,8 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
     public float countDown = LIFE_CYCLE;
     public float MAX_DAMAGE = 6;
     public float pDmg = 2;
+
+    public boolean ground = false;
 
     public Box defaultBoundingBox;
 
@@ -103,6 +110,10 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
 
     @Override
     public void tick() {
+        if (this.getStack() == null || this.getStack().getItem() == Items.AIR) {
+            this.discard();
+        }
+
         if (this.isTouchingWater()){
             if (!wasInWater){
                 boolean b = this.getWorld().getBlockState(this.getBlockPos()).isAir();
@@ -114,14 +125,18 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
             }
 
             wasInWater = true;
+        } else if (inGroundTime < 1){
+            spawnParticles(1);
         }
 
         if (this.inGroundTime > 4) {
             this.dealtDamage = 0;
+            this.ground = true;
         }
         if (this.inGroundTime < 1){
             float rotation = this.getDataTracker().get(ROTATION);
             this.getDataTracker().set(ROTATION, (rotation + ROTATION_SPEED) % 360);
+            this.ground = false;
 
             //this.setVelocity(this.getVelocity().add(0,Math.min( (float)(ROTATION_SPEED * (this.getVelocity().lengthSquared()) / 1000), 0.04),0));
         }
@@ -148,7 +163,7 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
 
                 this.setNoClip(true);
                 Vec3d vec3d = owner.getEyePos().add(owner.getFacing().getDoubleVector().multiply(0.5)).subtract(this.getEyePos());
-                this.setPos(this.getX(), this.getY() + vec3d.y * 0.015 * (double)returnSpeed, this.getZ());
+                //this.setPos(this.getX(), this.getY() + vec3d.y * 0.015 * (double)returnSpeed, this.getZ());
                 double d = 0.05 * (double)returnSpeed;
                 if (this.distanceTo(owner) <= 2) this.setVelocity(this.getVelocity().multiply(0.05));
                 this.setVelocity(this.getVelocity().multiply(0.95).add(vec3d.normalize().multiply(d)));
@@ -166,6 +181,10 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         super.tick();
     }
 
+    public boolean returning(){
+        return this.returnTimer > 0;
+    }
+
     @Nullable
     @Override
     protected EntityHitResult getEntityCollision(Vec3d currentPosition, Vec3d nextPosition) {
@@ -175,8 +194,6 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
     public Vec3d bounce( BlockHitResult blockHitResult,Vec3d entityVel, double bounceStrenght){
 
         Vec3d DdirVec = blockHitResult.getSide().getDoubleVector();
-        Arbalests.LOGGER.info( "DdirVec : {}", DdirVec);
-        Arbalests.LOGGER.info("Test X : {}", (Math.signum(entityVel.x)));
 
         return entityVel.multiply(
                 (DdirVec.x == 0) || (Math.signum(entityVel.x) == DdirVec.x) ? 1 : -1,
@@ -191,16 +208,28 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         dealtDamage = 3;
         countDown = LIFE_CYCLE * 2;
         lastAffected = null;
+        returnTimer = 0;
 
         if(deflector instanceof ProjectileEntity projectile) this.setOwner(projectile.getOwner());
-        if(deflector instanceof LivingEntity livingEntity) this.setOwner(livingEntity);
+        if(deflector instanceof PlayerEntity playerEntity) this.setOwner(playerEntity);
 
         if (pDmg < MAX_DAMAGE){
             pDmg++;
         }
-        this.setVelocity(this.getVelocity().multiply(1.3));
+
+        Entity target = targetNearest(this.getOwner(), null,null);
+        if (target != null){
+            Vec3d targetPos = new Vec3d(target.getEyePos().x, (target.getPos().y + target.getEyePos().y) / 2, target.getEyePos().z);
+            double vel = this.getVelocity().length();
+            this.setVelocity(targetPos.add(this.getPos().negate()).normalize().multiply(vel * 1));
+        }
+        else {
+            this.setVelocity(this.getVelocity().multiply(1.3));
+        }
+
         this.setNoClip(false);
         this.setBoundingBox(defaultBoundingBox);
+        this.playSound(SoundEvents.ITEM_TRIDENT_RETURN, 10.0F, 0.2F);
     }
 
     @Override
@@ -258,12 +287,10 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         super.onBlockHit(blockHitResult);
 
         if (vel.lengthSquared() > 0.5 && dealtDamage > 0){
-            Arbalests.LOGGER.info("B4 : {}",vel);
             this.setPitch(getPitch() + 20F * (float)(Math.random() > 0.5 ? -1 : 1));
             this.setVelocity(bounce(blockHitResult,vel, BOUNCE_STRENGHT));
             this.setInGround(false);
             dealtDamage--;
-            Arbalests.LOGGER.info("After : {}",this.getVelocity());
         }
         else {
             dealtDamage = 0;
@@ -299,8 +326,8 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         Entity lastTarget = lastAffected;
         lastAffected = entity;
         float f = pDmg;
-        Entity entity2 = this.getOwner();
-        DamageSource damageSource = this.getDamageSources().trident(entity, (entity2 == null ? this : entity2));
+        Entity owner = this.getOwner();
+        DamageSource damageSource = this.getDamageSources().trident(entity, (owner == null ? this : owner));
         if (this.getWorld() instanceof ServerWorld serverWorld) {
             f = EnchantmentHelper.getDamage(serverWorld, Objects.requireNonNull(this.getWeaponStack()), entity, damageSource, f);
         }
@@ -322,42 +349,14 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         }
 
 
-        ArrayList<Entity> entities = new ArrayList<>(getWorld().getOtherEntities(entity2, Box.of(this.getPos(),20,10,20)));
-        HashMap<Float, Entity> hashMap = new HashMap<>();
-
-        Arbalests.LOGGER.info("Entities near: {}", entities);
         if (dealtDamage > 0){
-            Float min = null;
-            float dis;
-            ArrayList<EntityDist> entList = new ArrayList<EntityDist>();
-            for (Entity entity1 : entities){
-                dis = 0;
-                if (!entity1.equals(entity) && !entity1.equals(this) && entity1 instanceof LivingEntity){
-                    if (entity1.equals(lastTarget)) dis = 10;
-                    dis += entity1.distanceTo(this);
-                    if (min == null) min = dis;
-                    if (min > dis) min = dis;
-                    hashMap.put(dis, entity1);
-                    entList.add(new EntityDist(entity1, dis));
-                }
-            }
-
-            entList.sort(new EntityDist());
-
 
             Vec3d vec3d;
 
-            Entity target = null;
-            Vec3d targetPos = null;
-            for (EntityDist entD : entList){
-                targetPos = new Vec3d(entD.entity.getEyePos().x, (entD.entity.getPos().y + entD.entity.getEyePos().y) / 2, entD.entity.getEyePos().z);
-                BlockHitResult blockHitResult = this.getWorld().raycast(new RaycastContext(this.getEyePos(), targetPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE,this));
-                if (blockHitResult.getType() == HitResult.Type.ENTITY || blockHitResult.getType() == HitResult.Type.MISS){
-                    target = entD.entity;
-                    break;
-                }
-            }
+            Entity target = targetNearest(owner,entity,lastTarget);
+
             if (target != null){
+                Vec3d targetPos = new Vec3d(target.getEyePos().x, (target.getPos().y + target.getEyePos().y) / 2, target.getEyePos().z);
                 double vel = this.getVelocity().length();
                 vec3d = targetPos.add(this.getPos().negate()).normalize().multiply(vel * 1);
             }
@@ -373,6 +372,45 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         else {
             countDown = 0;
         }
+
+    }
+
+    protected Entity targetNearest(Entity owner, Entity imune, Entity lastTarget){
+        // Get every entity in box radius
+        ArrayList<Entity> entities = new ArrayList<>(getWorld().getOtherEntities(owner, Box.of(this.getPos(),20,10,20)));
+
+        // Entity HashMap
+        HashMap<Float, Entity> hashMap = new HashMap<>();
+
+        float dis;
+        ArrayList<EntityDist> entList = new ArrayList<EntityDist>();
+        for (Entity entity1 : entities){
+            dis = 0;
+            if (!entity1.equals(imune) && !entity1.equals(this) && entity1 instanceof LivingEntity){
+                // last target gets lower priority
+                if (entity1.equals(lastTarget)) dis = 10;
+                dis += entity1.distanceTo(this);
+
+                hashMap.put(dis, entity1);
+                entList.add(new EntityDist(entity1, dis));
+            }
+        }
+
+        // Sort entities by distance
+        entList.sort(new EntityDist());
+
+        Entity target = null;
+        Vec3d targetPos = null;
+        for (EntityDist entD : entList){
+            targetPos = new Vec3d(entD.entity.getEyePos().x, (entD.entity.getPos().y + entD.entity.getEyePos().y) / 2, entD.entity.getEyePos().z);
+            BlockHitResult blockHitResult = this.getWorld().raycast(new RaycastContext(this.getEyePos(), targetPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE,this));
+            if (blockHitResult.getType() == HitResult.Type.ENTITY || blockHitResult.getType() == HitResult.Type.MISS){
+                target = entD.entity;
+                break;
+            }
+        }
+
+        return target;
 
     }
 
@@ -451,6 +489,22 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
     public void age() {
         if (this.pickupType != PickupPermission.ALLOWED) {
             super.age();
+        }
+    }
+
+    public int getColor() {
+        return 15170646;
+    }
+
+    private void spawnParticles(int amount) {
+        int i = this.getColor();
+        if (i != -1 && amount > 0) {
+            for (int j = 0; j < amount; j++) {
+                this.getWorld()
+                        .addParticle(
+                                StreakParticleEffect.create(ModParticles.STREAK, 0.905F,0.486F,0.337F,0,this.getYaw(),this.getPitch(), 0, this.prevYaw, this.prevPitch), this.getEyePos().x, this.getEyeY(), this.getEyePos().z, 0.0, 0.0, 0.0
+                        );
+            }
         }
     }
 

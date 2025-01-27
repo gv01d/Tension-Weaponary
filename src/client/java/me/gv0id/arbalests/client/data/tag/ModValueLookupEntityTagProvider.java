@@ -24,7 +24,8 @@ public class ModValueLookupEntityTagProvider extends FabricTagProvider.EntityTyp
                 .add(ModEntityType.WIND_GALE);
         getOrCreateTagBuilder(EntityTypeTags.REDIRECTABLE_PROJECTILE)
                 .add(ModEntityType.WIND_GALE)
-                .add(ModEntityType.MUSIC_DISC);
+                .add(ModEntityType.MUSIC_DISC)
+                .add(ModEntityType.END_CRYSTAL_PROJECTILE);
 
         // MODDED
         getOrCreateTagBuilder(ModEntityTypeTags.WIND_EXPLOSIVES)

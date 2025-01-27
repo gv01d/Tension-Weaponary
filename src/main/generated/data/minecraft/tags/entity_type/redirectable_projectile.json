@@ -1,6 +1,7 @@
 {
   "values": [
     "arbalests:wind_gale",
-    "arbalests:music_disc_entity"
+    "arbalests:music_disc_entity",
+    "arbalests:end_crystal_projectile"
   ]
 }
