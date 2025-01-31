@@ -4,6 +4,7 @@ import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.particle.ModParticleType;
 import me.gv0id.arbalests.particle.ModParticles;
+import me.gv0id.arbalests.particle.StreakParticleEffect;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -239,6 +240,7 @@ public class EndCrystalProjectileEntity extends ExplosiveProjectileEntity {
         if (!this.isRemoved()) {
             this.remove(RemovalReason.KILLED);
             DamageSource damageSource = this.getOwner() != null ? this.getDamageSources().explosion(this, this.getOwner()) : null;
+            this.getWorld().addParticle(StreakParticleEffect.create(ModParticles.ANGULAR_BOOM,1F,1F,1F,0F,0F,0F,0F,0F,0F), this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
             this.getWorld().createExplosion(this, damageSource, null, this.getX(), this.getY(), this.getZ(), 6.0F, false, World.ExplosionSourceType.BLOCK);
 
         }

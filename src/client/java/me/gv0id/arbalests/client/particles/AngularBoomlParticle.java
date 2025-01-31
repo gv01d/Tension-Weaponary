@@ -1,6 +1,5 @@
 package me.gv0id.arbalests.client.particles;
 
-import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.particle.StreakParticleEffect;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -9,14 +8,13 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-public class StreaklParticle extends SpriteBillboardParticle {
+public class AngularBoomlParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
     float roll;
     float yaw;
@@ -24,15 +22,12 @@ public class StreaklParticle extends SpriteBillboardParticle {
 
     Vec3d camera;
 
-    protected StreaklParticle(ClientWorld clientWorld, double d, double e, double f, SpriteProvider spriteProvider) {
+    protected AngularBoomlParticle(ClientWorld clientWorld, double d, double e, double f, SpriteProvider spriteProvider) {
         super(clientWorld, d, e, f);
         this.spriteProvider = spriteProvider;
         this.setSpriteForAge(spriteProvider);
-        this.maxAge = 8;
-        this.scale = 0.1F;
-        float a = (float)Math.random() * (float) (Math.PI * 2);
-        this.angle = a;
-        this.prevAngle = a;
+        this.maxAge = 10;
+        this.scale = 6.0F;
         this.setBoundingBoxSpacing(1.0F, 1.0F);
     }
 
@@ -44,8 +39,8 @@ public class StreaklParticle extends SpriteBillboardParticle {
 
     @Override
     public void tick() {
-        //this.alpha -= 1F /this.maxAge;
-        //this.scale += 0.02F * (this.scale * this.scale);
+        this.alpha -= 1F /this.maxAge;
+        this.scale += 0.02F * (this.scale * this.scale);
         if (this.age++ >= this.maxAge) {
             this.markDead();
         } else {
@@ -116,7 +111,7 @@ public class StreaklParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(StreakParticleEffect parameters, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            StreaklParticle streakParticle = new StreaklParticle(clientWorld, d, e, f, this.spriteProvider);
+            AngularBoomlParticle streakParticle = new AngularBoomlParticle(clientWorld, d, e, f, this.spriteProvider);
             streakParticle.setColor(parameters.getRed(),parameters.getGreen(), parameters.getBlue());
             streakParticle.setAlpha(parameters.getAlpha());
             streakParticle.roll = parameters.getLerpedRoll(1);

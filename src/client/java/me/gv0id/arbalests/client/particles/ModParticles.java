@@ -11,9 +11,18 @@ public class ModParticles {
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.FIRE_GUST, FireGustParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.LIGHT_FLASH, LightFlashParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SMALL_LIGHT_FLASH, LightFlashParticle.SmallFactory::new);
+
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.BOOM, BoomParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.RED_BOOM, BoomParticle.RedFactory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.COLORED_BOOM, ColoredBoomParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.ANGULAR_BOOM, AngularBoomlParticle.Factory::new);
+
+
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.STREAK, StreaklParticle.Factory::new);
+
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.COSMIC_BOOM, CosmicBoomParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SMALL_COSMIC_BOOM, CosmicBoomParticle.SmallFactory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.COSMIC_BOOM_EMITTER, new CosmicBoomEmiterParticle.Factory( 4, 6, 0));
     }
 
 }
