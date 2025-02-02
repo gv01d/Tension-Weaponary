@@ -2,9 +2,8 @@ package me.gv0id.arbalests.entity.projectile;
 
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.entity.ModEntityType;
-import me.gv0id.arbalests.particle.ModParticleType;
 import me.gv0id.arbalests.particle.ModParticles;
-import me.gv0id.arbalests.particle.StreakParticleEffect;
+import me.gv0id.arbalests.particle.AngularColoredParticleEffect;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -15,20 +14,13 @@ import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
 import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -36,10 +28,8 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class EndCrystalProjectileEntity extends ExplosiveProjectileEntity {
@@ -240,7 +230,7 @@ public class EndCrystalProjectileEntity extends ExplosiveProjectileEntity {
         if (!this.isRemoved()) {
             this.remove(RemovalReason.KILLED);
             DamageSource damageSource = this.getOwner() != null ? this.getDamageSources().explosion(this, this.getOwner()) : null;
-            this.getWorld().addParticle(StreakParticleEffect.create(ModParticles.ANGULAR_BOOM,1F,1F,1F,0F,0F,0F,0F,0F,0F), this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
+            this.getWorld().addParticle(AngularColoredParticleEffect.create(ModParticles.ANGULAR_BOOM,1F,1F,1F,0F,0F,0F,0F,0F,0F), this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
             this.getWorld().createExplosion(this, damageSource, null, this.getX(), this.getY(), this.getZ(), 6.0F, false, World.ExplosionSourceType.BLOCK);
 
         }

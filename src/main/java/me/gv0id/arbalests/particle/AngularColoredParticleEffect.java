@@ -12,28 +12,28 @@ import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
-public record StreakParticleEffect(ParticleType<StreakParticleEffect> type, int color, Vec3d RYP, Vec3d prev_RYP) implements ParticleEffect {
+public record AngularColoredParticleEffect(ParticleType<AngularColoredParticleEffect> type, int color, Vec3d RYP, Vec3d prev_RYP) implements ParticleEffect {
 
-    public static MapCodec<StreakParticleEffect> createCodec(ParticleType<StreakParticleEffect> type) {
+    public static MapCodec<AngularColoredParticleEffect> createCodec(ParticleType<AngularColoredParticleEffect> type) {
         return RecordCodecBuilder.mapCodec(
                 instance -> instance.group(
-                                Codecs.RGB.fieldOf("color").forGetter(StreakParticleEffect::color),
-                                Vec3d.CODEC.fieldOf("roll_yaw_pitch").forGetter(StreakParticleEffect::prev_RYP),
-                                Vec3d.CODEC.fieldOf("previous_roll_yaw_pitch").forGetter(StreakParticleEffect::RYP)
+                                Codecs.RGB.fieldOf("color").forGetter(AngularColoredParticleEffect::color),
+                                Vec3d.CODEC.fieldOf("roll_yaw_pitch").forGetter(AngularColoredParticleEffect::prev_RYP),
+                                Vec3d.CODEC.fieldOf("previous_roll_yaw_pitch").forGetter(AngularColoredParticleEffect::RYP)
                         )
-                        .apply(instance, (color, RYP, prev_RYP) -> new StreakParticleEffect(type,color,RYP,prev_RYP))
+                        .apply(instance, (color, RYP, prev_RYP) -> new AngularColoredParticleEffect(type,color,RYP,prev_RYP))
                 );
     }
 
-    public static PacketCodec<? super ByteBuf, StreakParticleEffect> createPacketCodec(ParticleType<StreakParticleEffect> type) {
+    public static PacketCodec<? super ByteBuf, AngularColoredParticleEffect> createPacketCodec(ParticleType<AngularColoredParticleEffect> type) {
         return PacketCodec.tuple(
                 PacketCodecs.INTEGER,
-                StreakParticleEffect::color,
+                AngularColoredParticleEffect::color,
                 Vec3d.PACKET_CODEC,
-                StreakParticleEffect::RYP,
+                AngularColoredParticleEffect::RYP,
                 Vec3d.PACKET_CODEC,
-                StreakParticleEffect::prev_RYP,
-                (color, RYP, prev_RYP) -> new StreakParticleEffect(type,color,RYP,prev_RYP)
+                AngularColoredParticleEffect::prev_RYP,
+                (color, RYP, prev_RYP) -> new AngularColoredParticleEffect(type,color,RYP,prev_RYP)
         );
     }
 
@@ -73,11 +73,11 @@ public record StreakParticleEffect(ParticleType<StreakParticleEffect> type, int 
         return (float)ColorHelper.getAlpha(this.color) / 255.0F;
     }
 
-    public static StreakParticleEffect create(ParticleType<StreakParticleEffect> type, int color, Vec3d RYP, Vec3d prev_RYP) {
-        return new StreakParticleEffect(type, color, RYP, prev_RYP);
+    public static AngularColoredParticleEffect create(ParticleType<AngularColoredParticleEffect> type, int color, Vec3d RYP, Vec3d prev_RYP) {
+        return new AngularColoredParticleEffect(type, color, RYP, prev_RYP);
     }
 
-    public static StreakParticleEffect create(ParticleType<StreakParticleEffect> type, float r, float g, float b, float roll, float yaw, float pitch, float previousRoll, float previousYaw, float previousPitch) {
+    public static AngularColoredParticleEffect create(ParticleType<AngularColoredParticleEffect> type, float r, float g, float b, float roll, float yaw, float pitch, float previousRoll, float previousYaw, float previousPitch) {
         return create(type, ColorHelper.fromFloats(1.0F, r, g, b), new Vec3d(roll, yaw, pitch), new Vec3d(previousRoll,previousYaw, previousPitch));
     }
 

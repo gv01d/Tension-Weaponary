@@ -1,26 +1,23 @@
 package me.gv0id.arbalests.item.custom;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Pair;
-import me.gv0id.arbalests.components.ModDataComponentTypes;
-import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
 import me.gv0id.arbalests.entity.projectile.MusicDiscEntity;
 import me.gv0id.arbalests.item.ModItems;
+import me.gv0id.arbalests.particle.ModParticles;
+import me.gv0id.arbalests.particle.TrailParticleEffect;
 import me.gv0id.arbalests.registry.tag.ModItemTypeTags;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.JukeboxBlock;
 import net.minecraft.block.entity.JukeboxBlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.component.type.JukeboxPlayableComponent;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.projectile.thrown.EggEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.*;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.particle.ParticleType;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.world.ServerWorld;
@@ -30,6 +27,7 @@ import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -108,7 +106,7 @@ public class CopperDiscItem extends Item {
                 null, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F)
         );
         if (world instanceof ServerWorld serverWorld) {
-            ProjectileEntity.spawnWithVelocity((world1, owner, stack) -> new MusicDiscEntity(world1, owner, stack, 3, true, false),
+            ProjectileEntity.spawnWithVelocity((world1, owner, stack) -> new MusicDiscEntity(world1, owner, stack, 3, true, false ),
                     serverWorld, user.isCreative() ? itemStack : itemStack.copy(), user, 0.0F, POWER, 2.0F);
         }
 
@@ -196,6 +194,7 @@ public class CopperDiscItem extends Item {
 
 
     public static Music getMusic(ItemStack stack){
+        if (stack == null) return Music.NONE;
         for (Music music : Music.values()){
             if (stack.isOf(music.getItem())){
                 return music;
@@ -205,38 +204,58 @@ public class CopperDiscItem extends Item {
     }
 
     public enum Music implements StringIdentifiable {
-        NONE((Item) null),
-        D13(Items.MUSIC_DISC_13),
-        D11(Items.MUSIC_DISC_11),
-        D_BLOCKS(Items.MUSIC_DISC_BLOCKS),
-        D_CAT(Items.MUSIC_DISC_CAT),
-        D_5(Items.MUSIC_DISC_5),
-        D_CHIRP(Items.MUSIC_DISC_CHIRP),
-        D_CREATOR(Items.MUSIC_DISC_CREATOR),
-        D_CREATOR_MUSIC_BOX(Items.MUSIC_DISC_CREATOR_MUSIC_BOX),
-        D_FAR(Items.MUSIC_DISC_FAR),
-        D_MALL(Items.MUSIC_DISC_MALL),
-        D_MELLOHI(Items.MUSIC_DISC_MELLOHI),
-        D_OTHERSIDE(Items.MUSIC_DISC_OTHERSIDE),
-        D_PIGSTEP(Items.MUSIC_DISC_PIGSTEP),
-        D_PRECIPICE(Items.MUSIC_DISC_PRECIPICE),
-        D_RELIC(Items.MUSIC_DISC_RELIC),
-        D_STAL(Items.MUSIC_DISC_STAL),
-        D_STRAD(Items.MUSIC_DISC_STRAD),
-        D_WAIT(Items.MUSIC_DISC_WAIT),
-        D_WARD(Items.MUSIC_DISC_WARD);
+        NONE((Item) null, ModParticles.COPPER_DISC_TRAIL),
+        D13(Items.MUSIC_DISC_13, ModParticles.D13_TRAIL),
+        D11(Items.MUSIC_DISC_11, ColorHelper.fromFloats(1F,0.533F,0.533F,0.533F)),
+        D_BLOCKS(Items.MUSIC_DISC_BLOCKS, ColorHelper.fromFloats(1F,0.886F,0.329F,0.231F)),
+        D_CAT(Items.MUSIC_DISC_CAT, ColorHelper.fromFloats(1F,0.298F,1F,0F)),
+        D_5(Items.MUSIC_DISC_5, ModParticles.D5_TRAIL),
+        D_CHIRP(Items.MUSIC_DISC_CHIRP, ModParticles.CHIRP_TRAIL),
+        D_CREATOR(Items.MUSIC_DISC_CREATOR, ModParticles.CREATOR_TRAIL),
+        D_CREATOR_MUSIC_BOX(Items.MUSIC_DISC_CREATOR_MUSIC_BOX, ModParticles.CREATOR_MUSIC_BOX_TRAIL),
+        D_FAR(Items.MUSIC_DISC_FAR, ModParticles.FAR_TRAIL),
+        D_MALL(Items.MUSIC_DISC_MALL, ColorHelper.fromFloats(1F,0.603F,0.458F,1F)),
+        D_MELLOHI(Items.MUSIC_DISC_MELLOHI, ModParticles.MELLOHI_TRAIL),
+        D_OTHERSIDE(Items.MUSIC_DISC_OTHERSIDE, ModParticles.OTHERSIDE_TRAIL),
+        D_PIGSTEP(Items.MUSIC_DISC_PIGSTEP, ModParticles.PIGSTEP_TRAIL),
+        D_PRECIPICE(Items.MUSIC_DISC_PRECIPICE, ModParticles.PRECIPICE_TRAIL),
+        D_RELIC(Items.MUSIC_DISC_RELIC, ModParticles.RELIC_TRAIL),
+        D_STAL(Items.MUSIC_DISC_STAL, ColorHelper.fromFloats(1F,0F,0F,0F)),
+        D_STRAD(Items.MUSIC_DISC_STRAD, ColorHelper.fromFloats(1F,1F,1F,1F)),
+        D_WAIT(Items.MUSIC_DISC_WAIT, ColorHelper.fromFloats(1F,0.282F,0.454F,0.701F)),
+        D_WARD(Items.MUSIC_DISC_WARD, ModParticles.WARD_TRAIL);
 
         public static final EnumCodec<Music> CODEC = StringIdentifiable.createCodec(Music::values);
 
         Item item = null;
+        ParticleType<me.gv0id.arbalests.particle.TrailParticleEffect> particleType = ModParticles.GENERIC_DISC_TRAIL;
+        int color = ColorHelper.fromFloats(1F,1F, 1F, 1F);
 
         Music(Item item){
             this.item = item;
         }
 
+        Music(Item item, int color){
+            this.item = item;
+            this.color = color;
+        }
+
+        Music(Item item, ParticleType<me.gv0id.arbalests.particle.TrailParticleEffect> particleType) {
+            this.item = item;
+            this.particleType = particleType;
+        }
+
+        Music(Item item, ParticleType<me.gv0id.arbalests.particle.TrailParticleEffect> particleType, int color){
+            this.item = item;
+            this.particleType = particleType;
+            this.color = color;
+        }
+
         public Item getItem() {
             return item;
         }
+        public ParticleType<TrailParticleEffect> getParticleType() { return particleType; }
+        public int getColor() { return color; }
 
         @Override
         public String asString() {

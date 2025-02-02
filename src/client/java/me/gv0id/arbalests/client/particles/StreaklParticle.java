@@ -1,7 +1,6 @@
 package me.gv0id.arbalests.client.particles;
 
-import me.gv0id.arbalests.Arbalests;
-import me.gv0id.arbalests.particle.StreakParticleEffect;
+import me.gv0id.arbalests.particle.AngularColoredParticleEffect;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.*;
@@ -9,7 +8,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
@@ -108,14 +106,14 @@ public class StreaklParticle extends SpriteBillboardParticle {
     }
 
     @Environment(EnvType.CLIENT)
-    public static class Factory implements ParticleFactory<StreakParticleEffect> {
+    public static class Factory implements ParticleFactory<AngularColoredParticleEffect> {
         private final SpriteProvider spriteProvider;
 
         public Factory(SpriteProvider spriteProvider) {
             this.spriteProvider = spriteProvider;
         }
 
-        public Particle createParticle(StreakParticleEffect parameters, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
+        public Particle createParticle(AngularColoredParticleEffect parameters, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
             StreaklParticle streakParticle = new StreaklParticle(clientWorld, d, e, f, this.spriteProvider);
             streakParticle.setColor(parameters.getRed(),parameters.getGreen(), parameters.getBlue());
             streakParticle.setAlpha(parameters.getAlpha());

@@ -1,14 +1,12 @@
 package me.gv0id.arbalests.client.particles;
 
 import me.gv0id.arbalests.particle.ColoredParticleEffect;
-import me.gv0id.arbalests.particle.StreakParticleEffect;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.SimpleParticleType;
 
 public class ColoredBoomParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;

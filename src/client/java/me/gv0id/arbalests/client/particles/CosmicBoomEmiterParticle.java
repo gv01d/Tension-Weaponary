@@ -2,7 +2,7 @@ package me.gv0id.arbalests.client.particles;
 
 import me.gv0id.arbalests.particle.ColoredParticleEffect;
 import me.gv0id.arbalests.particle.ModParticles;
-import me.gv0id.arbalests.particle.StreakParticleEffect;
+import me.gv0id.arbalests.particle.AngularColoredParticleEffect;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.NoRenderParticle;
@@ -22,13 +22,13 @@ public class CosmicBoomEmiterParticle extends NoRenderParticle {
         this.interval = interval;
         this.world.addParticle(ColoredParticleEffect.create(ModParticles.COLORED_BOOM,1,0.838F,0.854F,1), x, y, z, 0.0, 0.0, 0.0);
         this.world.addParticle(ModParticles.COSMIC_BOOM, x, y, z, 0.0, 0.0, 0.0);
-        this.world.addParticle(StreakParticleEffect.create(ModParticles.ANGULAR_BOOM, 0.838F,0.834F, 1F, 0F,0F,0F,0F,0F,0F), x, y, z, 0.0, 0.0, 0.0);
+        this.world.addParticle(AngularColoredParticleEffect.create(ModParticles.ANGULAR_BOOM, 0.838F,0.834F, 1F, 0F,0F,0F,0F,0F,0F), x, y, z, 0.0, 0.0, 0.0);
     }
 
     @Override
     public void tick() {
         if (this.age % (this.interval + 1) == 0) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 5; i++) {
                 double d = this.x + (this.random.nextDouble() - this.random.nextDouble()) * this.deviation;
                 double e = this.y + (this.random.nextDouble() - this.random.nextDouble()) * this.deviation;
                 double f = this.z + (this.random.nextDouble() - this.random.nextDouble()) * this.deviation;

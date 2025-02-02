@@ -3,8 +3,10 @@ package me.gv0id.arbalests.entity.projectile;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.item.ModItems;
+import me.gv0id.arbalests.item.custom.CopperDiscItem;
 import me.gv0id.arbalests.particle.ModParticles;
-import me.gv0id.arbalests.particle.StreakParticleEffect;
+import me.gv0id.arbalests.particle.AngularColoredParticleEffect;
+import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.minecraft.block.Block;
 import net.minecraft.block.JukeboxBlock;
 import net.minecraft.block.entity.JukeboxBlockEntity;
@@ -26,9 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.particle.EntityEffectParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.particle.TrailParticleEffect;
+import net.minecraft.particle.ParticleType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -55,6 +55,9 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
     public float MAX_DAMAGE = 6;
     public float pDmg = 2;
 
+    Vec3d previousEyePos = null;
+    Vec3d previousRYP = null;
+
     public boolean ground = false;
 
     public Box defaultBoundingBox;
@@ -62,8 +65,13 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
     public float PARRY_TIME = 3;
     public float parryCountDown = PARRY_TIME;
 
+    public int particleIndex = 0;
+
+    public ParticleType<TrailParticleEffect> particleType = ModParticles.TRAIL;
+
     private static final TrackedData<ItemStack> ITEM_STACK = DataTracker.registerData(MusicDiscEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
     private static final TrackedData<Float> ROTATION = DataTracker.registerData(MusicDiscEntity.class, TrackedDataHandlerRegistry.FLOAT);
+
     private Direction facing = Direction.SOUTH;
     public float ROTATION_SPEED = 105;
     private int returnTimer;
@@ -113,22 +121,6 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
         if (this.getStack() == null || this.getStack().getItem() == Items.AIR) {
             this.discard();
         }
-
-        if (this.isTouchingWater()){
-            if (!wasInWater){
-                boolean b = this.getWorld().getBlockState(this.getBlockPos()).isAir();
-                boolean a = this.getWorld().getBlockState(BlockPos.ofFloored(this.getPos().add(0D,1D,0D))).isAir();
-                double blockLevel = this.getPos().y - this.getBlockY();
-                if (Math.abs(this.getPitch()) < 45 && (b || (!b && blockLevel > 0.1 && a))){
-                    this.setVelocity(this.getVelocity().multiply(1,-BOUNCE_STRENGHT,1));
-                }
-            }
-
-            wasInWater = true;
-        } else if (inGroundTime < 1){
-            spawnParticles(1);
-        }
-
         if (this.inGroundTime > 4) {
             this.dealtDamage = 0;
             this.ground = true;
@@ -140,7 +132,6 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
 
             //this.setVelocity(this.getVelocity().add(0,Math.min( (float)(ROTATION_SPEED * (this.getVelocity().lengthSquared()) / 1000), 0.04),0));
         }
-
         Entity owner = this.getOwner();
         if ( BOOMERANG && (dealtDamage < 1 || countDown < 1) && owner != null){
             if (!this.isOwnerAlive()) {
@@ -179,6 +170,22 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
             countDown--;
         }
         super.tick();
+        if (this.isTouchingWater()){
+            if (!wasInWater){
+                boolean b = this.getWorld().getBlockState(this.getBlockPos()).isAir();
+                boolean a = this.getWorld().getBlockState(BlockPos.ofFloored(this.getPos().add(0D,1D,0D))).isAir();
+                double blockLevel = this.getPos().y - this.getBlockY();
+                if (Math.abs(this.getPitch()) < 45 && (b || (!b && blockLevel > 0.1 && a))){
+                    this.setVelocity(this.getVelocity().multiply(1,-BOUNCE_STRENGHT,1));
+                }
+            }
+
+            wasInWater = true;
+        } else if (inGroundTime < 1){
+            spawnParticles(1);
+        }
+
+
     }
 
     public boolean returning(){
@@ -497,15 +504,42 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
     }
 
     private void spawnParticles(int amount) {
+        if (previousEyePos == null){
+            this.previousEyePos = this.getEyePos();
+            this.previousRYP = new Vec3d(0, this.getYaw(), this.getPitch());
+        }
+
+        ArrayList<ItemStack> list = new ArrayList<>(Objects.requireNonNull(getStack().get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles());
+
+        CopperDiscItem.Music music = CopperDiscItem.getMusic(list.isEmpty()? null : list.getFirst());
+
         int i = this.getColor();
         if (i != -1 && amount > 0) {
             for (int j = 0; j < amount; j++) {
+                /*
                 this.getWorld()
                         .addParticle(
-                                StreakParticleEffect.create(ModParticles.STREAK, 0.905F,0.486F,0.337F,0,this.getYaw(),this.getPitch(), 0, this.prevYaw, this.prevPitch), this.getEyePos().x, this.getEyeY(), this.getEyePos().z, 0.0, 0.0, 0.0
+                                TrailParticleEffect.create(ModParticles.TRAIL, 0.905F,0.486F,0.337F,0,this.getYaw(),this.getPitch(), 0,(float) this.previousRYP.y, (float) this.previousRYP.z, this.getEyePos(), this.previousEyePos), this.getEyePos().x, this.getEyeY(), this.getEyePos().z, 0.0, 0.0, 0.0
+                        );
+                 */
+
+
+                this.getWorld()
+                        .addParticle(
+                                TrailParticleEffect.create(
+                                        music.getParticleType(),
+                                        music.getColor(),
+                                        new Vec3d(0,this.getYaw(),this.getPitch()),
+                                        new Vec3d(0,(float) this.previousRYP.y, (float) this.previousRYP.z),
+                                        this.getEyePos(),
+                                        this.previousEyePos,
+                                        this.particleIndex++
+                                ), this.getEyePos().x, this.getEyeY(), this.getEyePos().z, 0.0, 0.0, 0.0
                         );
             }
         }
+        this.previousEyePos = this.getEyePos();
+        this.previousRYP = new Vec3d(0, this.getYaw(), this.getPitch());
     }
 
     @Override
@@ -532,5 +566,4 @@ public class MusicDiscEntity extends PersistentProjectileEntity {
     public ItemStack getStack(){
         return this.getDataTracker().get(ITEM_STACK);
     }
-
 }

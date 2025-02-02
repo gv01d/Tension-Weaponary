@@ -562,6 +562,11 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         }
     }
 
+    public static MusicDiscEntity spawnDisc(World world, LivingEntity shooter, ItemStack stack, ItemStack projectileStack, boolean critical){
+
+        return new MusicDiscEntity(world,shooter,projectileStack,4,false,true);
+    }
+
     @Override
     public boolean isUsedOnRelease(ItemStack stack) {
         return stack.isOf(this);
@@ -625,8 +630,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                 )
         ),
         COPPER_DISC(ModItems.COPPER_DISC, 0.5F, 4.0F,
-                (world,shooter,weaponStack, projectileStack, critical) ->
-                        new MusicDiscEntity(world,shooter, projectileStack),
+                DeadbeatCrossbowItem::spawnDisc,
                 "MUSIC"),
         CRYSTAL(Items.END_CRYSTAL, 4F,1.0F, 3,
                 (world,shooter,weaponStack, projectileStack, critical) ->
