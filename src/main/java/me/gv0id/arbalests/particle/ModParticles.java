@@ -23,6 +23,10 @@ public class ModParticles{
     public static final ModParticleType SMALL_LIGHT_FLASH = register("small_light_flash", true);
     public static final ModParticleType BOOM = register("boom", true);
     public static final ModParticleType RED_BOOM = register("red_boom", true);
+
+    public static final ModParticleType COSMIC_EXPANDING_BOOM = register("cosmic_expanding_boom", true);
+    public static final ParticleType<AngularColoredParticleEffect> COSMIC_ANGULAR_BOOM = register("cosmic_angular_boom", true, AngularColoredParticleEffect::createCodec, AngularColoredParticleEffect::createPacketCodec);
+
     public static final ParticleType<ColoredParticleEffect> COLORED_BOOM = register("colored_boom", true, ColoredParticleEffect::createCodec, ColoredParticleEffect::createPacketCodec);
     public static final ParticleType<AngularColoredParticleEffect> STREAK = register("streak", true, AngularColoredParticleEffect::createCodec, AngularColoredParticleEffect::createPacketCodec);
     public static final ParticleType<AngularColoredParticleEffect> ANGULAR_BOOM = register("angular_boom", true, AngularColoredParticleEffect::createCodec, AngularColoredParticleEffect::createPacketCodec);

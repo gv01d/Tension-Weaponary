@@ -177,6 +177,8 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
 
     protected void addQuad(VertexConsumer vertexConsumer, Camera camera, int index){
 
+
+
         Vec3d pos1 = this.prevPositions.get(index);
         Vec3d pos2 = this.prevPositions.get(index + 1);
         Quaternionf angle1 = this.angles.get(index);

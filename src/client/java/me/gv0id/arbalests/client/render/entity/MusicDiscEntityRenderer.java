@@ -51,6 +51,7 @@ public class MusicDiscEntityRenderer extends EntityRenderer<MusicDiscEntity,Musi
         this.lightCircle = HighlightModels.getCircleTexturedModelData();
     }
 
+
     @Override
     public void render(MusicDiscEntityState musicDiscEntityState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         super.render(musicDiscEntityState, matrixStack, vertexConsumerProvider, i);

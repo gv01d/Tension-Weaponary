@@ -20,9 +20,9 @@ public class CosmicBoomEmiterParticle extends NoRenderParticle {
         this.deviation = deviation;
         this.maxAge = maxAge;
         this.interval = interval;
-        this.world.addParticle(ColoredParticleEffect.create(ModParticles.COLORED_BOOM,1,0.838F,0.854F,1), x, y, z, 0.0, 0.0, 0.0);
+        this.world.addParticle(ModParticles.COSMIC_EXPANDING_BOOM, x, y, z, 0.0, 0.0, 0.0);
         this.world.addParticle(ModParticles.COSMIC_BOOM, x, y, z, 0.0, 0.0, 0.0);
-        this.world.addParticle(AngularColoredParticleEffect.create(ModParticles.ANGULAR_BOOM, 0.838F,0.834F, 1F, 0F,0F,0F,0F,0F,0F), x, y, z, 0.0, 0.0, 0.0);
+        this.world.addParticle(AngularColoredParticleEffect.create(ModParticles.COSMIC_ANGULAR_BOOM, 0.838F,0.834F, 1F, 0F,0F,0F,0F,0F,0F), x, y, z, 0.0, 0.0, 0.0);
     }
 
     @Override

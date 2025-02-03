@@ -11,21 +11,17 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.scoreboard.ScoreboardCriterion;
 
-public class CosmicBoomParticle extends SpriteBillboardParticle {
+public class CosmicExpansionBoomParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
 
-    protected CosmicBoomParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
+    protected CosmicExpansionBoomParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.setSpriteForAge(spriteProvider);
-        this.maxAge = 9;
-        this.scale = 4.0F;
-        float a = (float)Math.random() * (float) (Math.PI * 2);
-        this.angle = a;
-        this.prevAngle = a;
+        this.maxAge = 7;
+        this.scale = 6.0F;
         this.setBoundingBoxSpacing(1.0F, 1.0F);
     }
 
@@ -40,11 +36,26 @@ public class CosmicBoomParticle extends SpriteBillboardParticle {
 
     @Override
     public void tick() {
+        this.alpha -= 1F /this.maxAge;
+        this.scale += 0.02F * (this.scale * this.scale);
         if (this.age++ >= this.maxAge) {
             this.markDead();
         } else {
             this.setSpriteForAge(this.spriteProvider);
         }
+    }
+
+    @Override
+    public void render(VertexConsumer vertexConsumer, Camera camera, float tickDelta) {
+        super.render(vertexConsumer, camera, tickDelta);
+    }
+
+    @Override
+    public void renderCustom(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Camera camera, float tickDelta) {
+
+        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.END_CUTOUT.apply(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE));
+
+        render(vertexConsumer, camera, tickDelta);
     }
 
     @Environment(EnvType.CLIENT)
@@ -55,41 +66,9 @@ public class CosmicBoomParticle extends SpriteBillboardParticle {
             this.spriteProvider = spriteProvider;
         }
 
-        public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            CosmicBoomParticle lightFlashParticle = new CosmicBoomParticle(clientWorld, d, e, f, this.spriteProvider);
-            //lightFlashParticle.angle = (float)Math.random() * (float) (Math.PI * 2);
-            return lightFlashParticle;
-        }
-    }
-
-    @Override
-    public void render(VertexConsumer vertexConsumer, Camera camera, float tickDelta) {
-
-        super.render(vertexConsumer, camera, tickDelta);
-    }
-
-    @Override
-    public void renderCustom(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Camera camera, float tickDelta) {
-
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.END_CUTOUT.apply(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE));
-        render(vertexConsumer, camera, tickDelta);
-    }
-
-
-
-    @Environment(EnvType.CLIENT)
-    public static class SmallFactory implements ParticleFactory<SimpleParticleType> {
-        private final SpriteProvider field_50230;
-
-        public SmallFactory(SpriteProvider spriteProvider) {
-            this.field_50230 = spriteProvider;
-        }
-
-        public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            Particle particle = new CosmicBoomParticle(clientWorld, d, e, f, this.field_50230);
-            particle.scale(0.15F);
-            particle.setMaxAge(7);
-            return particle;
+        public Particle createParticle(SimpleParticleType parameters, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
+            CosmicExpansionBoomParticle coloredBoomParticle = new CosmicExpansionBoomParticle(clientWorld, d, e, f, this.spriteProvider);
+            return coloredBoomParticle;
         }
     }
 }
