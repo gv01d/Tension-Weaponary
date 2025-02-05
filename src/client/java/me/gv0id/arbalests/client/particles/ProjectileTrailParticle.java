@@ -1,6 +1,5 @@
 package me.gv0id.arbalests.client.particles;
 
-import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -8,7 +7,6 @@ import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
@@ -49,7 +47,7 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
         super(clientWorld, d, e, f);
         this.spriteProvider = spriteProvider;
         this.setSpriteForAge(spriteProvider);
-        this.maxAge = 8;
+        this.maxAge = 30;
         this.scale = 1.0F;
         this.setBoundingBoxSpacing(1.0F, 1.0F);
     }
@@ -181,10 +179,29 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
 
         Vec3d pos1 = this.prevPositions.get(index);
         Vec3d pos2 = this.prevPositions.get(index + 1);
-        Quaternionf angle1 = this.angles.get(index);
-        Quaternionf angle2 = this.angles.get(index + 1);
+        Quaternionf angle1 = new Quaternionf(camera.getRotation());
+        Quaternionf angle2 = new Quaternionf(camera.getRotation());
         float tickDelta1 = this.tickDeltas.get(index);
         float tickDelta2 = this.tickDeltas.get(index + 1);
+
+        Quaternionf t1 = new Quaternionf(this.angles.get(index));
+        Quaternionf t2 = new Quaternionf(this.angles.get(index + 1));
+
+        float roll1 = (camera.getYaw() - MathHelper.lerp(tickDelta1, this.prevYaw, this.yaw));
+        float roll2 = (camera.getYaw() - MathHelper.lerp(tickDelta2, this.prevYaw, this.yaw));
+
+
+        angle1 = t1;
+        angle2 = t2;
+
+
+        //angle1 = angle1.rotationYXZ((float) Math.PI - camera.getYaw() * (float) (Math.PI / 180.0), -camera.getPitch() * (float) (Math.PI / 180.0),roll1 * (float) (Math.PI / 180.0));
+        //angle2 = angle2.rotationYXZ((float) Math.PI - camera.getYaw() * (float) (Math.PI / 180.0), -camera.getPitch() * (float) (Math.PI / 180.0),roll2 * (float) (Math.PI / 180.0));
+
+        /*
+        angle1 = angle1.mul(RotationAxis.POSITIVE_Z.rotation((camera.getYaw() - MathHelper.lerp(tickDelta1, this.prevYaw, this.yaw))));
+        angle2 = angle2.mul(RotationAxis.POSITIVE_Z.rotation((camera.getYaw() - MathHelper.lerp(tickDelta1, this.prevYaw, this.yaw))));
+         */
 
         float j = this.getSize(tickDelta1);
         float j2 = this.getSize(tickDelta2);
@@ -242,9 +259,6 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
         public Particle createParticle(TrailParticleEffect parameters, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
             ProjectileTrailParticle streakParticle = new ProjectileTrailParticle(clientWorld, d, e, f, this.spriteProvider);
             streakParticle.setColor(parameters.getRed(),parameters.getGreen(), parameters.getBlue());
-            if (parameters.color() == ColorHelper.fromFloats(1F,1F,0F,0F)){
-                Arbalests.LOGGER.info("Particle color received red");
-            }
             streakParticle.roll = parameters.getRoll();
             streakParticle.yaw = parameters.getYaw();
             streakParticle.pitch = parameters.getPitch();
