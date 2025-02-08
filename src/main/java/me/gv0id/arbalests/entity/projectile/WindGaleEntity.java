@@ -212,8 +212,8 @@ public class WindGaleEntity extends AbstractWindGaleEntity {
                         ICE_EXPLOSION_POWER,
                         false,
                         World.ExplosionSourceType.TRIGGER,
-                        ModParticles.SNOW_GUST_OLD,
-                        ModParticles.SNOW_GUST_OLD,
+                        ModParticles.SNOW_GUST_EMITTER,
+                        ModParticles.SNOW_GUST_EMITTER,
                         SoundEvents.ENTITY_WIND_CHARGE_WIND_BURST
                 );
         entity.discard();

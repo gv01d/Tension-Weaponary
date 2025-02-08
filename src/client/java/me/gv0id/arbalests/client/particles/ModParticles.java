@@ -2,6 +2,8 @@ package me.gv0id.arbalests.client.particles;
 
 import me.gv0id.arbalests.client.particles.wind.FireGustParticle;
 import me.gv0id.arbalests.client.particles.wind.OldSnowGustParticle;
+import me.gv0id.arbalests.client.particles.wind.SnowGustParticle;
+import me.gv0id.arbalests.client.particles.wind.SnowGustEmitterParticle;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.minecraft.client.particle.GustParticle;
 import net.minecraft.client.particle.SpriteProvider;
@@ -31,8 +33,9 @@ public class ModParticles {
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.ANGULAR_BOOM, AngularBoomlParticle.Factory::new);
 
         // Snow Gust
-        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SNOW_GUST, OldSnowGustParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SNOW_FLAKE, OldSnowGustParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SNOW_GUST, SnowGustParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SNOW_FLAKE, SnowFlakeParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SNOW_GUST_EMITTER, new SnowGustEmitterParticle.Factory(0, 3));
 
 
         //

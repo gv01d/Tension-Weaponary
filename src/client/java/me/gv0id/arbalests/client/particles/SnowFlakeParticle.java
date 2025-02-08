@@ -11,23 +11,34 @@ import net.minecraft.util.math.Vec3d;
 
 public class SnowFlakeParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
-    private final float deaccel = 0.01F;
-    private final float gravity = 0.01F;
+    private final float deaccel = 0.60F;
+    private final float gravity = 0.02F;
 
     protected SnowFlakeParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.setSpriteForAge(spriteProvider);
-        this.maxAge = 18;
-        this.scale = (float) MathHelper.lerp(Math.random(), 0.3, 0.6);
+        this.maxAge = 6;
+        this.scale = (float) MathHelper.lerp(Math.random(), 0.3, 0.7);
         Vec3d r = new Vec3d (
-                MathHelper.lerp(Math.random(), 0.0, 0.6),
-                MathHelper.lerp(Math.random(), 0.0, 0.6),
-                MathHelper.lerp(Math.random(), 0.0, 0.6)
+                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
                 );
+        this.prevPosX = this.x + r.x;
+        this.prevPosY = this.y + r.y;
+        this.prevPosZ = this.z + r.z;
         this.setPos(this.x + r.x, this.y + r.x, this.z + r.x);
-        this.setVelocity(r.x, r.y, r.z);
-        this.setBoundingBoxSpacing(1.0F, 1.0F);
+        this.setVelocity(r.x * 3, r.y * 3, r.z * 3);
+
+        float rand = this.random.nextFloat();
+        this.setColor(
+                MathHelper.lerp( rand, 0.462F, 0.937F),
+                MathHelper.lerp( rand, 0.831F, 0.984F),
+                MathHelper.lerp( rand, 0.956F, 0.956F)
+        );
+
+        //this.setBoundingBoxSpacing(1.0F, 1.0F);
     }
 
     @Override
@@ -41,8 +52,15 @@ public class SnowFlakeParticle extends SpriteBillboardParticle {
 
     @Override
     public void tick() {
-        this.setVelocity(this.velocityX * deaccel, this.velocityY, this.velocityZ * deaccel);
+        this.prevPosX = this.x;
+        this.prevPosY = this.y;
+        this.prevPosZ = this.z;
+
+        this.move(this.velocityX, this.velocityY, this.velocityZ);
+        this.setVelocity(this.velocityX * deaccel, this.velocityY * deaccel, this.velocityZ * deaccel);
         this.velocityY -= gravity;
+
+        this.alpha = 1.0F - (float)this.age / (float)this.maxAge;
         if (this.age++ >= this.maxAge) {
             this.markDead();
         } else {
