@@ -1,27 +1,17 @@
 package me.gv0id.arbalests.entity.projectile;
 
-import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.entity.ModEntityType;
-import me.gv0id.arbalests.particle.ModParticleType;
 import me.gv0id.arbalests.particle.ModParticles;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ProjectileDeflection;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.entity.projectile.thrown.SnowballEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.EntityTypeTags;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -35,10 +25,8 @@ import net.minecraft.world.explosion.AdvancedExplosionBehavior;
 import net.minecraft.world.explosion.ExplosionBehavior;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class WindGaleEntity extends AbstractWindGaleEntity {
     
@@ -224,8 +212,8 @@ public class WindGaleEntity extends AbstractWindGaleEntity {
                         ICE_EXPLOSION_POWER,
                         false,
                         World.ExplosionSourceType.TRIGGER,
-                        ModParticles.SNOW_GUST,
-                        ModParticles.SNOW_GUST,
+                        ModParticles.SNOW_GUST_OLD,
+                        ModParticles.SNOW_GUST_OLD,
                         SoundEvents.ENTITY_WIND_CHARGE_WIND_BURST
                 );
         entity.discard();

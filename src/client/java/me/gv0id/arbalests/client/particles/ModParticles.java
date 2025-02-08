@@ -1,5 +1,7 @@
 package me.gv0id.arbalests.client.particles;
 
+import me.gv0id.arbalests.client.particles.wind.FireGustParticle;
+import me.gv0id.arbalests.client.particles.wind.OldSnowGustParticle;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.minecraft.client.particle.GustParticle;
 import net.minecraft.client.particle.SpriteProvider;
@@ -13,7 +15,7 @@ public class ModParticles {
 
     public static void initialization(){
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.STRAFE, GustParticle.SmallGustFactory::new);
-        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SNOW_GUST, SnowGustParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SNOW_GUST_OLD, OldSnowGustParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.ENDER_GUST, CosmicBoomParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.FIRE_GUST, FireGustParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.LIGHT_FLASH, LightFlashParticle.Factory::new);
@@ -28,13 +30,20 @@ public class ModParticles {
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.COLORED_BOOM, ColoredBoomParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.ANGULAR_BOOM, AngularBoomlParticle.Factory::new);
 
+        // Snow Gust
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SNOW_GUST, OldSnowGustParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SNOW_FLAKE, OldSnowGustParticle.Factory::new);
 
+
+        //
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.STREAK, StreaklParticle.Factory::new);
 
+        // Shaded Cosmic End Crystal Explosion
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.COSMIC_BOOM, CosmicBoomParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SMALL_COSMIC_BOOM, CosmicBoomParticle.SmallFactory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.COSMIC_BOOM_EMITTER, new CosmicBoomEmiterParticle.Factory( 7, 6, 0));
 
+        // Disc Trails
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.TRAIL, ModParticles::defaultDiscFactory);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.GENERIC_DISC_TRAIL, ModParticles::defaultDiscFactory);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.COPPER_DISC_TRAIL, ModParticles::defaultDiscFactory);

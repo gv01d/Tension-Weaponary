@@ -1,11 +1,8 @@
 package me.gv0id.arbalests.entity.projectile;
 
-import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.particle.ModParticles;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.entity.*;
 import net.minecraft.entity.mob.BlazeEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.WindChargeEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
@@ -16,15 +13,12 @@ import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.explosion.AdvancedExplosionBehavior;
 
 import java.util.Optional;
@@ -93,8 +87,8 @@ public class SnowProjectileEntity extends ThrownItemEntity {
                         ICE_EXPLOSION_POWER,
                         false,
                         World.ExplosionSourceType.TRIGGER,
-                        ModParticles.SNOW_GUST,
-                        ModParticles.SNOW_GUST,
+                        ModParticles.SNOW_GUST_OLD,
+                        ModParticles.SNOW_GUST_OLD,
                         SoundEvents.ENTITY_WIND_CHARGE_WIND_BURST
                 );
         entity.discard();

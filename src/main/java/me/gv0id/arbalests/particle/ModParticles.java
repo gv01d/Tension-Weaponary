@@ -16,7 +16,7 @@ public class ModParticles{
 
 
     public static final ModParticleType STRAFE = register("strafe", true);
-    public static final ModParticleType SNOW_GUST = register("snow_gust", true);
+    public static final ModParticleType SNOW_GUST_OLD = register("snow_gust", true);
     public static final ModParticleType ENDER_GUST = register("ender_gust", true);
     public static final ModParticleType FIRE_GUST = register("fire_gust", true);
     public static final ModParticleType LIGHT_FLASH = register("light_flash", true);
@@ -31,13 +31,22 @@ public class ModParticles{
     public static final ParticleType<AngularColoredParticleEffect> STREAK = register("streak", true, AngularColoredParticleEffect::createCodec, AngularColoredParticleEffect::createPacketCodec);
     public static final ParticleType<AngularColoredParticleEffect> ANGULAR_BOOM = register("angular_boom", true, AngularColoredParticleEffect::createCodec, AngularColoredParticleEffect::createPacketCodec);
 
+    // Snow Gust
+    public static final ModParticleType SNOW_FLAKE = register("snow_flake", true);
+    public static final ModParticleType SNOW_GUST = register("snow_gust", true);
+    public static final ModParticleType SNOW_GUST_EMITTER = register("snow_gust", true);
+
+
+
+    // Shaded Cosmic End Crystal Explosion
     public static final ModParticleType COSMIC_BOOM = register("cosmic_boom", false);
     public static final ModParticleType SMALL_COSMIC_BOOM = register("small_cosmic_boom", true);
     public static final ModParticleType COSMIC_BOOM_EMITTER = register("cosmic_boom_emitter", true);
 
+
+
     public static final ParticleType<TrailParticleEffect> TRAIL = register("trail", true, TrailParticleEffect::createCodec, TrailParticleEffect::createPacketCodec);
-
-
+    // Disc Trails
     public static final ParticleType<TrailParticleEffect> GENERIC_DISC_TRAIL = register("generic_disc_trail", true, TrailParticleEffect::createCodec, TrailParticleEffect::createPacketCodec);
     public static final ParticleType<TrailParticleEffect> COPPER_DISC_TRAIL = register("copper_disc_trail", true, TrailParticleEffect::createCodec, TrailParticleEffect::createPacketCodec);
     public static final ParticleType<TrailParticleEffect> D13_TRAIL = register("d13_disc_trail", true, TrailParticleEffect::createCodec, TrailParticleEffect::createPacketCodec);

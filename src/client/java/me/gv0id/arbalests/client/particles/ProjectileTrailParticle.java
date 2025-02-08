@@ -191,8 +191,8 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
         float roll2 = (camera.getYaw() - MathHelper.lerp(tickDelta2, this.prevYaw, this.yaw));
 
 
-        angle1 = t1;
-        angle2 = t2;
+        //angle1 = t1;
+        //angle2 = t2;
 
 
         //angle1 = angle1.rotationYXZ((float) Math.PI - camera.getYaw() * (float) (Math.PI / 180.0), -camera.getPitch() * (float) (Math.PI / 180.0),roll1 * (float) (Math.PI / 180.0));
