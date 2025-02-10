@@ -165,8 +165,8 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
                 (float)this.FIRE_EXPLOSION_POWER,
                 true,
                 World.ExplosionSourceType.TRIGGER,
-                ModParticles.FIRE_GUST,
-                ModParticles.FIRE_GUST,
+                ModParticles.FIRE_GUST_EMITTER,
+                ModParticles.FIRE_GUST_EMITTER,
                 SoundEvents.ENTITY_GENERIC_EXPLODE
         );
     }

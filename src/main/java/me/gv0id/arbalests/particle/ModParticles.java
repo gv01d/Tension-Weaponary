@@ -16,9 +16,6 @@ public class ModParticles{
 
 
     public static final ModParticleType STRAFE = register("strafe", true);
-    public static final ModParticleType SNOW_GUST_OLD = register("snow_gust_old", true);
-    public static final ModParticleType ENDER_GUST = register("ender_gust", true);
-    public static final ModParticleType FIRE_GUST = register("fire_gust", true);
     public static final ModParticleType LIGHT_FLASH = register("light_flash", true);
     public static final ModParticleType SMALL_LIGHT_FLASH = register("small_light_flash", true);
     public static final ModParticleType BOOM = register("boom", true);
@@ -36,15 +33,22 @@ public class ModParticles{
     public static final ModParticleType SNOW_GUST = register("snow_gust", true);
     public static final ModParticleType SNOW_GUST_EMITTER = register("snow_gust_emitter", true);
 
+    // Fire Gust
+    public static final ModParticleType FIRE = register("fire", true);
+    public static final ModParticleType FIRE_GUST = register("fire_gust", true);
+    public static final ModParticleType FIRE_GUST_EMITTER = register("fire_gust_emitter", true);
 
+    // Ender Gust
+    public static final ModParticleType ENDER = register("ender", true);
+    public static final ModParticleType ENDER_GUST = register("ender_gust", true);
+    public static final ModParticleType ENDER_GUST_EMITTER = register("ender_gust_emitter", true);
 
     // Shaded Cosmic End Crystal Explosion
     public static final ModParticleType COSMIC_BOOM = register("cosmic_boom", false);
     public static final ModParticleType SMALL_COSMIC_BOOM = register("small_cosmic_boom", true);
     public static final ModParticleType COSMIC_BOOM_EMITTER = register("cosmic_boom_emitter", true);
 
-
-
+    // Trails
     public static final ParticleType<TrailParticleEffect> TRAIL = register("trail", true, TrailParticleEffect::createCodec, TrailParticleEffect::createPacketCodec);
     // Disc Trails
     public static final ParticleType<TrailParticleEffect> GENERIC_DISC_TRAIL = register("generic_disc_trail", true, TrailParticleEffect::createCodec, TrailParticleEffect::createPacketCodec);

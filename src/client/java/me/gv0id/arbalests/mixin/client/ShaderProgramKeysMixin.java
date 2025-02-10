@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.mixin.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.gv0id.arbalests.client.render.RenderLayer;
 import net.minecraft.client.gl.ShaderProgramKey;
 import net.minecraft.client.gl.ShaderProgramKeys;
@@ -21,4 +22,5 @@ public class ShaderProgramKeysMixin {
     private static void addCustomKeys(CallbackInfo ci){
         ALL.add(RenderLayer.END_CUTOUT_KEY);
     }
+
 }

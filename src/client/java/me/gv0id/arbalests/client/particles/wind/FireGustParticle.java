@@ -13,8 +13,11 @@ public class FireGustParticle extends SpriteBillboardParticle {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.setSpriteForAge(spriteProvider);
-        this.maxAge = 10;
-        this.scale = 4.0F;
+        this.maxAge = 7;
+        this.scale = 3.5F;
+        float a = (float)Math.random() * (float) (Math.PI * 2);
+        this.angle = a;
+        this.prevAngle = a;
         this.setBoundingBoxSpacing(1.0F, 1.0F);
     }
 

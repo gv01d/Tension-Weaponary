@@ -7,6 +7,7 @@ import me.gv0id.arbalests.client.render.entity.state.MusicDiscEntityState;
 import me.gv0id.arbalests.entity.projectile.MusicDiscEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gl.ShaderLoader;
 import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.model.*;
 import net.minecraft.client.network.ClientPlayerEntity;

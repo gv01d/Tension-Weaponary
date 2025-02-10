@@ -2,7 +2,10 @@ package me.gv0id.arbalests.entity.projectile;
 
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.effect.ModEffects;
+import me.gv0id.arbalests.item.custom.CopperDiscItem;
 import me.gv0id.arbalests.particle.ModParticles;
+import me.gv0id.arbalests.particle.TrailParticleEffect;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.*;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.EndermiteEntity;
@@ -32,6 +35,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.explosion.AdvancedExplosionBehavior;
 
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -41,6 +46,11 @@ public class CustomEnderPearlEntity extends EnderPearlEntity{
     private static final AdvancedExplosionBehavior EXPLOSION_BEHAVIOR = new AdvancedExplosionBehavior(
             true, false, Optional.of(ENDER_KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
     );
+
+    Vec3d previousEyePos;
+    Vec3d previousRYP;
+    int particleIndex = 0;
+
     public CustomEnderPearlEntity(EntityType<? extends EnderPearlEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -50,6 +60,39 @@ public class CustomEnderPearlEntity extends EnderPearlEntity{
     }
 
     protected Entity hitEntity = null;
+
+    @Override
+    public void tick() {
+        super.tick();
+
+    }
+
+    private void spawnParticles(int amount) {
+        if (previousEyePos == null){
+            this.previousEyePos = this.getEyePos();
+            this.previousRYP = new Vec3d(0, this.getYaw(), this.getPitch());
+        }
+
+        ArrayList<ItemStack> list = new ArrayList<>(Objects.requireNonNull(getStack().get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles());
+
+        CopperDiscItem.Music music = CopperDiscItem.getMusic(list.isEmpty()? null : list.getFirst());
+
+
+        this.getWorld()
+                .addParticle(
+                        TrailParticleEffect.create(
+                                music.getParticleType(),
+                                0,
+                                new Vec3d(0,this.getYaw(),this.getPitch()),
+                                new Vec3d(0,(float) this.previousRYP.y, (float) this.previousRYP.z),
+                                this.getEyePos(),
+                                this.previousEyePos,
+                                this.particleIndex++
+                        ), this.getEyePos().x, this.getEyeY(), this.getEyePos().z, 0.0, 0.0, 0.0
+                );
+        this.previousEyePos = this.getEyePos();
+        this.previousRYP = new Vec3d(0, this.getYaw(), this.getPitch());
+    }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
@@ -154,8 +197,8 @@ public class CustomEnderPearlEntity extends EnderPearlEntity{
                         ENDER_EXPLOSION_POWER,
                         false,
                         World.ExplosionSourceType.TRIGGER,
-                        ModParticles.ENDER_GUST,
-                        ModParticles.ENDER_GUST,
+                        ModParticles.ENDER_GUST_EMITTER,
+                        ModParticles.ENDER_GUST_EMITTER,
                         SoundEvents.ENTITY_WIND_CHARGE_WIND_BURST
                 );
         entity.discard();

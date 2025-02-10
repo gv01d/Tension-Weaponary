@@ -11,22 +11,39 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.scoreboard.ScoreboardCriterion;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
-public class CosmicBoomParticle extends SpriteBillboardParticle {
+public class EnderParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
+    private final float deaccel = 0.40F;
+    private final float gravity = 0F;
 
-
-    protected CosmicBoomParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
+    protected EnderParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.setSpriteForAge(spriteProvider);
-        this.maxAge = 9;
-        this.scale = 4.0F;
-        float a = (float)Math.random() * (float) (Math.PI * 2);
-        this.angle = a;
-        this.prevAngle = a;
-        this.setBoundingBoxSpacing(1.0F, 1.0F);
+        this.maxAge = (int) (this.random.nextFloat() * 8);
+        this.scale = (float) MathHelper.lerp(Math.random(), 0.3, 0.7);
+        Vec3d r = new Vec3d (
+                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
+                );
+        this.prevPosX = this.x + r.x;
+        this.prevPosY = this.y + r.y;
+        this.prevPosZ = this.z + r.z;
+        this.setPos(this.x + r.x, this.y + r.x, this.z + r.x);
+        this.setVelocity(r.x * 3, r.y * 3, r.z * 3);
+
+        float rand = this.random.nextFloat();
+        this.setColor(
+                MathHelper.lerp( rand, 1F, 0.8F),
+                MathHelper.lerp( rand, 1F, 0.8F),
+                MathHelper.lerp( rand, 1F, 0.2F)
+        );
+
+        //this.setBoundingBoxSpacing(1.0F, 1.0F);
     }
 
     @Override
@@ -40,19 +57,20 @@ public class CosmicBoomParticle extends SpriteBillboardParticle {
 
     @Override
     public void tick() {
+        this.prevPosX = this.x;
+        this.prevPosY = this.y;
+        this.prevPosZ = this.z;
+
+        this.move(this.velocityX, this.velocityY, this.velocityZ);
+        this.setVelocity(this.velocityX * deaccel, this.velocityY * deaccel, this.velocityZ * deaccel);
+        this.velocityY -= gravity;
+
+        //this.alpha = 1.0F - (float)this.age / (float)this.maxAge;
         if (this.age++ >= this.maxAge) {
             this.markDead();
         } else {
             this.setSpriteForAge(this.spriteProvider);
         }
-    }
-
-
-
-    @Override
-    public void render(VertexConsumer vertexConsumer, Camera camera, float tickDelta) {
-
-        super.render(vertexConsumer, camera, tickDelta);
     }
 
     @Override
@@ -71,25 +89,7 @@ public class CosmicBoomParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            CosmicBoomParticle lightFlashParticle = new CosmicBoomParticle(clientWorld, d, e, f, this.spriteProvider);
-            //lightFlashParticle.angle = (float)Math.random() * (float) (Math.PI * 2);
-            return lightFlashParticle;
-        }
-    }
-
-    @Environment(EnvType.CLIENT)
-    public static class SmallFactory implements ParticleFactory<SimpleParticleType> {
-        private final SpriteProvider field_50230;
-
-        public SmallFactory(SpriteProvider spriteProvider) {
-            this.field_50230 = spriteProvider;
-        }
-
-        public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            Particle particle = new CosmicBoomParticle(clientWorld, d, e, f, this.field_50230);
-            particle.scale(0.15F);
-            particle.setMaxAge(7);
-            return particle;
+            return new EnderParticle(clientWorld, d, e, f, this.spriteProvider);
         }
     }
 }
