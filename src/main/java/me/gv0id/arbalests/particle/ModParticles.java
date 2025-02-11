@@ -39,7 +39,6 @@ public class ModParticles{
     public static final ModParticleType FIRE_GUST_EMITTER = register("fire_gust_emitter", true);
 
     // Ender Gust
-    public static final ModParticleType ENDER = register("ender", true);
     public static final ModParticleType ENDER_GUST = register("ender_gust", true);
     public static final ModParticleType ENDER_GUST_EMITTER = register("ender_gust_emitter", true);
 
@@ -50,6 +49,8 @@ public class ModParticles{
 
     // Trails
     public static final ParticleType<TrailParticleEffect> TRAIL = register("trail", true, TrailParticleEffect::createCodec, TrailParticleEffect::createPacketCodec);
+    // Double Trail
+    public static final ParticleType<TrailParticleEffect> ENDER_TRAIL = register("ender_trail", true, TrailParticleEffect::createCodec, TrailParticleEffect::createPacketCodec);
     // Disc Trails
     public static final ParticleType<TrailParticleEffect> GENERIC_DISC_TRAIL = register("generic_disc_trail", true, TrailParticleEffect::createCodec, TrailParticleEffect::createPacketCodec);
     public static final ParticleType<TrailParticleEffect> COPPER_DISC_TRAIL = register("copper_disc_trail", true, TrailParticleEffect::createCodec, TrailParticleEffect::createPacketCodec);

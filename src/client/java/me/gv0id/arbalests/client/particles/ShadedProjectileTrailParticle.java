@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.client.particles;
 
+import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -41,6 +42,7 @@ public class ShadedProjectileTrailParticle extends SpriteBillboardParticle {
 
     ArrayList<Vec3d> prevPositions = new ArrayList<>();
     ArrayList<Quaternionf> angles = new ArrayList<>();
+    ArrayList<Quaternionf> angles2 = new ArrayList<>();
     ArrayList<Float> tickDeltas = new ArrayList<>();
 
     protected ShadedProjectileTrailParticle(ClientWorld clientWorld, double d, double e, double f, SpriteProvider spriteProvider) {
@@ -73,6 +75,7 @@ public class ShadedProjectileTrailParticle extends SpriteBillboardParticle {
 
     @Override
     public void tick() {
+        Arbalests.LOGGER.info("tick");
         this.prevGap = this.gap;
         this.prevAlpha = this.alpha;
 
@@ -97,10 +100,12 @@ public class ShadedProjectileTrailParticle extends SpriteBillboardParticle {
         this.prevPosition = pos;
 
         Quaternionf quaternionf = RotationAxis.POSITIVE_Y.rotationDegrees((float) angles.y - 90.0F)
-                .mul(RotationAxis.POSITIVE_Z.rotationDegrees((float) angles.z + 90.0F))
-                .mul(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
+                .mul(RotationAxis.POSITIVE_Z.rotationDegrees((float) angles.z + 90.0F));
+
+        Quaternionf quaternionf1 = new Quaternionf(quaternionf).mul(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
 
         this.angles.add(quaternionf);
+        this.angles2.add(quaternionf1);
         this.prevPositions.add(pos);
         this.tickDeltas.add(0.0F);
     }
@@ -121,14 +126,15 @@ public class ShadedProjectileTrailParticle extends SpriteBillboardParticle {
                 setStart(this.prevPosition, new Vec3d(this.prevRoll, this.prevYaw, this.prevPitch));
             }
             else if (this.tickDeltas.getLast() != tickDelta) {
-                Quaternionf quaternionf = new Quaternionf();
-
                 float yaw = MathHelper.lerp(tickDelta, this.prevYaw, this.yaw);
                 float pitch = MathHelper.lerp(tickDelta, this.prevPitch, this.pitch);
 
-                quaternionf = RotationAxis.POSITIVE_Y.rotationDegrees(yaw - 90.0F)
-                        .mul(RotationAxis.POSITIVE_Z.rotationDegrees(pitch + 90.0F))
-                        .mul(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
+                Quaternionf quaternionf = RotationAxis.POSITIVE_Y.rotationDegrees(yaw - 90.0F)
+                        .mul(RotationAxis.POSITIVE_Z.rotationDegrees(pitch + 90.0F));
+
+                Quaternionf quaternionf1 = new Quaternionf(quaternionf).mul(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
+
+
                 float pX;
                 float pY;
                 float pZ;
@@ -142,14 +148,16 @@ public class ShadedProjectileTrailParticle extends SpriteBillboardParticle {
                 }
 
                 this.angles.add(quaternionf);
+                this.angles2.add(quaternionf1);
                 this.prevPositions.add(pos);
                 this.tickDeltas.add(tickDelta);
             }
         }
         else if (!this.tickDeltas.isEmpty()  && this.tickDeltas.getLast() != 1){
             Quaternionf quaternionf = RotationAxis.POSITIVE_Y.rotationDegrees(this.yaw - 90.0F)
-                    .mul(RotationAxis.POSITIVE_Z.rotationDegrees(this.pitch + 90.0F))
-                    .mul(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
+                    .mul(RotationAxis.POSITIVE_Z.rotationDegrees(this.pitch + 90.0F));
+
+            Quaternionf quaternionf1 = new Quaternionf(quaternionf).mul(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
 
             Vec3d pos = new Vec3d(this.position.x, this.position.y, this.position.z);
 
@@ -158,6 +166,7 @@ public class ShadedProjectileTrailParticle extends SpriteBillboardParticle {
             }
 
             this.angles.add(quaternionf);
+            this.angles2.add(quaternionf1);
             this.prevPositions.add(pos);
             this.tickDeltas.add(1F);
         }
@@ -179,17 +188,13 @@ public class ShadedProjectileTrailParticle extends SpriteBillboardParticle {
 
         Vec3d pos1 = this.prevPositions.get(index);
         Vec3d pos2 = this.prevPositions.get(index + 1);
-        Quaternionf angle1 = new Quaternionf(camera.getRotation());
-        Quaternionf angle2 = new Quaternionf(camera.getRotation());
         float tickDelta1 = this.tickDeltas.get(index);
         float tickDelta2 = this.tickDeltas.get(index + 1);
 
-        Quaternionf t1 = new Quaternionf(this.angles.get(index));
-        Quaternionf t2 = new Quaternionf(this.angles.get(index + 1));
-
-        float roll1 = (camera.getYaw() - MathHelper.lerp(tickDelta1, this.prevYaw, this.yaw));
-        float roll2 = (camera.getYaw() - MathHelper.lerp(tickDelta2, this.prevYaw, this.yaw));
-
+        Quaternionf angle1 = new Quaternionf(this.angles.get(index));
+        Quaternionf angle1Rot = new Quaternionf(this.angles2.get(index));
+        Quaternionf angle2 = new Quaternionf(this.angles.get(index + 1));
+        Quaternionf angle2Rot = new Quaternionf(this.angles2.get(index + 1));
 
         //angle1 = t1;
         //angle2 = t2;
@@ -224,6 +229,16 @@ public class ShadedProjectileTrailParticle extends SpriteBillboardParticle {
         this.addVertex(vertexConsumer, angle2, (float) pos2.x, (float) pos2.y, (float) pos2.z, -getGap(tickDelta2),0F, j2, l, MathHelper.lerp(tickDelta2, n, m), o2, MathHelper.lerp(tickDelta2, this.alpha, this.prevAlpha));
         this.addVertex(vertexConsumer, angle1, (float) pos1.x, (float) pos1.y, (float) pos1.z, -getGap(tickDelta1),0F, j, l, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));
         this.addVertex(vertexConsumer, angle1, (float) pos1.x, (float) pos1.y, (float) pos1.z, getGap(tickDelta1),0F, j, k, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));
+
+        this.addVertex(vertexConsumer, angle1Rot, (float) pos1.x, (float) pos1.y, (float) pos1.z, getGap(tickDelta1),0F, j, k, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));
+        this.addVertex(vertexConsumer, angle1Rot, (float) pos1.x, (float) pos1.y, (float) pos1.z, -getGap(tickDelta1),0F, j, l, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));
+        this.addVertex(vertexConsumer, angle2Rot, (float) pos2.x, (float) pos2.y, (float) pos2.z, -getGap(tickDelta2),0F, j2, l, MathHelper.lerp(tickDelta2, n, m), o2, MathHelper.lerp(tickDelta2, this.alpha, this.prevAlpha));
+        this.addVertex(vertexConsumer, angle2Rot, (float) pos2.x, (float) pos2.y, (float) pos2.z, getGap(tickDelta2),0F, j2, k, MathHelper.lerp(tickDelta2, n, m), o2, MathHelper.lerp(tickDelta2, this.alpha, this.prevAlpha));
+
+        this.addVertex(vertexConsumer, angle2Rot, (float) pos2.x, (float) pos2.y, (float) pos2.z, getGap(tickDelta2),0F, j2, k, MathHelper.lerp(tickDelta2, n, m), o2, MathHelper.lerp(tickDelta2, this.alpha, this.prevAlpha));
+        this.addVertex(vertexConsumer, angle2Rot, (float) pos2.x, (float) pos2.y, (float) pos2.z, -getGap(tickDelta2),0F, j2, l, MathHelper.lerp(tickDelta2, n, m), o2, MathHelper.lerp(tickDelta2, this.alpha, this.prevAlpha));
+        this.addVertex(vertexConsumer, angle1Rot, (float) pos1.x, (float) pos1.y, (float) pos1.z, -getGap(tickDelta1),0F, j, l, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));
+        this.addVertex(vertexConsumer, angle1Rot, (float) pos1.x, (float) pos1.y, (float) pos1.z, getGap(tickDelta1),0F, j, k, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));
     }
 
     private void addVertex(

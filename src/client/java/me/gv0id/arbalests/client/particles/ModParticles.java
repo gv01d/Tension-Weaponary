@@ -37,10 +37,12 @@ public class ModParticles {
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.FIRE_GUST_EMITTER, new FireGustEmitterParticle.Factory( 0, 3));
 
         // Ender Gust
-        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.ENDER, EnderParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.ENDER_GUST, CosmicBoomParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.ENDER_GUST_EMITTER, new EnderGustEmitterParticle.Factory( 0, 3));
 
+        //
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.ENDER_TRAIL,
+                (spriteProvider) -> new ShadedProjectileTrailParticle.Factory(spriteProvider, 0.5f, 0.0F, 1.0F, 0.0F , 8));
 
         //
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.STREAK, StreaklParticle.Factory::new);

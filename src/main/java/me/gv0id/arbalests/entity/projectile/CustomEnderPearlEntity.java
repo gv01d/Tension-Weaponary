@@ -2,6 +2,7 @@ package me.gv0id.arbalests.entity.projectile;
 
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.effect.ModEffects;
+import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.item.custom.CopperDiscItem;
 import me.gv0id.arbalests.particle.ModParticles;
 import me.gv0id.arbalests.particle.TrailParticleEffect;
@@ -15,6 +16,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.WindChargeEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
@@ -28,6 +30,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.TeleportTarget;
@@ -56,7 +59,10 @@ public class CustomEnderPearlEntity extends EnderPearlEntity{
     }
 
     public CustomEnderPearlEntity(World world, LivingEntity owner, ItemStack stack) {
-        super(world, owner, stack);
+        super(ModEntityType.CUSTOM_ENDER_PEARL,world);
+        this.setOwner(owner);
+        this.setItem(stack);
+        this.setPosition(owner.getX(), owner.getEyeY() - 0.1F, owner.getZ());
     }
 
     protected Entity hitEntity = null;
@@ -64,25 +70,20 @@ public class CustomEnderPearlEntity extends EnderPearlEntity{
     @Override
     public void tick() {
         super.tick();
-
+        spawnParticles();
     }
 
-    private void spawnParticles(int amount) {
+    private void spawnParticles() {
         if (previousEyePos == null){
             this.previousEyePos = this.getEyePos();
             this.previousRYP = new Vec3d(0, this.getYaw(), this.getPitch());
         }
-
-        ArrayList<ItemStack> list = new ArrayList<>(Objects.requireNonNull(getStack().get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles());
-
-        CopperDiscItem.Music music = CopperDiscItem.getMusic(list.isEmpty()? null : list.getFirst());
-
-
+        Arbalests.logSide(this.getWorld());
         this.getWorld()
                 .addParticle(
                         TrailParticleEffect.create(
-                                music.getParticleType(),
-                                0,
+                                ModParticles.ENDER_TRAIL,
+                                ColorHelper.fromFloats(1.0F, 1.0F, 1.0F, 1.0F),
                                 new Vec3d(0,this.getYaw(),this.getPitch()),
                                 new Vec3d(0,(float) this.previousRYP.y, (float) this.previousRYP.z),
                                 this.getEyePos(),

@@ -5,6 +5,7 @@ import net.minecraft.client.particle.NoRenderParticle;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.particle.SimpleParticleType;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,8 +22,15 @@ public class EnderGustEmitterParticle extends NoRenderParticle {
             double te = this.y + (this.random.nextDouble() - this.random.nextDouble()) * 4;
             double tf = this.z + (this.random.nextDouble() - this.random.nextDouble()) * 4;
             this.world.addParticle(ModParticles.SMALL_COSMIC_BOOM, td, te, tf, (double)((float)this.age / (float)this.maxAge), 0.0, 0.0);
-
         }
+
+        for (int i = 0; i < 30; i++) {
+            double td = this.x + (this.random.nextDouble() - this.random.nextDouble()) * 4;
+            double te = this.y + (this.random.nextDouble() - this.random.nextDouble()) * 4;
+            double tf = this.z + (this.random.nextDouble() - this.random.nextDouble()) * 4;
+            this.world.addParticle(ParticleTypes.PORTAL, td, te, tf, (double)((float)this.age / (float)this.maxAge), 0.0, 0.0);
+        }
+
     }
 
     @Override
@@ -32,7 +40,13 @@ public class EnderGustEmitterParticle extends NoRenderParticle {
             double e = this.y + (this.random.nextDouble() - this.random.nextDouble()) * 3;
             double f = this.z + (this.random.nextDouble() - this.random.nextDouble()) * 3;
             this.world.addParticle(ModParticles.SMALL_COSMIC_BOOM, d, e, f, (double)((float)this.age / (float)this.maxAge), 0.0, 0.0);
+        }
 
+        for (int i = 0; i < 15; i++) {
+            double d = this.x + (this.random.nextDouble() - this.random.nextDouble()) * 3;
+            double e = this.y + (this.random.nextDouble() - this.random.nextDouble()) * 3;
+            double f = this.z + (this.random.nextDouble() - this.random.nextDouble()) * 3;
+            this.world.addParticle(ParticleTypes.PORTAL, d, e, f, (double)((float)this.age / (float)this.maxAge), 0.0, 0.0);
         }
 
         if (this.age++ == this.maxAge) {

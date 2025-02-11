@@ -5,6 +5,7 @@ import me.gv0id.arbalests.entity.ModEntityType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 
@@ -26,6 +27,7 @@ public class ModEntityRenderers implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntityType.WIND_GALE, WindGaleEntityRenderer::new);
         EntityRendererRegistry.register(ModEntityType.MUSIC_DISC, MusicDiscEntityRenderer::new);
         EntityRendererRegistry.register(ModEntityType.END_CRYSTAL_PROJECTILE, EndCrystalProjectileEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntityType.CUSTOM_ENDER_PEARL, FlyingItemEntityRenderer::new);
     }
 
 }

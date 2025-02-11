@@ -179,16 +179,10 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
 
         Vec3d pos1 = this.prevPositions.get(index);
         Vec3d pos2 = this.prevPositions.get(index + 1);
-        Quaternionf angle1 = new Quaternionf(camera.getRotation());
-        Quaternionf angle2 = new Quaternionf(camera.getRotation());
+        Quaternionf angle1 = new Quaternionf(this.angles.get(index));
+        Quaternionf angle2 = new Quaternionf(this.angles.get(index + 1));
         float tickDelta1 = this.tickDeltas.get(index);
         float tickDelta2 = this.tickDeltas.get(index + 1);
-
-        Quaternionf t1 = new Quaternionf(this.angles.get(index));
-        Quaternionf t2 = new Quaternionf(this.angles.get(index + 1));
-
-        float roll1 = (camera.getYaw() - MathHelper.lerp(tickDelta1, this.prevYaw, this.yaw));
-        float roll2 = (camera.getYaw() - MathHelper.lerp(tickDelta2, this.prevYaw, this.yaw));
 
 
         //angle1 = t1;

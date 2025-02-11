@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.entity;
 
+import me.gv0id.arbalests.entity.projectile.CustomEnderPearlEntity;
 import me.gv0id.arbalests.entity.projectile.EndCrystalProjectileEntity;
 import me.gv0id.arbalests.entity.projectile.MusicDiscEntity;
 import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
@@ -38,6 +39,16 @@ public class ModEntityType {
                     .dropsNothing()
                     .dimensions(1.2F,1.2F)
                     .eyeHeight(0.6F)
+                    .maxTrackingRange(4)
+                    .trackingTickInterval(10)
+    );
+
+
+    public static final EntityType<CustomEnderPearlEntity> CUSTOM_ENDER_PEARL = register(
+            "custom_ender_pearl",
+            EntityType.Builder.<CustomEnderPearlEntity>create(CustomEnderPearlEntity::new, SpawnGroup.MISC)
+                    .dropsNothing()
+                    .dimensions(0.25F, 0.25F)
                     .maxTrackingRange(4)
                     .trackingTickInterval(10)
     );
