@@ -49,6 +49,7 @@ public class ModEntityType {
             EntityType.Builder.<CustomEnderPearlEntity>create(CustomEnderPearlEntity::new, SpawnGroup.MISC)
                     .dropsNothing()
                     .dimensions(0.25F, 0.25F)
+                    .eyeHeight(0.125F)
                     .maxTrackingRange(4)
                     .trackingTickInterval(10)
     );

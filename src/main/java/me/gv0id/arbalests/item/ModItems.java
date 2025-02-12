@@ -3,6 +3,7 @@ package me.gv0id.arbalests.item;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
+import me.gv0id.arbalests.components.type.ChargeValueComponent;
 import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
 import me.gv0id.arbalests.item.custom.CopperDiscItem;
 import me.gv0id.arbalests.item.custom.DeadbeatCrossbowItem;
@@ -48,6 +49,7 @@ public class ModItems {
                     .maxDamage(465)
                     .component(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT)
                     .component(ModDataComponentTypes.ARBALEST_COOLDOWN, new ArbalestCooldown(0.5f))
+                    .component(ModDataComponentTypes.CHARGE_VALUE, ChargeValueComponent.DEFAULT)
                     .enchantable(1)
                     .useCooldown(1)
                     .component(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.DEFAULT)

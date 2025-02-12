@@ -42,7 +42,7 @@ public class ModParticles {
 
         //
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.ENDER_TRAIL,
-                (spriteProvider) -> new ShadedProjectileTrailParticle.Factory(spriteProvider, 0.5f, 0.0F, 1.0F, 0.0F , 8));
+                (spriteProvider) -> new ShadedProjectileTrailParticle.Factory(spriteProvider, 0.3f, 0.0F, 1.0F, 0.0F , 14));
 
         //
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.STREAK, StreaklParticle.Factory::new);

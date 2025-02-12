@@ -1,12 +1,16 @@
 package me.gv0id.arbalests.client.particles;
 
 import me.gv0id.arbalests.Arbalests;
+import me.gv0id.arbalests.client.render.RenderLayer;
 import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
@@ -115,6 +119,12 @@ public class ShadedProjectileTrailParticle extends SpriteBillboardParticle {
         //float tailGap = this.startGap - (( this.startGap / this.maxAge) * Math.min(Math.max(this.maxAge - this.index, 0) + this.age, this.maxAge));
         float tailGap = this.startGap - (( this.startGap / Math.min(this.age + this.index, this.maxAge)) * Math.min(this.age + 1, this.maxAge));
         return tickDelta == 0? tailGap : tickDelta == 1F? headGap : MathHelper.lerp(tickDelta, tailGap, headGap);
+    }
+
+    @Override
+    public void renderCustom(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Camera camera, float tickDelta) {
+        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.END_CUTOUT.apply(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE));
+        render(vertexConsumer, camera, tickDelta);
     }
 
     @Override
@@ -250,7 +260,7 @@ public class ShadedProjectileTrailParticle extends SpriteBillboardParticle {
 
     @Override
     public ParticleTextureSheet getType() {
-        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
+        return ParticleTextureSheet.CUSTOM;
     }
 
     @Environment(EnvType.CLIENT)

@@ -1,6 +1,8 @@
 package me.gv0id.arbalests.components;
 
+import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
+import me.gv0id.arbalests.components.type.ChargeValueComponent;
 import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
 import me.gv0id.arbalests.components.type.MultiChargedProjectilesComponent;
 import net.minecraft.component.ComponentType;
@@ -18,8 +20,14 @@ public class ModDataComponentTypes {
                     .cache()
     );
 
+    public static final ComponentType<ChargeValueComponent> CHARGE_VALUE = register(
+            "charge_value",
+            builder -> builder.codec(ChargeValueComponent.CODEC).packetCodec(ChargeValueComponent.PACKET_CODEC).cache()
+    );
+
     public static final ComponentType<ArbalestCooldown> ARBALEST_COOLDOWN = register(
-            "arbalests:arbalest_cooldown", builder -> builder.codec(ArbalestCooldown.CODEC).packetCodec(ArbalestCooldown.PACKET_CODEC).cache()
+            "arbalests:arbalest_cooldown",
+            builder -> builder.codec(ArbalestCooldown.CODEC).packetCodec(ArbalestCooldown.PACKET_CODEC).cache()
     );
 
     public static final ComponentType<DeadbeatCrossbowCharging> DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE = register(
