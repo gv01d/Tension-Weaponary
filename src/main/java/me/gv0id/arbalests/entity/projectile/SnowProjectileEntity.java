@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.entity.projectile;
 
+import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.particle.ModParticles;
 import net.minecraft.entity.*;
 import net.minecraft.entity.mob.BlazeEntity;
@@ -37,11 +38,20 @@ public class SnowProjectileEntity extends ThrownItemEntity {
     }
 
     public SnowProjectileEntity(World world, LivingEntity owner, ItemStack stack) {
-        super(EntityType.SNOWBALL, owner, world, stack);
+        super(ModEntityType.CUSTOM_SNOWBALL, owner, world, stack);
     }
 
     public SnowProjectileEntity(World world, double x, double y, double z, ItemStack stack) {
-        super(EntityType.SNOWBALL, x, y, z, world, stack);
+        super(ModEntityType.CUSTOM_SNOWBALL, x, y, z, world, stack);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        Vec3d p = this.getPos();
+        for (int i = 0; i < 20; i++) {
+            this.getWorld().addParticle(ModParticles.SNOW_FLAKE, p.x, p.y, p.z,0.0,0.0,0.0 );
+        }
     }
 
     @Override

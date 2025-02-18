@@ -1,9 +1,6 @@
 package me.gv0id.arbalests.entity;
 
-import me.gv0id.arbalests.entity.projectile.CustomEnderPearlEntity;
-import me.gv0id.arbalests.entity.projectile.EndCrystalProjectileEntity;
-import me.gv0id.arbalests.entity.projectile.MusicDiscEntity;
-import me.gv0id.arbalests.entity.projectile.WindGaleEntity;
+import me.gv0id.arbalests.entity.projectile.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -50,6 +47,15 @@ public class ModEntityType {
                     .dropsNothing()
                     .dimensions(0.25F, 0.25F)
                     .eyeHeight(0.125F)
+                    .maxTrackingRange(4)
+                    .trackingTickInterval(10)
+    );
+
+    public static final EntityType<SnowProjectileEntity> CUSTOM_SNOWBALL = register(
+            "custom_snowball",
+            EntityType.Builder.<SnowProjectileEntity>create(SnowProjectileEntity::new, SpawnGroup.MISC)
+                    .dropsNothing()
+                    .dimensions(0.25F, 0.25F)
                     .maxTrackingRange(4)
                     .trackingTickInterval(10)
     );

@@ -7,6 +7,7 @@ import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 public class SnowGustEmitterParticle extends NoRenderParticle {
@@ -18,7 +19,12 @@ public class SnowGustEmitterParticle extends NoRenderParticle {
         this.interval = interval;
         this.world.addParticle(ModParticles.SNOW_GUST, d, e, f, 0.0, 0.0, 0.0);
         for (int i = 0; i < 20; i++) {
-            this.world.addParticle(ModParticles.SNOW_FLAKE, this.x, this.y, this.z, 0.0, 0.0, 0.0);
+            Vec3d r = new Vec3d(
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
+            );
+            this.world.addParticle(ModParticles.SNOW_FLAKE, this.x + r.x, this.y + r.y, this.z + r.z, r.x * 3, r.y * 3, r.z * 3);
         }
     }
 

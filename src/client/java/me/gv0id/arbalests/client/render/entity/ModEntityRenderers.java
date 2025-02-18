@@ -28,6 +28,7 @@ public class ModEntityRenderers implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntityType.MUSIC_DISC, MusicDiscEntityRenderer::new);
         EntityRendererRegistry.register(ModEntityType.END_CRYSTAL_PROJECTILE, EndCrystalProjectileEntityRenderer::new);
         EntityRendererRegistry.register(ModEntityType.CUSTOM_ENDER_PEARL, FlyingItemEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntityType.CUSTOM_SNOWBALL, FlyingItemEntityRenderer::new);
     }
 
 }

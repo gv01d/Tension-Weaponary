@@ -3,11 +3,13 @@ package me.gv0id.arbalests.client.particles;
 import me.gv0id.arbalests.client.particles.wind.OldSnowGustParticle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 
 public class SnowFlakeParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
@@ -20,16 +22,6 @@ public class SnowFlakeParticle extends SpriteBillboardParticle {
         this.setSpriteForAge(spriteProvider);
         this.maxAge = 6;
         this.scale = (float) MathHelper.lerp(Math.random(), 0.3, 0.7);
-        Vec3d r = new Vec3d (
-                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
-                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
-                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
-                );
-        this.prevPosX = this.x + r.x;
-        this.prevPosY = this.y + r.y;
-        this.prevPosZ = this.z + r.z;
-        this.setPos(this.x + r.x, this.y + r.x, this.z + r.x);
-        this.setVelocity(r.x * 3, r.y * 3, r.z * 3);
 
         float rand = this.random.nextFloat();
         this.setColor(
@@ -39,6 +31,11 @@ public class SnowFlakeParticle extends SpriteBillboardParticle {
         );
 
         //this.setBoundingBoxSpacing(1.0F, 1.0F);
+    }
+
+    protected SnowFlakeParticle(ClientWorld world, Vec3d pos, SpriteProvider spriteProvider, Vec3d speed){
+        this(world, pos.x, pos.y, pos.z, spriteProvider);
+        this.setVelocity(speed.x, speed.y, speed.z);
     }
 
     @Override
@@ -77,22 +74,10 @@ public class SnowFlakeParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            return new SnowFlakeParticle(clientWorld, d, e, f, this.spriteProvider);
-        }
-    }
+            SnowFlakeParticle snowFlakeParticle = new SnowFlakeParticle(clientWorld, d, e, f, this.spriteProvider);
+            snowFlakeParticle.setVelocity(g, h, i);
+            return snowFlakeParticle;
 
-    @Environment(EnvType.CLIENT)
-    public static class SmallFactory implements ParticleFactory<SimpleParticleType> {
-        private final SpriteProvider field_50230;
-
-        public SmallFactory(SpriteProvider spriteProvider) {
-            this.field_50230 = spriteProvider;
-        }
-
-        public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            Particle particle = new SnowFlakeParticle(clientWorld, d, e, f, this.field_50230);
-            particle.scale(0.15F);
-            return particle;
         }
     }
 }
