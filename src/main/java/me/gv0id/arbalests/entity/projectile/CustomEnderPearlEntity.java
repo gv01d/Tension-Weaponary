@@ -8,6 +8,7 @@ import me.gv0id.arbalests.particle.ModParticles;
 import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.*;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.EndermiteEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -70,7 +71,7 @@ public class CustomEnderPearlEntity extends EnderPearlEntity{
     @Override
     public void tick() {
         super.tick();
-        spawnParticles();
+        //spawnParticles();
     }
 
     private void spawnParticles() {
@@ -176,6 +177,10 @@ public class CustomEnderPearlEntity extends EnderPearlEntity{
             if (entity2 instanceof WindGaleEntity || entity2 instanceof WindChargeEntity || entity2 instanceof BreezeWindChargeEntity){
                 enderExplosion(explosionPos,entity2);
                 playEndExplosionSound(serverWorld,teleportPos);
+            }
+            else if (entity2 instanceof EndCrystalProjectileEntity endCrystalProjectileEntity){
+                DamageSource damageSource = this.getDamageSources().explosion(this, this.getOwner());
+                endCrystalProjectileEntity.cosmicExplosion(damageSource, this);
             }
             if (strafe && entity2 instanceof LivingEntity livingEntity){
                 livingEntity.addStatusEffect(new StatusEffectInstance(ModEffects.STRAFE,5,0,true,true,true));

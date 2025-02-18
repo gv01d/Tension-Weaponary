@@ -2,8 +2,11 @@ package me.gv0id.arbalests.entity.projectile;
 
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.entity.ModEntityType;
+import me.gv0id.arbalests.particle.ColoredParticleEffect;
 import me.gv0id.arbalests.particle.ModParticles;
 import me.gv0id.arbalests.particle.AngularColoredParticleEffect;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -16,11 +19,15 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -28,9 +35,19 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.BlockView;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.AdvancedExplosionBehavior;
+import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.explosion.ExplosionBehavior;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 public class EndCrystalProjectileEntity extends ExplosiveProjectileEntity {
     public double BOUNCE_STRENGTH = 0.6D;
@@ -230,9 +247,52 @@ public class EndCrystalProjectileEntity extends ExplosiveProjectileEntity {
         if (!this.isRemoved()) {
             this.remove(RemovalReason.KILLED);
             DamageSource damageSource = this.getOwner() != null ? this.getDamageSources().explosion(this, this.getOwner()) : null;
-            this.getWorld().addParticle(AngularColoredParticleEffect.create(ModParticles.ANGULAR_BOOM,1F,1F,1F,0F,0F,0F,0F,0F,0F), this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
+
+            if (this.getWorld() instanceof  ServerWorld serverWorld){
+                if (this.getWorld().raycast(
+                        new RaycastContext(this.getEyePos(),this.getPos().add(0,-5,0), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this)
+                ).getType() == HitResult.Type.BLOCK)
+                {
+                    serverWorld.spawnParticles(AngularColoredParticleEffect.create(ModParticles.ANGULAR_BOOM,1F,1F,1F,0F,0F,0F,0F,0F,0F), this.getX(),this.getY(),this.getZ(),1,0,0,0,0);
+                }
+                else {
+                    serverWorld.spawnParticles(ColoredParticleEffect.create(ModParticles.COLORED_BOOM,1F,1F,1F,1F), this.getX(),this.getY(),this.getZ(),1,0,0,0,0);
+                }
+                //serverWorld.spawnParticles(AngularColoredParticleEffect.create(ModParticles.ANGULAR_BOOM,1F,1F,1F,0F,0F,0F,0F,0F,0F),this.getX(),this.getY(),this.getZ(),1,0,0,0,0);
+            }
+            //this.getWorld().addParticle(AngularColoredParticleEffect.create(ModParticles.ANGULAR_BOOM,1F,1F,1F,0F,0F,0F,0F,0F,0F), this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
             this.getWorld().createExplosion(this, damageSource, null, this.getX(), this.getY(), this.getZ(), 6.0F, false, World.ExplosionSourceType.BLOCK);
 
+        }
+    }
+
+    private static final float COSMIC_POWER = 5F;
+    private static AdvancedExplosionBehavior COSMIC_EXPLOSION = new AdvancedExplosionBehavior(
+            true, true, Optional.of(4F), Registries.BLOCK.getOptional(BlockTags.ENDERMAN_HOLDABLE).map(Function.identity())
+    );
+
+    public void cosmicExplosion(DamageSource dmg, Entity entity){
+        RegistryEntry<SoundEvent> registryEntry = RegistryEntry.of(SoundEvents.ENTITY_DRAGON_FIREBALL_EXPLODE);
+
+        this.discard();
+
+        this.getWorld()
+                .createExplosion(
+                        entity,
+                        dmg,
+                        null,
+                        this.getX(),
+                        this.getY(),
+                        this.getZ(),
+                        6F,
+                        false,
+                        World.ExplosionSourceType.TNT,
+                        ModParticles.COSMIC_BOOM_EMITTER,
+                        ModParticles.COSMIC_BOOM_EMITTER,
+                        registryEntry
+                );
+        if (this.getWorld() instanceof ServerWorld serverWorld){
+            serverWorld.playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 5.5F, 1.0F, false);
         }
     }
 

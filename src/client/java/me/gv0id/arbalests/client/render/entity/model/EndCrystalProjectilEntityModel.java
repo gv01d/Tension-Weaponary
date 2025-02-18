@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.client.render.entity.model;
 
+import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.client.render.entity.state.EndCrystalProjectileEntityRenderState;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
@@ -63,7 +64,7 @@ public class EndCrystalProjectilEntityModel extends EntityModel<EndCrystalProjec
 
         float scaleMod2 = 0F;
         mod = MathHelper.lerp((fuse) / 600F, 1.0F, 1F);
-        a = MathHelper.lerp((fuse) / 600F, 0.1F, 0.1F);
+        a = MathHelper.lerp((fuse) / 600F, 50F, 0F);
 
 
         if (fuse < 20){
@@ -71,10 +72,11 @@ public class EndCrystalProjectilEntityModel extends EntityModel<EndCrystalProjec
         }
 
         //float scaleMod = ((endCrystalProjectileEntityRenderState.age % a) / (a/2));
-        float scaleMod = (float) Math.sin(endCrystalProjectileEntityRenderState.age * a);
+        Arbalests.LOGGER.info("a value: {}", a);
+        float scaleMod = (float) Math.sin(EndCrystalProjectileEntityRenderState.fuse * ((a + 4F) / 180F) * Math.PI);
         scaleMod *= (0.1F * mod) + scaleMod2;
         this.innerGlass.scale(new Vector3f(scaleMod,scaleMod,scaleMod));
-        scaleMod *= (0.5F * mod) + scaleMod2;
+        scaleMod *= (0.5F * mod);
         this.outerGlass.scale(new Vector3f(scaleMod,scaleMod,scaleMod));
     }
 }

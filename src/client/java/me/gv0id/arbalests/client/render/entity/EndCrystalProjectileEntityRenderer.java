@@ -145,6 +145,8 @@ public class EndCrystalProjectileEntityRenderer extends EntityRenderer<EndCrysta
         //float rotation = (maxRotation) * (float)Math.pow(maxFuse - EndCrystalProjectileEntityRenderState.fuse, 3) / (float)Math.pow(maxFuse,3);
 
 
+        /*
+
         matrixStack.push();
         matrixStack.translate(0,0.6F,0);
         matrixStack.scale(scale , scale, scale);
@@ -157,6 +159,8 @@ public class EndCrystalProjectileEntityRenderer extends EntityRenderer<EndCrysta
                 ColorHelper.fromFloats(alpha, r, g, b)
         );
         matrixStack.pop();
+
+        */
 
     }
 
@@ -176,6 +180,7 @@ public class EndCrystalProjectileEntityRenderer extends EntityRenderer<EndCrysta
         endCrystalProjectileEntityRenderState.age = (float)endCrystalEntity.endCrystalAge + f;
         endCrystalProjectileEntityRenderState.baseVisible = endCrystalEntity.shouldShowBottom();
         EndCrystalProjectileEntityRenderState.owner = endCrystalEntity.getOwner();
-        EndCrystalProjectileEntityRenderState.fuse = endCrystalEntity.fuseTimer;
+        EndCrystalProjectileEntityRenderState.fuse = endCrystalEntity.fuseTimer + f;
+        //Arbalests.LOGGER.info("Fuse Timer: {}", EndCrystalProjectileEntityRenderState.fuse);
     }
 }
