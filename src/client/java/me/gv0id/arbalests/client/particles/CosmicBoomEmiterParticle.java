@@ -10,10 +10,15 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+
 @Environment(EnvType.CLIENT)
 public class CosmicBoomEmiterParticle extends NoRenderParticle {
     private final double deviation;
     private final int interval;
+
+
 
     CosmicBoomEmiterParticle(ClientWorld world, double x, double y, double z, double deviation, int maxAge, int interval) {
         super(world, x, y, z, 0.0, 0.0, 0.0);
@@ -28,10 +33,12 @@ public class CosmicBoomEmiterParticle extends NoRenderParticle {
     @Override
     public void tick() {
         if (this.age % (this.interval + 1) == 0) {
-            for (int i = 0; i < 5; i++) {
-                double d = this.x + (this.random.nextDouble() - this.random.nextDouble()) * this.deviation;
-                double e = this.y + (this.random.nextDouble() - this.random.nextDouble()) * this.deviation;
-                double f = this.z + (this.random.nextDouble() - this.random.nextDouble()) * this.deviation;
+            for (int i = 0; i < 16; i++) {
+                float mult = this.random.nextDouble() > 0.8f ? 3.0f : 1.0f;
+                double d = this.x + (this.random.nextDouble() - this.random.nextDouble()) * (this.deviation + mult);
+                double e = this.y + (this.random.nextDouble() - this.random.nextDouble()) * (this.deviation + mult);
+                double f = this.z + (this.random.nextDouble() - this.random.nextDouble()) * (this.deviation + mult);
+
                 this.world.addParticle(ModParticles.SMALL_COSMIC_BOOM, d, e, f, (double)((float)this.age / (float)this.maxAge), 0.0, 0.0);
             }
         }

@@ -32,6 +32,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.TeleportTarget;
@@ -71,29 +72,19 @@ public class CustomEnderPearlEntity extends EnderPearlEntity{
     @Override
     public void tick() {
         super.tick();
-        //spawnParticles();
+        spawnParticles();
     }
 
     private void spawnParticles() {
-        if (previousEyePos == null){
-            this.previousEyePos = this.getEyePos();
-            this.previousRYP = new Vec3d(0, this.getYaw(), this.getPitch());
+        Vec3d p = this.getPos();
+        for (int i = 0; i < (int) MathHelper.lerp(this.random.nextDouble(), 2, 4); i++) {
+            Vec3d r = new Vec3d(
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
+            );
+            this.getWorld().addParticle(ModParticles.COSMIC_SPARK, p.x, p.y, p.z,r.x * 1,r.y * 1,r.z * 1);
         }
-        Arbalests.logSide(this.getWorld());
-        this.getWorld()
-                .addParticle(
-                        TrailParticleEffect.create(
-                                ModParticles.ENDER_TRAIL,
-                                ColorHelper.fromFloats(1.0F, 1.0F, 1.0F, 1.0F),
-                                new Vec3d(0,this.getYaw(),this.getPitch()),
-                                new Vec3d(0,(float) this.previousRYP.y, (float) this.previousRYP.z),
-                                this.getEyePos(),
-                                this.previousEyePos,
-                                this.particleIndex++
-                        ), this.getEyePos().x, this.getEyeY(), this.getEyePos().z, 0.0, 0.0, 0.0
-                );
-        this.previousEyePos = this.getEyePos();
-        this.previousRYP = new Vec3d(0, this.getYaw(), this.getPitch());
     }
 
     @Override

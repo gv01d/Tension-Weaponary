@@ -18,6 +18,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.AdvancedExplosionBehavior;
@@ -49,8 +50,13 @@ public class SnowProjectileEntity extends ThrownItemEntity {
     public void tick() {
         super.tick();
         Vec3d p = this.getPos();
-        for (int i = 0; i < 20; i++) {
-            this.getWorld().addParticle(ModParticles.SNOW_FLAKE, p.x, p.y, p.z,0.0,0.0,0.0 );
+        for (int i = 0; i < 3; i++) {
+            Vec3d r = new Vec3d(
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
+            );
+            this.getWorld().addParticle(ModParticles.SNOW_FLAKE, p.x, p.y, p.z,r.x * 0.5,r.y * 0.5,r.z * 0.5);
         }
     }
 
@@ -59,6 +65,8 @@ public class SnowProjectileEntity extends ThrownItemEntity {
         if (hitResult.getType() == HitResult.Type.ENTITY) {
             EntityHitResult entityHitResult = (EntityHitResult)hitResult;
             Entity entity = entityHitResult.getEntity();
+
+
 
             if (entity instanceof WindGaleEntity|| entity instanceof WindChargeEntity){
                 iceExplosion(entity.getPos(),this);
@@ -131,12 +139,15 @@ public class SnowProjectileEntity extends ThrownItemEntity {
         super.onEntityHit(entityHitResult);
         Entity entity = entityHitResult.getEntity();
 
-        int f = entity.isFrozen() ? (int) Math.min(400, entity.getFrozenTicks() * 2) : 200;
-        int i = (entity.isFrozen() ? 2 : 1 ) * (entity instanceof BlazeEntity ? 5 : 2);
-        entity.extinguish();
-        entity.addVelocity(this.getVelocity().multiply(0.2));
-        entity.setFrozenTicks(f);
-        entity.serverDamage(this.getDamageSources().thrown(this, this.getOwner()), (float)i);
+        if (entity != this.getOwner()){
+            int f = entity.isFrozen() ? (int) Math.min(400, entity.getFrozenTicks() * 2) : 200;
+            int i = (entity.isFrozen() ? 2 : 1 ) * (entity instanceof BlazeEntity ? 5 : 2);
+            entity.extinguish();
+            entity.addVelocity(this.getVelocity().multiply(0.2));
+            entity.setFrozenTicks(f);
+            entity.serverDamage(this.getDamageSources().thrown(this, this.getOwner()), (float)i);
+        }
+
     }
 
     @Override

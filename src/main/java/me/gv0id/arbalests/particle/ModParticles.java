@@ -44,8 +44,7 @@ public class ModParticles{
 
     // Shaded Cosmic End Crystal Explosion
     public static final ModParticleType COSMIC_BOOM = register("cosmic_boom", false);
-    public static final ModParticleType COSMIC_SMOKE = register("cosmic_smoke", true);
-    public static final ModParticleType SMALL_COSMIC_SMOKE = register("small_cosmic_smoke", true);
+    public static final ModParticleType COSMIC_SPARK = register("cosmic_spark", true);
     public static final ModParticleType SMALL_COSMIC_BOOM = register("small_cosmic_boom", true);
     public static final ModParticleType COSMIC_BOOM_EMITTER = register("cosmic_boom_emitter", true);
 

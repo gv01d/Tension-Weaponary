@@ -31,7 +31,12 @@ public class SnowGustEmitterParticle extends NoRenderParticle {
     @Override
     public void tick() {
         for (int i = 0; i < 15; i++) {
-            this.world.addParticle(ModParticles.SNOW_FLAKE, this.x, this.y, this.z, 0.0, 0.0, 0.0);
+            Vec3d r = new Vec3d(
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
+            );
+            this.world.addParticle(ModParticles.SNOW_FLAKE, this.x + r.x, this.y + r.y, this.z + r.z, r.x * 3, r.y * 3, r.z * 3);
         }
 
         if (this.age++ == this.maxAge) {

@@ -12,6 +12,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.scoreboard.ScoreboardCriterion;
+import net.minecraft.util.math.MathHelper;
 
 public class CosmicBoomParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
@@ -40,6 +41,13 @@ public class CosmicBoomParticle extends SpriteBillboardParticle {
 
     @Override
     public void tick() {
+        this.prevPosX = this.x;
+        this.prevPosY = this.y;
+        this.prevPosZ = this.z;
+
+        this.setVelocity(this.velocityX * 0.6, this.velocityY * 0.6, this.velocityZ * 0.6);
+
+        move(this.velocityX, this.velocityY, this.velocityZ);
         if (this.age++ >= this.maxAge) {
             this.markDead();
         } else {
@@ -90,6 +98,23 @@ public class CosmicBoomParticle extends SpriteBillboardParticle {
             particle.scale(0.15F);
             particle.setMaxAge(7);
             return particle;
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    public static class SparkFactory implements ParticleFactory<SimpleParticleType> {
+        private final SpriteProvider spriteProvider;
+
+        public SparkFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
+        }
+
+        public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
+            CosmicBoomParticle smokeParticle = new CosmicBoomParticle(clientWorld, d, e, f, this.spriteProvider);
+            smokeParticle.scale(0.05F);
+            smokeParticle.setMaxAge((int)MathHelper.lerp(clientWorld.random.nextFloat(), 5.0F, 10.0F));
+            smokeParticle.setVelocity(g, h, i);
+            return smokeParticle;
         }
     }
 

@@ -60,6 +60,15 @@ public class ModEntityType {
                     .trackingTickInterval(10)
     );
 
+    public static final EntityType<CustomFireBallEntity> CUSTOM_FIREBALL = register(
+            "custom_fireball",
+            EntityType.Builder.<CustomFireBallEntity>create(CustomFireBallEntity::new, SpawnGroup.MISC)
+                    .dropsNothing()
+                    .dimensions(1.0F, 1.0F)
+                    .maxTrackingRange(4)
+                    .trackingTickInterval(10)
+    );
+
     private static <T extends Entity> EntityType<T> register(RegistryKey<EntityType<?>> key, EntityType.Builder<T> type) {
         return Registry.register(Registries.ENTITY_TYPE, key, type.build(key));
     }

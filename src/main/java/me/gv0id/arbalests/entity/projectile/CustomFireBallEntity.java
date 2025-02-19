@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.entity.projectile;
 
+import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.particle.ModParticles;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -24,6 +25,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.AdvancedExplosionBehavior;
@@ -42,19 +44,17 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
     );
     private Entity lastDeflectedEntity;
 
-    /*
     public CustomFireBallEntity(EntityType<? extends CustomFireBallEntity> entityType, World world) {
         super(entityType, world);
     }
-    */
 
     public CustomFireBallEntity(World world, LivingEntity owner, Vec3d velocity, int explosionPower) {
-        super(EntityType.FIREBALL, owner, velocity, world);
+        super(ModEntityType.CUSTOM_FIREBALL, owner, velocity, world);
         this.EXPLOSION_POWER = explosionPower;
     }
 
     public CustomFireBallEntity(Entity owner, World world, double x, double y, double z, Vec3d velocity,float knockback,float explosionPower) {
-        super(EntityType.FIREBALL, x, y, z, velocity, world);
+        super(ModEntityType.CUSTOM_FIREBALL, x, y, z, velocity, world);
         this.setOwner(owner);
         this.refreshPositionAndAngles(x, y, z, this.getYaw(), this.getPitch());
         this.refreshPosition();
@@ -62,8 +62,20 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
         EXPLOSION_POWER = explosionPower;
     }
 
-    public CustomFireBallEntity(EntityType<FireballEntity> fireballEntityEntityType, World world) {
-        super(fireballEntityEntityType, world);
+    @Override
+    public void tick() {
+        super.tick();
+
+        Vec3d p = this.getPos();
+        for (int i = 0; i < (int) MathHelper.lerp(this.random.nextDouble(), 2, 4); i++) {
+            Vec3d r = new Vec3d(
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
+            );
+            Arbalests.logSide(this.getWorld());
+            this.getWorld().addParticle(ModParticles.FIRE, p.x, p.y, p.z,r.x * 1,r.y * 1,r.z * 1);
+        }
     }
 
     @Override

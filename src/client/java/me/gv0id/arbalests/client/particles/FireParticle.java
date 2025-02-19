@@ -20,16 +20,6 @@ public class FireParticle extends SpriteBillboardParticle {
         this.setSpriteForAge(spriteProvider);
         this.maxAge = (int) (this.random.nextFloat() * 8);
         this.scale = (float) MathHelper.lerp(Math.random(), 0.3, 0.7);
-        Vec3d r = new Vec3d (
-                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
-                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
-                MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
-                );
-        this.prevPosX = this.x + r.x;
-        this.prevPosY = this.y + r.y;
-        this.prevPosZ = this.z + r.z;
-        this.setPos(this.x + r.x, this.y + r.x, this.z + r.x);
-        this.setVelocity(r.x * 3, r.y * 3, r.z * 3);
 
         float rand = this.random.nextFloat();
         this.setColor(
@@ -77,7 +67,9 @@ public class FireParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            return new FireParticle(clientWorld, d, e, f, this.spriteProvider);
+            FireParticle particle = new FireParticle(clientWorld, d, e, f, this.spriteProvider);
+            particle.setVelocity(g, h, i);
+            return particle;
         }
     }
 
@@ -92,6 +84,7 @@ public class FireParticle extends SpriteBillboardParticle {
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
             Particle particle = new FireParticle(clientWorld, d, e, f, this.field_50230);
             particle.scale(0.15F);
+            particle.setVelocity(g, h, i);
             return particle;
         }
     }
