@@ -1,15 +1,12 @@
-package me.gv0id.arbalests.client.particles;
+package me.gv0id.arbalests.client.particles.snow;
 
-import me.gv0id.arbalests.client.particles.wind.OldSnowGustParticle;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
 
 public class SnowFlakeParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;

@@ -1,4 +1,4 @@
-package me.gv0id.arbalests.client.particles.wind;
+package me.gv0id.arbalests.client.particles.deprecated;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -6,18 +6,15 @@ import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 
-public class FireGustParticle extends SpriteBillboardParticle {
+public class OldSnowGustParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
-    protected FireGustParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
+    protected OldSnowGustParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.setSpriteForAge(spriteProvider);
-        this.maxAge = 7;
-        this.scale = 3.5F;
-        float a = (float)Math.random() * (float) (Math.PI * 2);
-        this.angle = a;
-        this.prevAngle = a;
+        this.maxAge = 18;
+        this.scale = 4.0F;
         this.setBoundingBoxSpacing(1.0F, 1.0F);
     }
 
@@ -48,7 +45,7 @@ public class FireGustParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            return new FireGustParticle(clientWorld, d, e, f, this.spriteProvider);
+            return new OldSnowGustParticle(clientWorld, d, e, f, this.spriteProvider);
         }
     }
 
@@ -61,7 +58,7 @@ public class FireGustParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            Particle particle = new FireGustParticle(clientWorld, d, e, f, this.field_50230);
+            Particle particle = new OldSnowGustParticle(clientWorld, d, e, f, this.field_50230);
             particle.scale(0.15F);
             return particle;
         }

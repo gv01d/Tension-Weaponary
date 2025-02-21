@@ -1,4 +1,4 @@
-package me.gv0id.arbalests.client.particles;
+package me.gv0id.arbalests.client.particles.cosmic;
 
 import me.gv0id.arbalests.client.render.RenderLayer;
 import net.fabricmc.api.EnvType;

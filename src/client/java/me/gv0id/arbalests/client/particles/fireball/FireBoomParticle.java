@@ -1,22 +1,15 @@
-package me.gv0id.arbalests.client.particles.wind;
+package me.gv0id.arbalests.client.particles.fireball;
 
-import me.gv0id.arbalests.client.particles.CosmicBoomParticle;
-import me.gv0id.arbalests.client.render.RenderLayer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.*;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 
-public class EnderGustParticle extends SpriteBillboardParticle {
+public class FireBoomParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
-    protected EnderGustParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
+    protected FireBoomParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider) {
         super(world, x, y, z);
         this.spriteProvider = spriteProvider;
         this.setSpriteForAge(spriteProvider);
@@ -30,7 +23,7 @@ public class EnderGustParticle extends SpriteBillboardParticle {
 
     @Override
     public ParticleTextureSheet getType() {
-        return ParticleTextureSheet.CUSTOM;
+        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
     }
     @Override
     public int getBrightness(float tint) {
@@ -46,13 +39,6 @@ public class EnderGustParticle extends SpriteBillboardParticle {
         }
     }
 
-    @Override
-    public void renderCustom(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Camera camera, float tickDelta) {
-
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.END_CUTOUT.apply(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE));
-        render(vertexConsumer, camera, tickDelta);
-    }
-
     @Environment(EnvType.CLIENT)
     public static class Factory implements ParticleFactory<SimpleParticleType> {
         private final SpriteProvider spriteProvider;
@@ -62,7 +48,22 @@ public class EnderGustParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            return new EnderGustParticle(clientWorld, d, e, f, this.spriteProvider);
+            return new FireBoomParticle(clientWorld, d, e, f, this.spriteProvider);
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    public static class SmallFactory implements ParticleFactory<SimpleParticleType> {
+        private final SpriteProvider field_50230;
+
+        public SmallFactory(SpriteProvider spriteProvider) {
+            this.field_50230 = spriteProvider;
+        }
+
+        public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
+            Particle particle = new FireBoomParticle(clientWorld, d, e, f, this.field_50230);
+            particle.scale(0.15F);
+            return particle;
         }
     }
 }

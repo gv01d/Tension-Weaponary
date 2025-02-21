@@ -42,6 +42,10 @@ public class ModParticles{
     public static final ModParticleType ENDER_GUST = register("ender_gust", true);
     public static final ModParticleType ENDER_GUST_EMITTER = register("ender_gust_emitter", true);
 
+    // Fire End Crystal Explosion
+    public static final ModParticleType FIRE_BOOM = register("fire_boom", true);
+    public static final ModParticleType FIRE_BOOM_EMITTER = register("fire_boom_emitter", true);
+
     // Shaded Cosmic End Crystal Explosion
     public static final ModParticleType COSMIC_BOOM = register("cosmic_boom", false);
     public static final ModParticleType COSMIC_SPARK = register("cosmic_spark", true);

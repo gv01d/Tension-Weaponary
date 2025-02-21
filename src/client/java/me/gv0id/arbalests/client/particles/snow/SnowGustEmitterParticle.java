@@ -1,4 +1,4 @@
-package me.gv0id.arbalests.client.particles.wind;
+package me.gv0id.arbalests.client.particles.snow;
 
 import me.gv0id.arbalests.particle.ModParticles;
 import net.minecraft.client.particle.NoRenderParticle;

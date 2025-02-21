@@ -1,13 +1,11 @@
-package me.gv0id.arbalests.client.particles;
+package me.gv0id.arbalests.client.particles.fireball;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 
 public class FireParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;

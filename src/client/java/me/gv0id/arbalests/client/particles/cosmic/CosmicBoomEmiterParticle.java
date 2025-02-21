@@ -1,6 +1,5 @@
-package me.gv0id.arbalests.client.particles;
+package me.gv0id.arbalests.client.particles.cosmic;
 
-import me.gv0id.arbalests.particle.ColoredParticleEffect;
 import me.gv0id.arbalests.particle.ModParticles;
 import me.gv0id.arbalests.particle.AngularColoredParticleEffect;
 import net.fabricmc.api.EnvType;
@@ -10,8 +9,6 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 
 @Environment(EnvType.CLIENT)
 public class CosmicBoomEmiterParticle extends NoRenderParticle {

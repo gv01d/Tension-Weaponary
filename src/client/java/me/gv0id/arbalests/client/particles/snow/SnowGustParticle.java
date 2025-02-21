@@ -1,4 +1,4 @@
-package me.gv0id.arbalests.client.particles.wind;
+package me.gv0id.arbalests.client.particles.snow;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

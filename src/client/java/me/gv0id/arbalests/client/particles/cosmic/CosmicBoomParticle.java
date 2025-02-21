@@ -1,4 +1,4 @@
-package me.gv0id.arbalests.client.particles;
+package me.gv0id.arbalests.client.particles.cosmic;
 
 import me.gv0id.arbalests.client.render.RenderLayer;
 import net.fabricmc.api.EnvType;
@@ -11,7 +11,6 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.scoreboard.ScoreboardCriterion;
 import net.minecraft.util.math.MathHelper;
 
 public class CosmicBoomParticle extends SpriteBillboardParticle {
