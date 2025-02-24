@@ -230,6 +230,13 @@
           {
             "model": {
               "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_echo_crystal"
+            },
+            "when": "echo_crystal"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
               "model": "arbalests:item/deadbeat_crossbow_nether_star"
             },
             "when": "nether_star"
@@ -508,6 +515,13 @@
           {
             "model": {
               "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_second_echo_crystal"
+            },
+            "when": "echo_crystal"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
               "model": "arbalests:item/deadbeat_crossbow_second_nether_star"
             },
             "when": "nether_star"
@@ -743,6 +757,13 @@
               "model": "arbalests:item/deadbeat_crossbow_third_end_crystal"
             },
             "when": "end_crystal"
+          },
+          {
+            "model": {
+              "type": "minecraft:model",
+              "model": "arbalests:item/deadbeat_crossbow_third_echo_crystal"
+            },
+            "when": "echo_crystal"
           },
           {
             "model": {

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 350,
+  "experience": 1.0,
+  "group": "cursed_copper_nugget_extraction",
+  "ingredient": "minecraft:trial_key",
+  "result": {
+    "id": "arbalests:cursed_copper_nugget"
+  }
+}

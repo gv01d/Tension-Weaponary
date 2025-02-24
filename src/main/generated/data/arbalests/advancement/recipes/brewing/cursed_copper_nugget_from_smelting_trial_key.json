@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:cursed_copper_nugget_from_smelting_trial_key"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_trial_key": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:trial_key"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_trial_key"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:cursed_copper_nugget_from_smelting_trial_key"
+    ]
+  }
+}

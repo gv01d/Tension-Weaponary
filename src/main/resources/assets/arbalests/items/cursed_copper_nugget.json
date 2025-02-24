@@ -1,6 +1,6 @@
 {
   "model" : {
     "type": "minecraft:model",
-    "model" : "arbalests:item/trial_essence"
+    "model" : "arbalests:item/cursed_copper_nugget"
   }
 }

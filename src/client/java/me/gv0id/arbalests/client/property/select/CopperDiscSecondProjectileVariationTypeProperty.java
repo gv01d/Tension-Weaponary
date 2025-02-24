@@ -1,7 +1,7 @@
 package me.gv0id.arbalests.client.property.select;
 
 import com.mojang.serialization.MapCodec;
-import me.gv0id.arbalests.client.data.ModModelProvider;
+import me.gv0id.arbalests.client.data.models.ModModelProvider;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.item.property.select.SelectProperty;

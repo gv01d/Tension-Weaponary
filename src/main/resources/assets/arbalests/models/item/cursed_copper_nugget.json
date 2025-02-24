@@ -1,6 +1,6 @@
 {
   "parent" : "item/generated",
   "textures" : {
-    "layer0" : "arbalests:item/trial_essence"
+    "layer0" : "arbalests:item/cursed_copper_nugget"
   }
 }

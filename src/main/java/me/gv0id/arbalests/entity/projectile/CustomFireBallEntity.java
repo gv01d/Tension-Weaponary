@@ -90,6 +90,10 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
                 this.discard();
                 return ProjectileDeflection.NONE;
             }
+            else if (entity instanceof EndCrystalProjectileEntity endCrystalProjectileEntity){
+                DamageSource damageSource = this.getDamageSources().explosion(this, this.getOwner());
+                endCrystalProjectileEntity.fireExplosion(damageSource, this);
+            }
 
             ProjectileDeflection projectileDeflection = entity.getProjectileDeflection(this);
             if (projectileDeflection != ProjectileDeflection.NONE) {

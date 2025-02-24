@@ -1,9 +1,7 @@
 package me.gv0id.arbalests.client.particles;
 
 import me.gv0id.arbalests.client.particles.cosmic.*;
-import me.gv0id.arbalests.client.particles.fireball.FireGustEmitterParticle;
-import me.gv0id.arbalests.client.particles.fireball.FireGustParticle;
-import me.gv0id.arbalests.client.particles.fireball.FireParticle;
+import me.gv0id.arbalests.client.particles.fireball.*;
 import me.gv0id.arbalests.client.particles.snow.SnowFlakeParticle;
 import me.gv0id.arbalests.client.particles.snow.SnowGustEmitterParticle;
 import me.gv0id.arbalests.client.particles.snow.SnowGustParticle;
@@ -54,8 +52,8 @@ public class ModParticles {
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.STREAK, StreaklParticle.Factory::new);
 
         // Fire End Crystal Explosion
-        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.FIRE_BOOM, CosmicBoomParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.FIRE_BOOM_EMITTER, CosmicBoomParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.FIRE_BOOM, FireBoomParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.FIRE_BOOM_EMITTER, new FireBoomEmitterParticle.Factory(0, 3));
 
         // Shaded Cosmic End Crystal Explosion
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.COSMIC_BOOM, CosmicBoomParticle.Factory::new);

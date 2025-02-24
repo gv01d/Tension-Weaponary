@@ -58,7 +58,8 @@ public class ModValueLookupItemTagProvider extends FabricTagProvider.ItemTagProv
                         Items.FIRE_CHARGE,
                         Items.NETHER_STAR,
                         ModItems.COPPER_DISC,
-                        Items.END_CRYSTAL
+                        Items.END_CRYSTAL,
+                        ModItems.ECHO_CRYSTAL
                 );
     }
 }

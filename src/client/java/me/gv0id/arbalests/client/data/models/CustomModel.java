@@ -1,4 +1,4 @@
-package me.gv0id.arbalests.client.data;
+package me.gv0id.arbalests.client.data.models;
 
 import net.minecraft.client.data.Model;
 import net.minecraft.client.data.TextureKey;

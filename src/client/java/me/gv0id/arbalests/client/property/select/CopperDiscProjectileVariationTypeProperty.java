@@ -1,9 +1,7 @@
 package me.gv0id.arbalests.client.property.select;
 
 import com.mojang.serialization.MapCodec;
-import me.gv0id.arbalests.client.data.ModModelProvider;
-import me.gv0id.arbalests.item.custom.CopperDiscItem;
-import me.gv0id.arbalests.item.custom.DeadbeatCrossbowItem;
+import me.gv0id.arbalests.client.data.models.ModModelProvider;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.item.property.select.SelectProperty;
@@ -11,7 +9,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ModelTransformationMode;
 import org.jetbrains.annotations.Nullable;

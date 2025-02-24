@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": "minecraft:amethyst_shard",
+    "E": "minecraft:echo_shard"
+  },
+  "pattern": [
+    " E ",
+    "ECE",
+    " E "
+  ],
+  "result": {
+    "count": 1,
+    "id": "arbalests:echo_crystal"
+  }
+}

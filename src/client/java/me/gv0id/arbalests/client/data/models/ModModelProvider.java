@@ -1,4 +1,4 @@
-package me.gv0id.arbalests.client.data;
+package me.gv0id.arbalests.client.data.models;
 
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.client.property.bool.CopperDiscChargedProperty;
@@ -18,7 +18,6 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.client.data.*;
 import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.client.render.item.model.SelectItemModel;
-import net.minecraft.client.render.item.property.bool.BooleanProperty;
 import net.minecraft.client.render.item.property.select.SelectProperty;
 import net.minecraft.client.render.item.tint.TintSource;
 import net.minecraft.item.Item;
@@ -91,7 +90,7 @@ public class ModModelProvider extends FabricModelProvider {
 
         int i = 0;
         for (DeadbeatCrossbowItem.Projectiles projectile : projArray){
-            if (i > 0 && !projectile.isCollection() && !projectile.isTinted() && !projectile.isVariation()) {
+            if (i > 0 && !projectile.isTinted() && !projectile.isVariation()) {
                 Arbalests.LOGGER.info("<> Generated charge name: _{}", projectile.getName());
 
                 mainChargeList.add(ItemModels.switchCase(projectile, ItemModels.basic(itemModelGenerator

@@ -11,18 +11,13 @@ import me.gv0id.arbalests.item.potion.ModPotions;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.*;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.*;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.*;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 
@@ -34,10 +29,18 @@ import java.util.function.UnaryOperator;
 
 public class ModItems {
 
-    public static final Item TRIAL_ESSENCE = register(
-            "trial_essence",
+    public static final Item CURSED_COPPER_NUGGET = register(
+            "cursed_copper_nugget",
             Item::new,
             new Item.Settings().rarity(Rarity.UNCOMMON)
+    );
+
+    public static final Item ECHO_CRYSTAL = register(
+            "echo_crystal",
+            Item::new,
+            new Item.Settings()
+                    .rarity(Rarity.RARE)
+                    .maxCount(16)
     );
 
     //Tension Repeater
@@ -111,10 +114,11 @@ public class ModItems {
         // Get the event for modifying entries in the ingredients group.
         // And register an event handler that adds our suspicious item to the ingredients group.
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
-                .register((itemGroup) -> itemGroup.add(ModItems.TRIAL_ESSENCE));
+                .register((itemGroup) -> itemGroup.addAfter(Items.OMINOUS_TRIAL_KEY,ModItems.CURSED_COPPER_NUGGET));
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT)
                 .register((itemGroup) -> {
                     itemGroup.addAfter(Items.CROSSBOW,ModItems.DEADBEAT_CROSSBOW);
+                    itemGroup.addAfter(Items.END_CRYSTAL, ModItems.ECHO_CRYSTAL);
                     itemGroup.add(ModItems.COPPER_DISC);
                     for (Item item : discList){
 
@@ -133,7 +137,7 @@ public class ModItems {
             builder.registerPotionRecipe(Potions.WIND_CHARGED, Items.FERMENTED_SPIDER_EYE, ModPotions.UNSTABLE_STRAFE_POTION);
         });
         FabricBrewingRecipeRegistryBuilder.BUILD.register( builder -> {
-            builder.registerPotionRecipe(ModPotions.UNSTABLE_STRAFE_POTION, ModItems.TRIAL_ESSENCE, ModPotions.STRAFE_POTION);
+            builder.registerPotionRecipe(ModPotions.UNSTABLE_STRAFE_POTION, Items.OMINOUS_BOTTLE, ModPotions.STRAFE_POTION);
         });
     }
 

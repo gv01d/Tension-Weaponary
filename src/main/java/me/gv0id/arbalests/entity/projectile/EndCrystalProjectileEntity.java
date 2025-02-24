@@ -296,6 +296,26 @@ public class EndCrystalProjectileEntity extends ExplosiveProjectileEntity {
         }
     }
 
+    public void fireExplosion(DamageSource dmg, Entity entity){
+
+        this.discard();
+
+        this.getWorld().createExplosion(
+                entity,
+                dmg,
+                null,
+                this.getX(),
+                this.getY(),
+                this.getZ(),
+                5F,
+                true,
+                World.ExplosionSourceType.TRIGGER,
+                ModParticles.FIRE_BOOM_EMITTER,
+                ModParticles.FIRE_BOOM_EMITTER,
+                SoundEvents.ENTITY_GENERIC_EXPLODE
+        );
+    }
+
 
     @Override
     public final boolean damage(ServerWorld world, DamageSource source, float amount) {
