@@ -174,7 +174,12 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
             Vec3d pos1 = this.vertexPoint.get(i);
             Vec3d pos2 = this.vertexPoint.get(i + 1);
 
-            this.addVertex(vertexConsumer, pos1, getGap(tickDelta1),0F, j, k, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));}
+            float k = this.getMinU();
+            float l = this.getMaxU();
+            float m = this.getMinV();
+            float n = this.getMaxV();
+
+            this.addVertex(vertexConsumer, pos1, k, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));}
     }
 
     protected void RotatePoints(VertexConsumer vertexConsumer, Camera camera, int index){
@@ -202,21 +207,7 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
                         -this.getGap(this.tickDeltas.get(index) * this.getSize(this.tickDeltas.get(index))
                         )
                 ))
-        );
-        if (index != 0 && index != this.prevPositions.size() - 1)
-        {
-            vertexPoint.add(pos.add(
-                    normal.multiply(
-                            this.getGap(this.tickDeltas.get(index)) * this.getSize(this.tickDeltas.get(index))
-                    ))
-            );
-            vertexPoint.add(pos.add(
-                    normal.multiply(
-                            -this.getGap(this.tickDeltas.get(index) * this.getSize(this.tickDeltas.get(index))
-                            )
-                    ))
-            );
-        }
+        )
     }
 
     private void addVertex(
