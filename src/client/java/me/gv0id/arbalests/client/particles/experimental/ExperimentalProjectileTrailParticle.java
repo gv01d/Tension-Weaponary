@@ -1,4 +1,4 @@
-package me.gv0id.arbalests.client.particles;
+package me.gv0id.arbalests.client.particles.experimental;
 
 import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.fabricmc.api.EnvType;
@@ -15,7 +15,7 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 
-public class ProjectileTrailParticle extends SpriteBillboardParticle {
+public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
     float roll;
     float yaw;
@@ -37,13 +37,15 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
     float startAlpha;
     float endAlpha;
 
+
     int index;
 
+    ArrayList<Vec3d> vertexPoint;
+    ArrayList<Vec3d> uvPoints;
     ArrayList<Vec3d> prevPositions = new ArrayList<>();
-    ArrayList<Quaternionf> angles = new ArrayList<>();
     ArrayList<Float> tickDeltas = new ArrayList<>();
 
-    protected ProjectileTrailParticle(ClientWorld clientWorld, double d, double e, double f, SpriteProvider spriteProvider) {
+    protected ExperimentalProjectileTrailParticle(ClientWorld clientWorld, double d, double e, double f, SpriteProvider spriteProvider) {
         super(clientWorld, d, e, f);
         this.spriteProvider = spriteProvider;
         this.setSpriteForAge(spriteProvider);
@@ -96,11 +98,6 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
     public void setStart(Vec3d pos, Vec3d angles){
         this.prevPosition = pos;
 
-        Quaternionf quaternionf = RotationAxis.POSITIVE_Y.rotationDegrees((float) angles.y - 90.0F)
-                .mul(RotationAxis.POSITIVE_Z.rotationDegrees((float) angles.z + 90.0F))
-                .mul(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
-
-        this.angles.add(quaternionf);
         this.prevPositions.add(pos);
         this.tickDeltas.add(0.0F);
     }
@@ -115,6 +112,9 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
     @Override
     public void render(VertexConsumer vertexConsumer, Camera camera, float tickDelta) {
         //super.render(vertexConsumer,camera,tickDelta);
+
+        vertexPoint = new ArrayList<>();
+        uvPoints = new ArrayList<>();
 
         if (this.age == 0){
             if (this.prevPositions.isEmpty()) {
@@ -141,7 +141,6 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
                     quaternionf.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle));
                 }
 
-                this.angles.add(quaternionf);
                 this.prevPositions.add(pos);
                 this.tickDeltas.add(tickDelta);
             }
@@ -157,7 +156,6 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
                 quaternionf.rotateZ(MathHelper.lerp(1F, this.prevAngle, this.angle));
             }
 
-            this.angles.add(quaternionf);
             this.prevPositions.add(pos);
             this.tickDeltas.add(1F);
         }
@@ -169,49 +167,62 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
     }
     protected void renderTrailQuads(VertexConsumer vertexConsumer, Camera camera){
         for (int i = 0; i < this.prevPositions.size() - 1; i++) {
-            this.addQuad(vertexConsumer, camera, i);
+            this.RotatePoints(vertexConsumer, camera, i);
+        }
+
+        for (int i = 0; i < this.vertexPoint.size(); i += 2){
+            Vec3d pos1 = this.vertexPoint.get(i);
+            Vec3d pos2 = this.vertexPoint.get(i + 1);
+
+            this.addVertex(vertexConsumer, pos1, getGap(tickDelta1),0F, j, k, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));}
+    }
+
+    protected void RotatePoints(VertexConsumer vertexConsumer, Camera camera, int index){
+
+        Vec3d prevPos;
+        if (index == 0){
+            prevPos = this.prevPosition;
+        }
+        else {
+            prevPos = this.prevPositions.get(index - 1);
+        }
+        Vec3d pos = this.prevPositions.get(index);
+
+        Vec3d pathDirection = new Vec3d(this.prevPositions.get(index - 1).toVector3f()).subtract(prevPos).normalize();
+
+        Vec3d normal = pathDirection.crossProduct(camera.getPos().subtract(pos.add(prevPos).multiply(0.5))).normalize();
+
+        vertexPoint.add(pos.add(
+                normal.multiply(
+                        this.getGap(this.tickDeltas.get(index)) * this.getSize(this.tickDeltas.get(index))
+                ))
+        );
+        vertexPoint.add(pos.add(
+                normal.multiply(
+                        -this.getGap(this.tickDeltas.get(index) * this.getSize(this.tickDeltas.get(index))
+                        )
+                ))
+        );
+        if (index != 0 && index != this.prevPositions.size() - 1)
+        {
+            vertexPoint.add(pos.add(
+                    normal.multiply(
+                            this.getGap(this.tickDeltas.get(index)) * this.getSize(this.tickDeltas.get(index))
+                    ))
+            );
+            vertexPoint.add(pos.add(
+                    normal.multiply(
+                            -this.getGap(this.tickDeltas.get(index) * this.getSize(this.tickDeltas.get(index))
+                            )
+                    ))
+            );
         }
     }
 
-    protected void addQuad(VertexConsumer vertexConsumer, Camera camera, int index){
-
-
-        Vec3d pos1 = this.prevPositions.get(index);
-        Vec3d pos2 = this.prevPositions.get(index + 1);
-        Quaternionf angle1 = new Quaternionf(this.angles.get(index));
-        Quaternionf angle2 = new Quaternionf(this.angles.get(index + 1));
-        float tickDelta1 = this.tickDeltas.get(index);
-        float tickDelta2 = this.tickDeltas.get(index + 1);
-
-
-        float j = this.getSize(tickDelta1);
-        float j2 = this.getSize(tickDelta2);
-        float k = this.getMinU();
-        float l = this.getMaxU();
-        float m = this.getMinV();
-        float n = this.getMaxV();
-        int o = this.getBrightness(tickDelta1);
-        int o2 = this.getBrightness(tickDelta2);
-
-        pos1 = pos1.subtract(camera.getPos());
-        pos2 = pos2.subtract(camera.getPos());
-
-        this.addVertex(vertexConsumer, angle1, (float) pos1.x, (float) pos1.y, (float) pos1.z, getGap(tickDelta1),0F, j, k, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));
-        this.addVertex(vertexConsumer, angle1, (float) pos1.x, (float) pos1.y, (float) pos1.z, -getGap(tickDelta1),0F, j, l, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));
-        this.addVertex(vertexConsumer, angle2, (float) pos2.x, (float) pos2.y, (float) pos2.z, -getGap(tickDelta2),0F, j2, l, MathHelper.lerp(tickDelta2, n, m), o2, MathHelper.lerp(tickDelta2, this.alpha, this.prevAlpha));
-        this.addVertex(vertexConsumer, angle2, (float) pos2.x, (float) pos2.y, (float) pos2.z, getGap(tickDelta2),0F, j2, k, MathHelper.lerp(tickDelta2, n, m), o2, MathHelper.lerp(tickDelta2, this.alpha, this.prevAlpha));
-
-        this.addVertex(vertexConsumer, angle2, (float) pos2.x, (float) pos2.y, (float) pos2.z, getGap(tickDelta2),0F, j2, k, MathHelper.lerp(tickDelta2, n, m), o2, MathHelper.lerp(tickDelta2, this.alpha, this.prevAlpha));
-        this.addVertex(vertexConsumer, angle2, (float) pos2.x, (float) pos2.y, (float) pos2.z, -getGap(tickDelta2),0F, j2, l, MathHelper.lerp(tickDelta2, n, m), o2, MathHelper.lerp(tickDelta2, this.alpha, this.prevAlpha));
-        this.addVertex(vertexConsumer, angle1, (float) pos1.x, (float) pos1.y, (float) pos1.z, -getGap(tickDelta1),0F, j, l, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));
-        this.addVertex(vertexConsumer, angle1, (float) pos1.x, (float) pos1.y, (float) pos1.z, getGap(tickDelta1),0F, j, k, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));
-    }
-
     private void addVertex(
-            VertexConsumer vertexConsumer, Quaternionf quaternionf, float f, float g, float h, float i, float j, float k, float l, float m, int n , float alpha
+            VertexConsumer vertexConsumer, Vec3d pos, float u, float v, int light, float alpha
     ){
-        Vector3f vector3f = new Vector3f(i, j, 0.0F).rotate(quaternionf).mul(k).add(f, g, h);
-        vertexConsumer.vertex(vector3f.x(), vector3f.y(), vector3f.z()).texture(l, m).color(this.red, this.green, this.blue, alpha).light(n);
+        vertexConsumer.vertex((float) pos.x, (float) pos.y, (float) pos.z).texture(u, v).color(this.red, this.green, this.blue, alpha).light(light);
     }
 
     @Override
@@ -238,7 +249,7 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(TrailParticleEffect parameters, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            ProjectileTrailParticle streakParticle = new ProjectileTrailParticle(clientWorld, d, e, f, this.spriteProvider);
+            ExperimentalProjectileTrailParticle streakParticle = new ExperimentalProjectileTrailParticle(clientWorld, d, e, f, this.spriteProvider);
             streakParticle.setColor(parameters.getRed(),parameters.getGreen(), parameters.getBlue());
             streakParticle.roll = parameters.getRoll();
             streakParticle.yaw = parameters.getYaw();
