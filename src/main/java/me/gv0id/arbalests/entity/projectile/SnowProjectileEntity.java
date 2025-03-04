@@ -2,6 +2,8 @@ package me.gv0id.arbalests.entity.projectile;
 
 import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.particle.ModParticles;
+import me.gv0id.arbalests.particle.RecisableTrailParticleEffect;
+import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.minecraft.entity.*;
 import net.minecraft.entity.mob.BlazeEntity;
 import net.minecraft.entity.projectile.WindChargeEntity;
@@ -18,6 +20,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -33,6 +36,9 @@ public class SnowProjectileEntity extends ThrownItemEntity {
                 false, true, Optional.of(ICE_KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
             );
     private Entity lastDeflectedEntity;
+    private Vec3d previousEyePos;
+    private Vec3d previousPreviousEyePos;
+    private int trailIndex = 0;
 
     public SnowProjectileEntity(EntityType<? extends SnowProjectileEntity> entityType, World world) {
         super(entityType, world);
@@ -49,15 +55,38 @@ public class SnowProjectileEntity extends ThrownItemEntity {
     @Override
     public void tick() {
         super.tick();
-        Vec3d p = this.getPos();
+        Vec3d p = this.getEyePos();
         for (int i = 0; i < 3; i++) {
             Vec3d r = new Vec3d(
                     MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
                     MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
                     MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
             );
-            this.getWorld().addParticle(ModParticles.SNOW_FLAKE, p.x, p.y, p.z,r.x * 0.5,r.y * 0.5,r.z * 0.5);
+            float velR = (float) MathHelper.lerp(this.random.nextDouble(), -2F, 0F);
+            Vec3d velocity = this.getVelocity().multiply(velR);
+            this.getWorld().addParticle(ModParticles.SNOW_FLAKE, p.x + (r.x * 0.5) + velocity.x  , p.y + (r.y * 0.5) + velocity.y, p.z + (r.z * 0.5) + velocity.z,r.x * 0.5,r.y * 0.5,r.z * 0.5);
         }
+
+        if (this.previousEyePos == null){
+            previousEyePos = this.getEyePos().subtract(this.getVelocity().normalize());
+        }
+        if (this.previousPreviousEyePos == null){
+            previousPreviousEyePos = this.previousEyePos.subtract(this.getVelocity().normalize());
+        }
+
+        if (this.age > 1){
+            this.getWorld().addParticle(
+                    RecisableTrailParticleEffect.create(
+                            ModParticles.EXPERIMENTAL_TRAIL, ColorHelper.fromFloats(1F,0.9F,0.9F,1F),
+                            10, 1F,
+                            this.previousEyePos, this.previousPreviousEyePos,
+                            trailIndex++
+                    ), this.getEyePos().x, this.getEyePos().y,this.getEyePos().z,0,0,0
+            );
+        }
+
+        this.previousPreviousEyePos = this.previousEyePos;
+        this.previousEyePos = this.getEyePos();
     }
 
     @Override

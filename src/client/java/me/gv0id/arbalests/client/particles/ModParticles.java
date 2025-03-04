@@ -1,6 +1,7 @@
 package me.gv0id.arbalests.client.particles;
 
 import me.gv0id.arbalests.client.particles.cosmic.*;
+import me.gv0id.arbalests.client.particles.experimental.ExperimentalProjectileTrailParticle;
 import me.gv0id.arbalests.client.particles.fireball.*;
 import me.gv0id.arbalests.client.particles.snow.SnowFlakeParticle;
 import me.gv0id.arbalests.client.particles.snow.SnowGustEmitterParticle;
@@ -77,6 +78,10 @@ public class ModParticles {
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.PRECIPICE_TRAIL, ModParticles::defaultDiscFactory);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.RELIC_TRAIL, ModParticles::defaultDiscFactory);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.WARD_TRAIL, ModParticles::defaultDiscFactory);
+
+        // Experimental
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.EXPERIMENTAL_TRAIL,
+                (spriteProvider) -> new ExperimentalProjectileTrailParticle.Factory(spriteProvider, 0.2f, 0F, 1.0F, 0.1F , 10));
 
     }
 

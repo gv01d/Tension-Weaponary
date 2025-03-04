@@ -2,6 +2,8 @@ package me.gv0id.arbalests.entity.projectile;
 
 import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.particle.ModParticles;
+import me.gv0id.arbalests.particle.RecisableTrailParticleEffect;
+import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ProjectileDeflection;
@@ -17,6 +19,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -38,11 +41,14 @@ public class WindGaleEntity extends AbstractWindGaleEntity {
     private final float ICE_KNOCKBACK_POWER = 3.0F;
     private final float ICE_EXPLOSION_POWER = 2.0F;
 
+    // Experimental Shit
+    private Vec3d previousPreviousEyePos;
+    private Vec3d previousEyePos;
+    private int trailIndex = 0;
+
     public ExplosionBehavior EXPLOSION_BEHAVIOR = new AdvancedExplosionBehavior(
             true, false, Optional.of(KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
     );
-
-
     
     public WindGaleEntity(EntityType<? extends AbstractWindGaleEntity> entityType, World world) {
         super(entityType, world);
@@ -56,12 +62,15 @@ public class WindGaleEntity extends AbstractWindGaleEntity {
         super(ModEntityType.WIND_GALE, x, y, z, velocity, world);
         KNOCKBACK_POWER = knockback;
         EXPLOSION_POWER = explosionPower;
+        previousEyePos = this.getPos().subtract(velocity.normalize());
+        previousPreviousEyePos = this.previousEyePos.subtract(velocity.normalize());
     }
 
     public WindGaleEntity(Entity owner, World world, double x, double y, double z, Vec3d velocity,float knockback,float explosionPower) {
         super(owner,ModEntityType.WIND_GALE, x, y, z, velocity, world);
         KNOCKBACK_POWER = knockback;
         EXPLOSION_POWER = explosionPower;
+
     }
 
     public WindGaleEntity(World world, double x, double y, double z, Vec3d velocity) {
@@ -146,21 +155,38 @@ public class WindGaleEntity extends AbstractWindGaleEntity {
             this.deflectCooldown--;
         }
 
-
-
-
-
-        /*
-        Predicate<Entity> test = entity -> entity instanceof SnowProjectileEntity;
-
-        ArrayList<Entity> ent = new ArrayList<>(this.getWorld().getOtherEntities(this,this.getBoundingBox().stretch(this.getVelocity()).expand(2),test));
-
-        if (!ent.isEmpty()){
-            Entity temp = ent.getFirst();
-            iceExplosion(this.getPos(),temp);
-            this.discard();
+        Vec3d p = this.getEyePos();
+        for (int i = 0; i < 3; i++) {
+            Vec3d r = new Vec3d(
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
+                    MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
+            );
+            float velR = (float) MathHelper.lerp(this.random.nextDouble(), -2F, 0F);
+            Vec3d velocity = this.getVelocity().multiply(velR);
+            this.getWorld().addParticle(ParticleTypes.SMALL_GUST, p.x + (r.x * 0.5) + velocity.x  , p.y + (r.y * 0.5) + velocity.y, p.z + (r.z * 0.5) + velocity.z,r.x * 0.5,r.y * 0.5,r.z * 0.5);
         }
-         */
+
+        if (this.previousEyePos == null){
+            previousEyePos = this.getEyePos().subtract(this.getVelocity().normalize());
+        }
+        if (this.previousPreviousEyePos == null){
+            previousPreviousEyePos = this.previousEyePos.subtract(this.getVelocity().normalize());
+        }
+
+        if (this.age > 1){
+            this.getWorld().addParticle(
+                    RecisableTrailParticleEffect.create(
+                            ModParticles.EXPERIMENTAL_TRAIL, ColorHelper.fromFloats(1F,0.75F,0.75F,1F),
+                            10, 1F,
+                            this.previousEyePos, this.previousPreviousEyePos,
+                            trailIndex++
+                    ), this.getPos().x, this.getPos().y,this.getPos().z,0,0,0
+            );
+        }
+
+        this.previousPreviousEyePos = this.previousEyePos;
+        this.previousEyePos = this.getEyePos();
     }
 
     @Override

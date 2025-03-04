@@ -72,7 +72,6 @@ public class EndCrystalProjectilEntityModel extends EntityModel<EndCrystalProjec
         }
 
         //float scaleMod = ((endCrystalProjectileEntityRenderState.age % a) / (a/2));
-        Arbalests.LOGGER.info("a value: {}", a);
         float scaleMod = (float) Math.sin(EndCrystalProjectileEntityRenderState.fuse * ((a + 4F) / 180F) * Math.PI);
         scaleMod *= (0.1F * mod) + scaleMod2;
         this.innerGlass.scale(new Vector3f(scaleMod,scaleMod,scaleMod));

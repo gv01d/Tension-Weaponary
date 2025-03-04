@@ -79,7 +79,6 @@ public class ShadedProjectileTrailParticle extends SpriteBillboardParticle {
 
     @Override
     public void tick() {
-        Arbalests.LOGGER.info("tick");
         this.prevGap = this.gap;
         this.prevAlpha = this.alpha;
 

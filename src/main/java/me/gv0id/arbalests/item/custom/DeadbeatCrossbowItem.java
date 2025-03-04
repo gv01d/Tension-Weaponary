@@ -18,13 +18,14 @@ import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.*;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
@@ -38,14 +39,19 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -453,10 +459,25 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         shooter.setVelocity(shooter.getVelocity().add(shooter.getOppositeRotationVector(1.0F).multiply(1F)));
         float multiplier = 2F;
 
+
+
         for (int i = 1; i < 10; i++) {
             Vec3d vec3d3 = vec3d.add(vec3d2.multiply(((double)i) * multiplier));
-            world.spawnParticles(ParticleTypes.SONIC_BOOM, vec3d3.getX(), vec3d3.getY(), vec3d3.getZ(), 1, 0.0D, 0.0D, 0.0D, 0.0D);
+            world.spawnParticles(ParticleTypes.SONIC_BOOM, vec3d3.getX(), vec3d3.getY(), vec3d3.getZ(), 1, 0.0D, 0.0D, 0.0D, 5.0D);
         }
+
+/*
+        world.getPlayers().stream().filter(player -> player.squaredDistanceTo(vec3d) < 100).forEach(player -> {
+            player.damage(DamageSource.player(shooter), 5F);
+            player.setVelocity(player.getVelocity().add(shooter.getOppositeRotationVector(1.0F).multiply(1F)));
+        });
+        if (hitResult.getType() == HitResult.Type.ENTITY){
+            if (((EntityHitResult) hitResult).getEntity() instanceof LivingEntity livingEntity){
+                livingEntity.damage(world,world.getDamageSources().create(DamageTypes.SONIC_BOOM, shooter), 5F);
+            }
+        }
+        */
+
         RegistryEntry<SoundEvent> registryEntry = RegistryEntry.of(SoundEvents.ENTITY_WARDEN_SONIC_BOOM);
         long l = world.random.nextLong();
         world.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), registryEntry, SoundCategory.PLAYERS, 3.0F, 1.0F, l);
@@ -700,7 +721,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         ),
 
         EGG(Items.EGG,0.0F, 6.0F,
-                (world,shooter,weaponStack, projectileStack, critical) -> new EggProjectileEntity(
+                (world,shooter,weaponStack, projectileStack, critical) -> new CustomEggProjectileEntity(
                         world,shooter,projectileStack
                 )
         ),

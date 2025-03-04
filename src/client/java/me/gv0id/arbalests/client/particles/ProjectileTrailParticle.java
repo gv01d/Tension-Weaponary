@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.client.particles;
 
+import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -114,8 +115,6 @@ public class ProjectileTrailParticle extends SpriteBillboardParticle {
 
     @Override
     public void render(VertexConsumer vertexConsumer, Camera camera, float tickDelta) {
-        //super.render(vertexConsumer,camera,tickDelta);
-
         if (this.age == 0){
             if (this.prevPositions.isEmpty()) {
                 setStart(this.prevPosition, new Vec3d(this.prevRoll, this.prevYaw, this.prevPitch));

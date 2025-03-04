@@ -1,5 +1,7 @@
 package me.gv0id.arbalests.client.particles.experimental;
 
+import me.gv0id.arbalests.Arbalests;
+import me.gv0id.arbalests.particle.RecisableTrailParticleEffect;
 import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -7,23 +9,14 @@ import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 
 public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
-    float roll;
-    float yaw;
-    float pitch;
-
-    float prevRoll;
-    float prevYaw;
-    float prevPitch;
 
     Vec3d position;
     Vec3d prevPosition;
@@ -41,8 +34,7 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
     int index;
 
     ArrayList<Vec3d> vertexPoint;
-    ArrayList<Vec3d> uvPoints;
-    ArrayList<Vec3d> prevPositions = new ArrayList<>();
+    ArrayList<Vec3d> positionList = new ArrayList<>();
     ArrayList<Float> tickDeltas = new ArrayList<>();
 
     protected ExperimentalProjectileTrailParticle(ClientWorld clientWorld, double d, double e, double f, SpriteProvider spriteProvider) {
@@ -75,8 +67,11 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
 
     @Override
     public void tick() {
+
+
         this.prevGap = this.gap;
         this.prevAlpha = this.alpha;
+        //this.world.addParticle(ParticleTypes.FLAME, this.x, this.y, this.z, 0, 0, 0);
 
         if (this.gap == this.maxAge - 1){
             this.gap = this.endGap;
@@ -87,76 +82,70 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
 
         this.alpha = MathHelper.lerp(((float) this.age+1) / ((float) this.maxAge), this.startAlpha, this.endAlpha);
 
-        //this.alpha -= 1F /this.maxAge;
-        if (this.age++ >= this.maxAge) {
+        //this.alpha -= 1F /this.maxAge;\
+        this.age++;
+        if (this.age >= this.maxAge) {
             this.markDead();
         } else {
             this.setSpriteForAge(this.spriteProvider);
         }
     }
 
-    public void setStart(Vec3d pos, Vec3d angles){
-        this.prevPosition = pos;
-
-        this.prevPositions.add(pos);
+    public void setStart(Vec3d pos){
+        this.positionList.add(new Vec3d(pos.x,pos.y,pos.z));
         this.tickDeltas.add(0.0F);
     }
 
-    protected float getGap(float tickDelta){
-        float headGap = this.startGap - (( this.startGap / Math.min(this.age + this.index, this.maxAge)) * Math.min(this.age, this.maxAge));
-        //float tailGap = this.startGap - (( this.startGap / this.maxAge) * Math.min(Math.max(this.maxAge - this.index, 0) + this.age, this.maxAge));
-        float tailGap = this.startGap - (( this.startGap / Math.min(this.age + this.index, this.maxAge)) * Math.min(this.age + 1, this.maxAge));
-        return tickDelta == 0? tailGap : tickDelta == 1F? headGap : MathHelper.lerp(tickDelta, tailGap, headGap);
+    protected float headDelta(){
+        float amount =  Math.min(this.age + this.index + 1, this.maxAge);
+        float pos = Math.min(this.age, amount);
+        return pos / amount;
+    }
+
+    protected float tailDelta(){
+        float amount =  Math.min(this.age + this.index + 1, this.maxAge);
+        float pos = Math.min(this.age, amount);
+        return (pos + 1) / amount;
+    }
+
+    public float getAlpha(float tickDelta){
+        float halpha = MathHelper.lerp(headDelta(), this.startAlpha, this.endAlpha);
+        float talpha = MathHelper.lerp(tailDelta(), this.startAlpha, this.endAlpha);
+
+        return tickDelta == 0? talpha : tickDelta == 1F? halpha : MathHelper.lerp(tickDelta, talpha, halpha);
+    }
+
+
+    public float getGap(float tickDelta){
+        float hgap = MathHelper.lerp(headDelta(), this.startGap, this.endGap);
+        float tgap = MathHelper.lerp(tailDelta(), this.startGap, this.endGap);
+
+        return tickDelta == 0? tgap : tickDelta == 1F? hgap : MathHelper.lerp(tickDelta, tgap, hgap);
     }
 
     @Override
     public void render(VertexConsumer vertexConsumer, Camera camera, float tickDelta) {
         //super.render(vertexConsumer,camera,tickDelta);
-
         vertexPoint = new ArrayList<>();
-        uvPoints = new ArrayList<>();
+        if (this.age == 0 && (this.tickDeltas.isEmpty() || tickDelta >= this.tickDeltas.getLast())) // Create trail points on 1st tick
+        {
+            if (this.positionList.isEmpty()) // Ensure 1st point is set to the starting position
+            {
+                setStart(this.position);
+            } else if (this.tickDeltas.getLast() != tickDelta) // Ensure there is no repetition of the same point and creates all other points
+            {
+                Vec3d pos = new Vec3d(
+                        MathHelper.lerp(tickDelta, this.position.x, this.x),
+                        MathHelper.lerp(tickDelta, this.position.y, this.y),
+                        MathHelper.lerp(tickDelta, this.position.z, this.z)
+                );
 
-        if (this.age == 0){
-            if (this.prevPositions.isEmpty()) {
-                setStart(this.prevPosition, new Vec3d(this.prevRoll, this.prevYaw, this.prevPitch));
-            }
-            else if (this.tickDeltas.getLast() != tickDelta) {
-                Quaternionf quaternionf = new Quaternionf();
-
-                float yaw = MathHelper.lerp(tickDelta, this.prevYaw, this.yaw);
-                float pitch = MathHelper.lerp(tickDelta, this.prevPitch, this.pitch);
-
-                quaternionf = RotationAxis.POSITIVE_Y.rotationDegrees(yaw - 90.0F)
-                        .mul(RotationAxis.POSITIVE_Z.rotationDegrees(pitch + 90.0F))
-                        .mul(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
-                float pX;
-                float pY;
-                float pZ;
-                pX = (float) MathHelper.lerp(tickDelta, this.prevPosition.x, this.position.x);
-                pY = (float) MathHelper.lerp(tickDelta, this.prevPosition.y, this.position.y);
-                pZ = (float) MathHelper.lerp(tickDelta, this.prevPosition.z, this.position.z);
-                Vec3d pos = new Vec3d(pX, pY, pZ);
-
-                if (this.angle != 0.0F) {
-                    quaternionf.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle));
-                }
-
-                this.prevPositions.add(pos);
+                this.positionList.add(pos);
                 this.tickDeltas.add(tickDelta);
             }
-        }
-        else if (!this.tickDeltas.isEmpty()  && this.tickDeltas.getLast() != 1){
-            Quaternionf quaternionf = RotationAxis.POSITIVE_Y.rotationDegrees(this.yaw - 90.0F)
-                    .mul(RotationAxis.POSITIVE_Z.rotationDegrees(this.pitch + 90.0F))
-                    .mul(RotationAxis.POSITIVE_Y.rotationDegrees(90.0F));
-
-            Vec3d pos = new Vec3d(this.position.x, this.position.y, this.position.z);
-
-            if (this.angle != 0.0F) {
-                quaternionf.rotateZ(MathHelper.lerp(1F, this.prevAngle, this.angle));
-            }
-
-            this.prevPositions.add(pos);
+        } else if (!this.tickDeltas.isEmpty() && this.tickDeltas.getLast() != 1) // Ensure the last point is set to the ending position
+        {
+            this.positionList.add(new Vec3d(this.x, this.y, this.z));
             this.tickDeltas.add(1F);
         }
 
@@ -166,48 +155,73 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
         //this.method_60373(vertexConsumer, camera, quaternionf, tickDelta);
     }
     protected void renderTrailQuads(VertexConsumer vertexConsumer, Camera camera){
-        for (int i = 0; i < this.prevPositions.size() - 1; i++) {
-            this.RotatePoints(vertexConsumer, camera, i);
+
+        Vec3d cameraPos = camera.getPos();
+        // Calculate the vertex points for the trail
+        for (int i = 0; i < this.positionList.size(); i++) {
+            this.RotatePoints(vertexConsumer, cameraPos, i);
         }
 
-        for (int i = 0; i < this.vertexPoint.size(); i += 2){
-            Vec3d pos1 = this.vertexPoint.get(i);
-            Vec3d pos2 = this.vertexPoint.get(i + 1);
+        if (this.positionList.size() > 2){
+            for (int i = 0; i < this.positionList.size() - 1; i++) {
+                /*
+                if (i != 1){
+                    continue;
+                }
+                 */
+                float k = this.getMinU();
+                float l = this.getMaxU();
+                float m = this.getMinV();
+                float n = this.getMaxV();
+                renderQuad(vertexConsumer,
+                        this.vertexPoint.get(i * 2),
+                        this.vertexPoint.get((i * 2) + 1),
+                        this.vertexPoint.get((i * 2) + 2),
+                        this.vertexPoint.get((i * 2) + 3),
+                        k, l, MathHelper.lerp(this.tickDeltas.get(i),m,n), MathHelper.lerp(this.tickDeltas.get(i+1),m,n),
+                        this.getBrightness(this.tickDeltas.get(i)),
+                        getAlpha(this.tickDeltas.get(i)), getAlpha(this.tickDeltas.get(i+1))
+                );
+            }
+        }
 
-            float k = this.getMinU();
-            float l = this.getMaxU();
-            float m = this.getMinV();
-            float n = this.getMaxV();
-
-            this.addVertex(vertexConsumer, pos1, k, MathHelper.lerp(tickDelta1, n, m), o, MathHelper.lerp(tickDelta1, this.alpha, this.prevAlpha));}
     }
 
-    protected void RotatePoints(VertexConsumer vertexConsumer, Camera camera, int index){
+    protected void renderQuad(VertexConsumer vertexConsumer, Vec3d posA1, Vec3d posA2, Vec3d posB1, Vec3d posB2, float u1, float u2, float v1, float v2, int light, float alpha1 ,float alpha2){
+        this.addVertex(vertexConsumer, posA2, u1, v1, light, alpha1);
+        this.addVertex(vertexConsumer, posA1, u2, v1, light, alpha1);
+        this.addVertex(vertexConsumer, posB1, u2, v2, light, alpha2);
+        this.addVertex(vertexConsumer, posB2, u1, v2, light, alpha2);
+    }
+
+    protected void RotatePoints(VertexConsumer vertexConsumer, Vec3d cameraPos, int index){
 
         Vec3d prevPos;
         if (index == 0){
             prevPos = this.prevPosition;
         }
         else {
-            prevPos = this.prevPositions.get(index - 1);
+            prevPos = this.positionList.get(index - 1);
         }
-        Vec3d pos = this.prevPositions.get(index);
+        Vec3d pos = this.positionList.get(index);
 
-        Vec3d pathDirection = new Vec3d(this.prevPositions.get(index - 1).toVector3f()).subtract(prevPos).normalize();
+        Vec3d pathDirection = this.positionList.get(index).subtract(prevPos).normalize();
 
-        Vec3d normal = pathDirection.crossProduct(camera.getPos().subtract(pos.add(prevPos).multiply(0.5))).normalize();
+        Vec3d normal = pathDirection.crossProduct(cameraPos.subtract(pos.add(prevPos).multiply(0.5))).normalize();
+        //normal = new Vec3d(1,0 ,0);
+
+        float gapSize = getGap(this.tickDeltas.get(index)) * this.getSize(this.tickDeltas.get(index));
 
         vertexPoint.add(pos.add(
                 normal.multiply(
-                        this.getGap(this.tickDeltas.get(index)) * this.getSize(this.tickDeltas.get(index))
-                ))
+                        gapSize
+                )).subtract(cameraPos)
         );
         vertexPoint.add(pos.add(
                 normal.multiply(
-                        -this.getGap(this.tickDeltas.get(index) * this.getSize(this.tickDeltas.get(index))
-                        )
-                ))
-        )
+                        -gapSize
+                )).subtract(cameraPos)
+        );
     }
 
     private void addVertex(
@@ -222,7 +236,7 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
     }
 
     @Environment(EnvType.CLIENT)
-    public static class Factory implements ParticleFactory<TrailParticleEffect> {
+    public static class Factory implements ParticleFactory<RecisableTrailParticleEffect> {
         private final SpriteProvider spriteProvider;
         float startSize;
         float endSize;
@@ -239,21 +253,15 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
             this.maxAge = maxAge;
         }
 
-        public Particle createParticle(TrailParticleEffect parameters, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
+        public Particle createParticle(RecisableTrailParticleEffect parameters, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
             ExperimentalProjectileTrailParticle streakParticle = new ExperimentalProjectileTrailParticle(clientWorld, d, e, f, this.spriteProvider);
             streakParticle.setColor(parameters.getRed(),parameters.getGreen(), parameters.getBlue());
-            streakParticle.roll = parameters.getRoll();
-            streakParticle.yaw = parameters.getYaw();
-            streakParticle.pitch = parameters.getPitch();
-            streakParticle.prevRoll = parameters.getPrevRoll();
-            streakParticle.prevYaw = parameters.getPrevYaw();
-            streakParticle.prevPitch = parameters.getPrevPitch();
             streakParticle.position = parameters.getPos();
             streakParticle.prevPosition = parameters.getPrevPos();
             streakParticle.index = parameters.getIndex();
 
-            streakParticle.maxAge = this.maxAge;
-            streakParticle.setStartGap(this.startSize / 2, this.endSize / 2);
+            streakParticle.maxAge = parameters.age();
+            streakParticle.setStartGap((this.startSize / 2) * parameters.getSize() , (this.endSize / 2) * parameters.getSize());
             streakParticle.setStartAlpha(this.startAlpha * parameters.getAlpha(), this.endAlpha * parameters.getAlpha());
             return streakParticle;
         }

@@ -5,6 +5,7 @@ import me.gv0id.arbalests.effect.ModEffects;
 import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.item.custom.CopperDiscItem;
 import me.gv0id.arbalests.particle.ModParticles;
+import me.gv0id.arbalests.particle.RecisableTrailParticleEffect;
 import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.*;
@@ -52,9 +53,9 @@ public class CustomEnderPearlEntity extends EnderPearlEntity{
             true, false, Optional.of(ENDER_KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
     );
 
+    Vec3d previousPreviousEyePos;
     Vec3d previousEyePos;
-    Vec3d previousRYP;
-    int particleIndex = 0;
+    int trailIndex = 0;
 
     public CustomEnderPearlEntity(EntityType<? extends EnderPearlEntity> entityType, World world) {
         super(entityType, world);
@@ -76,15 +77,38 @@ public class CustomEnderPearlEntity extends EnderPearlEntity{
     }
 
     private void spawnParticles() {
-        Vec3d p = this.getPos();
+        Vec3d p = this.getEyePos();
         for (int i = 0; i < (int) MathHelper.lerp(this.random.nextDouble(), 2, 4); i++) {
             Vec3d r = new Vec3d(
                     MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
                     MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
                     MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
             );
-            this.getWorld().addParticle(ModParticles.COSMIC_SPARK, p.x, p.y, p.z,r.x * 1,r.y * 1,r.z * 1);
+            float velR = (float) MathHelper.lerp(this.random.nextDouble(), -2F, 0F);
+            Vec3d velocity = this.getVelocity().multiply(velR);
+            this.getWorld().addParticle(ModParticles.COSMIC_SPARK, p.x + (r.x * 0.5) + velocity.x  , p.y + (r.y * 0.5) + velocity.y, p.z + (r.z * 0.5) + velocity.z,r.x,r.y,r.z);
         }
+
+        if (this.previousEyePos == null){
+            previousEyePos = this.getEyePos().subtract(this.getVelocity().normalize());
+        }
+        if (this.previousPreviousEyePos == null){
+            previousPreviousEyePos = this.previousEyePos.subtract(this.getVelocity().normalize());
+        }
+
+        if (this.age > 1){
+            this.getWorld().addParticle(
+                    RecisableTrailParticleEffect.create(
+                            ModParticles.EXPERIMENTAL_TRAIL, ColorHelper.fromFloats(1F,0.203F,0.6F,0.533F),
+                            10, 1,
+                            this.previousEyePos, this.previousPreviousEyePos,
+                            trailIndex++
+                    ), this.getEyePos().x, this.getEyePos().y,this.getEyePos().z,0,0,0
+            );
+        }
+
+        this.previousPreviousEyePos = this.previousEyePos;
+        this.previousEyePos = this.getEyePos();
     }
 
     @Override

@@ -1,5 +1,9 @@
 package me.gv0id.arbalests.entity.projectile;
 
+import me.gv0id.arbalests.entity.ModEntityType;
+import me.gv0id.arbalests.particle.ModParticles;
+import me.gv0id.arbalests.particle.RecisableTrailParticleEffect;
+import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.minecraft.entity.*;
 import net.minecraft.entity.passive.ChickenEntity;
 import net.minecraft.entity.projectile.thrown.EggEntity;
@@ -11,21 +15,52 @@ import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class EggProjectileEntity extends ThrownItemEntity {
+public class CustomEggProjectileEntity extends ThrownItemEntity {
+    private Vec3d previousEyePos;
+    private Vec3d previousPreviousEyePos;
+    private int trailIndex = 0;
     private static final EntityDimensions EMPTY_DIMENSIONS = EntityDimensions.fixed(0.0F, 0.0F);
 
-    public EggProjectileEntity(EntityType<? extends EggEntity> entityType, World world) {
+    public CustomEggProjectileEntity(EntityType<? extends CustomEggProjectileEntity> entityType, World world) {
         super(entityType, world);
     }
 
-    public EggProjectileEntity(World world, LivingEntity owner, ItemStack stack) {
-        super(EntityType.EGG, owner, world, stack);
+    public CustomEggProjectileEntity(World world, LivingEntity owner, ItemStack stack) {
+        super(ModEntityType.CUSTOM_EGG, owner, world, stack);
     }
 
-    public EggProjectileEntity(World world, double x, double y, double z, ItemStack stack) {
-        super(EntityType.EGG, x, y, z, world, stack);
+    public CustomEggProjectileEntity(World world, double x, double y, double z, ItemStack stack) {
+        super(ModEntityType.CUSTOM_EGG, x, y, z, world, stack);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (this.previousEyePos == null){
+            previousEyePos = this.getPos().subtract(this.getVelocity().normalize());
+        }
+        if (this.previousPreviousEyePos == null){
+            previousPreviousEyePos = this.previousEyePos.subtract(this.getVelocity().normalize());
+        }
+
+        if (this.age > 1){
+            this.getWorld().addParticle(
+                    RecisableTrailParticleEffect.create(
+                            ModParticles.EXPERIMENTAL_TRAIL, ColorHelper.fromFloats(1F,0.874F,0.807F,0.607F),
+                            10,1F,
+                            this.previousEyePos, this.previousPreviousEyePos,
+                            trailIndex++
+                    ), this.getPos().x, this.getPos().y,this.getPos().z,0,0,0
+            );
+        }
+
+        this.previousPreviousEyePos = this.previousEyePos;
+        this.previousEyePos = this.getPos();
     }
 
     @Override

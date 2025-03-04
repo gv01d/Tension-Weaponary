@@ -63,9 +63,6 @@ public class EndCrystalProjectileEntityRenderer extends EntityRenderer<EndCrysta
 
         if (!endCrystalProjectileEntityRenderState.invisible)
             super.render(endCrystalProjectileEntityRenderState, matrixStack, vertexConsumerProvider, i);
-        else {
-            Arbalests.LOGGER.info("HEH");
-        }
 
         Camera camera = this.dispatcher.camera;
         float mod = 0.8f;

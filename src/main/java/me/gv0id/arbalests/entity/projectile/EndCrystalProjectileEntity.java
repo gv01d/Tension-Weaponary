@@ -5,6 +5,7 @@ import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.particle.ColoredParticleEffect;
 import me.gv0id.arbalests.particle.ModParticles;
 import me.gv0id.arbalests.particle.AngularColoredParticleEffect;
+import me.gv0id.arbalests.particle.RecisableTrailParticleEffect;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -36,8 +37,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -58,6 +58,11 @@ public class EndCrystalProjectileEntity extends ExplosiveProjectileEntity {
     public int EXPLOSION_FREEZE_TIME = 2;
     public int tickFreezed = -1;
     public boolean explode = false;
+
+    private Vec3d previousEyePos;
+    private Vec3d previousPreviousEyePos;
+    private int trailIndex = 0;
+
     private static final TrackedData<Boolean> SHOW_BOTTOM = DataTracker.registerData(EndCrystalProjectileEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
     public static final int MAX_FUSE_TIMER = 600;
@@ -97,7 +102,6 @@ public class EndCrystalProjectileEntity extends ExplosiveProjectileEntity {
     protected ParticleEffect getParticleType() {
         return explode? ModParticles.LIGHT_FLASH : null;
     }
-
 
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
@@ -141,6 +145,35 @@ public class EndCrystalProjectileEntity extends ExplosiveProjectileEntity {
             }
             super.tick();
         }
+
+        if (this.previousEyePos == null){
+            previousEyePos = this.getEyePos().subtract(this.getVelocity().normalize());
+        }
+        if (this.previousPreviousEyePos == null){
+            previousPreviousEyePos = this.previousEyePos.subtract(this.getVelocity().normalize());
+        }
+
+        float speed = (float) this.getVelocity().length();
+        float size = 5F;
+        if (this.getVelocity().length() > 0.3){
+            if (speed < 1){
+                size = MathHelper.lerp(speed - 0.3F, 0.1F, 7F);
+            }
+            this.getWorld().addParticle(
+                    RecisableTrailParticleEffect.create(
+                            ModParticles.EXPERIMENTAL_TRAIL, ColorHelper.fromFloats(0.8F,1F,0.5F,0.9F),
+                            10, size,
+                            this.previousEyePos, this.previousPreviousEyePos,
+                            trailIndex++
+                    ), this.getEyePos().x, this.getEyePos().y,this.getEyePos().z,0,0,0
+            );
+        }
+        else{
+            trailIndex = 0;
+        }
+
+        this.previousPreviousEyePos = this.previousEyePos;
+        this.previousEyePos = this.getEyePos();
     }
 
     private void addParticle() {
@@ -174,9 +207,6 @@ public class EndCrystalProjectileEntity extends ExplosiveProjectileEntity {
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (!this.getWorld().isClient) Arbalests.LOGGER.info("Server");
-        else Arbalests.LOGGER.info("Client");
-
         Entity target = entityHitResult.getEntity();
         if (target instanceof ProjectileEntity){
             if (!this.isRemoved()) trigger(false);
@@ -224,7 +254,6 @@ public class EndCrystalProjectileEntity extends ExplosiveProjectileEntity {
     public void trigger(boolean subExplosion){
         Vec3d vec3d = this.getEyePos();
         this.setVelocity(Vec3d.ZERO);
-        Arbalests.LOGGER.info("Particle where? : {}", vec3d);
         if (this.getWorld() instanceof ServerWorld serverWorld){
             serverWorld.spawnParticles(ModParticles.LIGHT_FLASH,vec3d.x,vec3d.y,vec3d.z,1,0,0,0,0);
             RegistryEntry<SoundEvent> registryEntry = RegistryEntry.of(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP);

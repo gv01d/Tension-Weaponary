@@ -73,6 +73,9 @@ public class ModParticles{
     public static final ParticleType<TrailParticleEffect> WARD_TRAIL = register("ward_disc_trail", true, TrailParticleEffect::createCodec, TrailParticleEffect::createPacketCodec);
 
 
+    // Experimental Trail
+    public static final ParticleType<RecisableTrailParticleEffect> EXPERIMENTAL_TRAIL = register("experimental_trail", true, RecisableTrailParticleEffect::createCodec, RecisableTrailParticleEffect::createPacketCodec);
+
     public static <T extends ParticleType<?>> T register(String name, T type) {
         return Registry.register(Registries.PARTICLE_TYPE, Identifier.of(Arbalests.MOD_ID, name), type);
     }

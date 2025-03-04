@@ -3,6 +3,8 @@ package me.gv0id.arbalests.entity.projectile;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.entity.ModEntityType;
 import me.gv0id.arbalests.particle.ModParticles;
+import me.gv0id.arbalests.particle.RecisableTrailParticleEffect;
+import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
@@ -25,6 +27,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -43,6 +46,9 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
             true, false, Optional.of(KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
     );
     private Entity lastDeflectedEntity;
+    private Vec3d previousEyePos;
+    private Vec3d previousPreviousEyePos;
+    private int trailIndex = 0;
 
     public CustomFireBallEntity(EntityType<? extends CustomFireBallEntity> entityType, World world) {
         super(entityType, world);
@@ -66,16 +72,38 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
     public void tick() {
         super.tick();
 
-        Vec3d p = this.getPos();
-        for (int i = 0; i < (int) MathHelper.lerp(this.random.nextDouble(), 2, 4); i++) {
+        Vec3d p = this.getEyePos();
+        for (int i = 0; i < 3; i++) {
             Vec3d r = new Vec3d(
                     MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
                     MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6),
                     MathHelper.lerp(this.random.nextDouble(), -0.6, 0.6)
             );
-            Arbalests.logSide(this.getWorld());
-            this.getWorld().addParticle(ModParticles.FIRE, p.x, p.y, p.z,r.x * 1,r.y * 1,r.z * 1);
+            float velR = (float) MathHelper.lerp(this.random.nextDouble(), -2F, 0F);
+            Vec3d velocity = this.getVelocity().multiply(velR);
+            this.getWorld().addParticle(ParticleTypes.SMALL_FLAME, p.x + (r.x * 0.5) + velocity.x  , p.y + (r.y * 0.5) + velocity.y, p.z + (r.z * 0.5) + velocity.z,r.x * 0.1,r.y * 0.1,r.z * 0.1);
         }
+
+        if (this.previousEyePos == null){
+            previousEyePos = this.getPos().subtract(this.getVelocity().normalize());
+        }
+        if (this.previousPreviousEyePos == null){
+            previousPreviousEyePos = this.previousEyePos.subtract(this.getVelocity().normalize());
+        }
+
+        if (this.age > 1){
+            this.getWorld().addParticle(
+                    RecisableTrailParticleEffect.create(
+                            ModParticles.EXPERIMENTAL_TRAIL, ColorHelper.fromFloats(1F,0.9F,0.4F,0F),
+                            15, 2F,
+                            this.previousEyePos, this.previousPreviousEyePos,
+                            trailIndex++
+                    ), this.getEyePos().x, this.getEyePos().y,this.getEyePos().z,0,0,0
+            );
+        }
+
+        this.previousPreviousEyePos = this.previousEyePos;
+        this.previousEyePos = this.getEyePos();
     }
 
     @Override

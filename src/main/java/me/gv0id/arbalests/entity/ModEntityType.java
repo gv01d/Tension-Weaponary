@@ -69,6 +69,15 @@ public class ModEntityType {
                     .trackingTickInterval(10)
     );
 
+    public static final EntityType<CustomEggProjectileEntity> CUSTOM_EGG = register(
+            "custom_egg",
+            EntityType.Builder.<CustomEggProjectileEntity>create(CustomEggProjectileEntity::new, SpawnGroup.MISC)
+                    .dropsNothing()
+                    .dimensions(5.0F, 5.0F)
+                    .maxTrackingRange(4)
+                    .trackingTickInterval(10)
+    );
+
     private static <T extends Entity> EntityType<T> register(RegistryKey<EntityType<?>> key, EntityType.Builder<T> type) {
         return Registry.register(Registries.ENTITY_TYPE, key, type.build(key));
     }
