@@ -37,7 +37,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class CopperDiscItem extends Item {
-    public Predicate<ItemStack> DISCS = stack -> stack.isIn(ModItemTypeTags.DISCS);
+    public static Predicate<ItemStack> DISCS = stack -> stack.isIn(ModItemTypeTags.DISCS);
     public float POWER = 1.0F;
     public final int AMOUNT = 1;
 
@@ -171,11 +171,8 @@ public class CopperDiscItem extends Item {
             }
 
             for (ItemStack itemStack : itemList){
-
-                tooltip.add((itemStack.toHoverableText().copy().formatted(Formatting.BLUE)));
-                JukeboxPlayableComponent jukeboxPlayableComponent = itemStack.get(DataComponentTypes.JUKEBOX_PLAYABLE);
-
                 if (type.isAdvanced()) {
+                    JukeboxPlayableComponent jukeboxPlayableComponent = itemStack.get(DataComponentTypes.JUKEBOX_PLAYABLE);
                     List<Text> list = Lists.<Text>newArrayList();
                     Consumer<Text> textConsumer = list::add;
                     if (jukeboxPlayableComponent != null){
@@ -183,9 +180,12 @@ public class CopperDiscItem extends Item {
                     }
                     itemStack.getItem().appendTooltip(itemStack, context, list, type);
                     if (!list.isEmpty()) {
-                        list.replaceAll(text -> Text.literal("  ").append((Text) text).formatted(Formatting.GRAY));
+                        list.replaceAll(text -> Text.literal("").append((Text) text).formatted(Formatting.GRAY));
                         tooltip.addAll(list);
                     }
+                }
+                else {
+                    tooltip.add((itemStack.toHoverableText().copy().formatted(Formatting.BLUE)));
                 }
             }
         }

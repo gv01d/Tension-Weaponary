@@ -43,6 +43,24 @@ public class ModRecipesProvider extends FabricRecipeProvider {
                         350,
                         "cursed_copper_nugget_extraction"
                 );
+                createShaped(RecipeCategory.COMBAT, ModItems.DEADBEAT_CROSSBOW, 1)
+                        .pattern("NCN")
+                        .pattern("STS")
+                        .pattern(" N ")
+                        .input('N', ModItems.CURSED_COPPER_NUGGET)
+                        .input('C', Items.COPPER_INGOT)
+                        .input('S', Items.STRING)
+                        .input('T', Items.TRIPWIRE_HOOK)
+                        .criterion("has_copper", conditionsFromItem(Items.COPPER_INGOT))
+                        .offerTo(exporter);
+                createShaped(RecipeCategory.COMBAT, ModItems.COPPER_DISC, 1)
+                        .pattern(" N ")
+                        .pattern("NCN")
+                        .pattern(" N ")
+                        .input('N', ModItems.CURSED_COPPER_NUGGET)
+                        .input('C', Items.COPPER_INGOT)
+                        .criterion("has_copper", conditionsFromItem(Items.COPPER_INGOT))
+                        .offerTo(exporter);
             }
         };
     }

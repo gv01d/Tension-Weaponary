@@ -1,6 +1,6 @@
 package me.gv0id.arbalests.mixin;
 
-import me.gv0id.arbalests.Arbalests;
+
 import me.gv0id.arbalests.entity.projectile.SnowProjectileEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -16,7 +16,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Debug(export = true)
 @Mixin(Entity.class)
-public abstract class EntityMixin{
+public abstract class EntityMixin implements EntityInterface{
+
+    @Unique
+    boolean tagged;
+
+    @Override
+    public boolean arbalests$isTagged(){
+        return this.tagged;
+    }
+
+    @Override
+    public void arbalests$setTag(boolean b){
+        this.tagged = b;
+    }
+
     @Shadow public abstract boolean isOnGround();
 
     @Unique

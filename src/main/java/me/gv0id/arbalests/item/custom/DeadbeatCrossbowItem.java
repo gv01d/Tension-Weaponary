@@ -521,8 +521,9 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     public static void clientShootSonicBoom(LivingEntity shooter){
         Vec3d vec3d = shooter.getRotationVec(1.0F).normalize();
         Vec3d vel = shooter.getVelocity();
+        vel = new Vec3d(vel.x,vel.y < 0 && vec3d.y < 0? 0: vel.y , vel.z);
 
-        shooter.setVelocity((-vec3d.x * 1.0D) + vel.x, (-vec3d.y * 1.0D) + vel.y, (-vec3d.z * 1.0D) + vel.z);
+        shooter.setVelocity((-vec3d.x * 1D) + vel.x, (-vec3d.y * 1D) + vel.y, (-vec3d.z * 1) + vel.z);
         //shooter.addStatusEffect(new StatusEffectInstance(ModEffects.STRAFE,5,0,true,true,true));
     }
 
@@ -664,6 +665,12 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         return ENTITY_RANGE;
     }
 
+    public static ProjectileEntity spawnSonicBoom(World world, LivingEntity shooter, ItemStack weaponStack, ItemStack projectileStack, boolean critical){
+
+        shooter.addStatusEffect(new StatusEffectInstance(ModEffects.STRAFE,5,0,true,true,true));
+
+        return new SonicBoomProjectile(world, shooter, 5F, true);
+    }
 
     public static Projectiles getProjectileData(ItemStack stack){
         if (stack.isIn(ModItemTypeTags.DEADBEAT_PROJECTILE)){
@@ -675,6 +682,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         }
         return Projectiles.NONE;
     }
+
 
     public enum Projectiles implements StringIdentifiable {
         NONE((Item) null,1.0F,3.0F, DeadbeatCrossbowItem::createArrow),
@@ -723,8 +731,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                 (world,shooter,weaponStack, projectileStack, critical) ->
                 new EndCrystalProjectileEntity(world, shooter)),
         ECHO_CRYSTAL(ModItems.ECHO_CRYSTAL, 5F, 10.0F, 3,
-                (world,shooter,weaponStack, projectileStack, critical) ->
-                new SonicBoomProjectile(world, shooter, 5F, true),
+                DeadbeatCrossbowItem::spawnSonicBoom,
                 ((world, shooter, weapon, projectile, target, speed, divergence) -> DeadbeatCrossbowItem.clientShootSonicBoom(shooter) )),
 
         NETHER_STAR(Items.NETHER_STAR, 2F,1F,DeadbeatCrossbowItem::createArrow);

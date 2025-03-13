@@ -54,11 +54,11 @@ public class SonicBoomProjectile extends PersistentProjectileEntity {
         super.initDataTracker(builder);
     }
 
+    // TODO : Locked rotation sonic booms (better sonic boom vfx) and actual piercing effect
+
     @Override
     public void tick() {
-        Arbalests.LOGGER.info("SonicBoomProjectile tick - age: " + this.age);
         if(this.age > 1) {
-            Arbalests.LOGGER.info("SonicBoomProjectile Discart");
             this.discard();
         }
         else {

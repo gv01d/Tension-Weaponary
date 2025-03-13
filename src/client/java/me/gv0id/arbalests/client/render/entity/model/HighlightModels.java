@@ -26,4 +26,11 @@ public class HighlightModels
         modelPartData.addChild("light_special", ModelPartBuilder.create().uv(0, 0).cuboid(-16.0F, -16.0F, 0.0F, 32.0F, 32.0F, 0.0F, new Dilation(0.01F)), ModelTransform.NONE);
         return TexturedModelData.of(modelData, 32, 32).createModel();
     }
+
+    public static ModelPart getTaggedTextureModelData(){
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        modelPartData.addChild("tagged", ModelPartBuilder.create().uv(0,0).cuboid(-16.0F, -16.0F, 0F,32.0F,32.0F,32.0F, new Dilation(1)), ModelTransform.NONE);
+        return TexturedModelData.of(modelData,16,16).createModel();
+    }
 }
