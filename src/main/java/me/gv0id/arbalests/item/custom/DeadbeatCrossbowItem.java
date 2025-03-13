@@ -8,6 +8,7 @@ import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
 import me.gv0id.arbalests.components.type.ChargeValueComponent;
 import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
+import me.gv0id.arbalests.effect.ModEffects;
 import me.gv0id.arbalests.entity.damage.ModDamageSources;
 import me.gv0id.arbalests.entity.damage.ModDamageTypes;
 import me.gv0id.arbalests.entity.projectile.*;
@@ -24,6 +25,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.damage.DamageTypes;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
 import net.minecraft.inventory.StackReference;
@@ -517,10 +519,11 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     }
 
     public static void clientShootSonicBoom(LivingEntity shooter){
-        Vec3d vec3d = shooter.getOppositeRotationVector(1.0F);
+        Vec3d vec3d = shooter.getRotationVec(1.0F).normalize();
         Vec3d vel = shooter.getVelocity();
 
-        shooter.setVelocity(vec3d.x * 2.0D + vel.x, vec3d.y * 2.0D + vel.y, vec3d.z * 2.0D + vel.z);
+        shooter.setVelocity((-vec3d.x * 1.0D) + vel.x, (-vec3d.y * 1.0D) + vel.y, (-vec3d.z * 1.0D) + vel.z);
+        //shooter.addStatusEffect(new StatusEffectInstance(ModEffects.STRAFE,5,0,true,true,true));
     }
 
     private static float getSoundPitch(Random random, int index) {
