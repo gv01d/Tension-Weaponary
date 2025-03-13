@@ -12,6 +12,16 @@ import net.minecraft.util.Identifier;
 
 
 public class ModEntityType {
+
+    public static final EntityType<SonicBoomProjectile> SONIC_BOOM_PROJECTILE = register(
+            "sonic_boom_projectile",
+            EntityType.Builder.<SonicBoomProjectile>create(SonicBoomProjectile::new, SpawnGroup.MISC)
+                    .dropsNothing()
+                    .dimensions(0.5F, 0.5F)
+                    .maxTrackingRange(4)
+                    .trackingTickInterval(10)
+    );
+
     public static final EntityType<WindGaleEntity> WIND_GALE = register(
             "wind_gale",
             EntityType.Builder.<WindGaleEntity>create(WindGaleEntity::new, SpawnGroup.MISC)

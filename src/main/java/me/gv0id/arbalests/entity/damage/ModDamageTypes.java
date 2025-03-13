@@ -8,4 +8,5 @@ import net.minecraft.util.Identifier;
 
 public interface ModDamageTypes {
     RegistryKey<DamageType> COPPER_DISC = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Arbalests.identifierOf("copper_disc"));
+    RegistryKey<DamageType> SONIC_BOOM = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Arbalests.identifierOf("sonic_boom"));
 }

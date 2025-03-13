@@ -14,7 +14,11 @@ public class ModDamageSources extends DamageSources{
     }
 
     public DamageSource COPPER_DISC(Entity source, @Nullable Entity attacker) {
-        return this.create(DamageTypes.TRIDENT, source, attacker);
+        return this.create(ModDamageTypes.SONIC_BOOM, source, attacker);
+    }
+
+    public DamageSource SONIC_BOOM(Entity source, @Nullable Entity attacker) {
+        return this.create(ModDamageTypes.SONIC_BOOM, source, attacker);
     }
 
 

@@ -31,6 +31,7 @@ public class ModEntityRenderers implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntityType.CUSTOM_SNOWBALL, FlyingItemEntityRenderer::new);
         EntityRendererRegistry.register(ModEntityType.CUSTOM_FIREBALL, context -> new FlyingItemEntityRenderer<>(context, 3.0F, true));
         EntityRendererRegistry.register(ModEntityType.CUSTOM_EGG, FlyingItemEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntityType.SONIC_BOOM_PROJECTILE, SonicBoomProjectileRenderer::new);
     }
 
 }
