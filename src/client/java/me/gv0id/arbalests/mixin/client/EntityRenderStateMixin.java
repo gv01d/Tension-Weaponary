@@ -1,5 +1,6 @@
 package me.gv0id.arbalests.mixin.client;
 
+import me.gv0id.arbalests.helper.EntityRenderStateInterface;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

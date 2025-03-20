@@ -13,11 +13,22 @@ import net.minecraft.util.Identifier;
 
 public class ModEntityType {
 
+    public static final EntityType<NetherStarProjectileEntity> NETHER_STAR_PROJECTILE = register(
+            "nether_star_projectile",
+            EntityType.Builder.<NetherStarProjectileEntity>create(NetherStarProjectileEntity::new, SpawnGroup.MISC)
+                    .dropsNothing()
+                    .dimensions(0.25F, 0.25F)
+                    .eyeHeight(0.125F)
+                    .maxTrackingRange(4)
+                    .trackingTickInterval(10)
+    );
+
     public static final EntityType<SonicBoomProjectile> SONIC_BOOM_PROJECTILE = register(
             "sonic_boom_projectile",
             EntityType.Builder.<SonicBoomProjectile>create(SonicBoomProjectile::new, SpawnGroup.MISC)
                     .dropsNothing()
-                    .dimensions(0.5F, 0.5F)
+                    .dimensions(2F, 2F)
+                    .eyeHeight(1.0F)
                     .maxTrackingRange(4)
                     .trackingTickInterval(10)
     );

@@ -2,6 +2,7 @@ package me.gv0id.arbalests.client.particles;
 
 import me.gv0id.arbalests.client.particles.cosmic.*;
 import me.gv0id.arbalests.client.particles.experimental.ExperimentalProjectileTrailParticle;
+import me.gv0id.arbalests.client.particles.experimental.LazerBeamParticle;
 import me.gv0id.arbalests.client.particles.fireball.*;
 import me.gv0id.arbalests.client.particles.snow.SnowFlakeParticle;
 import me.gv0id.arbalests.client.particles.snow.SnowGustEmitterParticle;
@@ -61,6 +62,11 @@ public class ModParticles {
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.COSMIC_SPARK, CosmicBoomParticle.SparkFactory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SMALL_COSMIC_BOOM, CosmicBoomParticle.SmallFactory::new);
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.COSMIC_BOOM_EMITTER, new CosmicBoomEmiterParticle.Factory( 5, 6, 0));
+
+        // Sonic Boom
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SONIC_BOOM, AngularSonicBoomParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.SONIC_BEAM,
+                (spriteProvider) -> new LazerBeamParticle.Factory(spriteProvider, 0.5f, -1F, 1.0F, 0.0F , 5));
 
         // Disc Trails
         ParticleFactoryRegistry.getInstance().register(me.gv0id.arbalests.particle.ModParticles.TRAIL, ModParticles::defaultDiscFactory);

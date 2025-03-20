@@ -3,7 +3,8 @@ package me.gv0id.arbalests.mixin.client;
 
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.client.render.entity.model.HighlightModels;
-import me.gv0id.arbalests.mixin.EntityInterface;
+import me.gv0id.arbalests.helper.EntityInterface;
+import me.gv0id.arbalests.helper.EntityRenderStateInterface;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.ModelPart;
@@ -54,7 +55,7 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
         if (((EntityRenderStateInterface) state).arbalests$isTagged()){
             Camera camera = this.dispatcher.camera;
             matrixStack.push();
-            matrixStack.translate(0,0.6F,0);
+            matrixStack.translate(0,1F,0);
             matrixStack.scale(1.4F , 1.4F, 1.4F);
             matrixStack.multiply(new Quaternionf().rotationYXZ(-camera.getYaw() * (float) (Math.PI / 180.0), camera.getPitch() * (float) (Math.PI / 180.0), (float)Math.PI));
             this.target.render(

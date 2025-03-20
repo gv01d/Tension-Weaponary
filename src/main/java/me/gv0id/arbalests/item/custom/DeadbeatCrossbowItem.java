@@ -3,18 +3,17 @@ package me.gv0id.arbalests.item.custom;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
 import me.gv0id.arbalests.components.type.ChargeValueComponent;
 import me.gv0id.arbalests.components.type.DeadbeatCrossbowCharging;
 import me.gv0id.arbalests.effect.ModEffects;
-import me.gv0id.arbalests.entity.damage.ModDamageSources;
-import me.gv0id.arbalests.entity.damage.ModDamageTypes;
 import me.gv0id.arbalests.entity.projectile.*;
+import me.gv0id.arbalests.helper.EntityInterface;
 import me.gv0id.arbalests.item.ModItems;
 import me.gv0id.arbalests.registry.tag.ModItemTypeTags;
 import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
@@ -22,9 +21,6 @@ import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageSources;
-import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
@@ -32,8 +28,6 @@ import net.minecraft.inventory.StackReference;
 import net.minecraft.item.*;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.ScreenTexts;
@@ -46,9 +40,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
-import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
@@ -58,7 +50,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -92,18 +83,28 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     }
 
     public static boolean isLoaded(ItemStack stack){ return stack.getOrDefault(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.DEFAULT).isLoaded(); }
-
     public static boolean isChamberFull(ItemStack stack, LivingEntity shooter){
         ChargedProjectilesComponent chargedProjectilesComponent = stack.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
         return chargedProjectilesComponent.getProjectiles().size() >= ((shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND) * AMMO);
     }
-
     public static boolean isFullyCharged(ItemStack stack){ return stack.getOrDefault(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.DEFAULT).isFullyCharged(); }
     public static boolean isCharged(ItemStack stack) { return stack.getOrDefault(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.DEFAULT).isCharged(); }
     public static boolean isCharging(ItemStack stack){
         DeadbeatCrossbowCharging deadbeatCrossbowCharging = stack.get(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE);
         assert deadbeatCrossbowCharging != null;
         return deadbeatCrossbowCharging.isCharging();
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, world, entity, slot, selected);
+
+        if (selected && entity instanceof LivingEntity livingEntity && isCharged(stack)){
+            Projectiles proj = getProjectileData(Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles().getFirst());
+            if (proj.doTick()){
+                proj.tickInterface.tick(world,livingEntity,stack,slot);
+            }
+        }
     }
 
     ///
@@ -518,15 +519,6 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         }
     }
 
-    public static void clientShootSonicBoom(LivingEntity shooter){
-        Vec3d vec3d = shooter.getRotationVec(1.0F).normalize();
-        Vec3d vel = shooter.getVelocity();
-        vel = new Vec3d(vel.x,vel.y < 0 && vec3d.y < 0? 0: vel.y , vel.z);
-
-        shooter.setVelocity((-vec3d.x * 1D) + vel.x, (-vec3d.y * 1D) + vel.y, (-vec3d.z * 1) + vel.z);
-        //shooter.addStatusEffect(new StatusEffectInstance(ModEffects.STRAFE,5,0,true,true,true));
-    }
-
     private static float getSoundPitch(Random random, int index) {
         return index == 0 ? 1.0F : getSoundPitch((index & 1) == 1, random);
     }
@@ -650,10 +642,6 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         }
     }
 
-    public static MusicDiscEntity spawnDisc(World world, LivingEntity shooter, ItemStack stack, ItemStack projectileStack, boolean critical){
-
-        return new MusicDiscEntity(world,shooter,projectileStack,4,false,true);
-    }
 
     @Override
     public boolean isUsedOnRelease(ItemStack stack) {
@@ -665,13 +653,65 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         return ENTITY_RANGE;
     }
 
+    // - - - - - - PROJECTILES - - - - - -
+    // Disc
+    public static MusicDiscEntity spawnDisc(World world, LivingEntity shooter, ItemStack stack, ItemStack projectileStack, boolean critical){
+
+        return new MusicDiscEntity(world,shooter,projectileStack,4,false,true);
+    }
+    // Sonic Boom
     public static ProjectileEntity spawnSonicBoom(World world, LivingEntity shooter, ItemStack weaponStack, ItemStack projectileStack, boolean critical){
 
-        shooter.addStatusEffect(new StatusEffectInstance(ModEffects.STRAFE,5,0,true,true,true));
+        shooter.addStatusEffect(new StatusEffectInstance(ModEffects.STRAFE,1,0,true,true,false));
 
-        return new SonicBoomProjectile(world, shooter, 5F, true);
+        return new SonicBoomProjectile(world, shooter, 5F, true, getProjectileData(projectileStack).speed, shooter.getRotationVector());
+    }
+    public static void clientShootSonicBoom(LivingEntity shooter){
+        Vec3d vec3d = shooter.getRotationVec(1.0F).normalize();
+        Vec3d vel = shooter.getVelocity();
+        vel = new Vec3d(vel.x,vel.y < 0 && vec3d.y < 0? 0: vel.y , vel.z);
+
+        shooter.setVelocity((-vec3d.x * 1D) + vel.x, (-vec3d.y * 1D) + vel.y, (-vec3d.z * 1) + vel.z);
+        //shooter.addStatusEffect(new StatusEffectInstance(ModEffects.STRAFE,5,0,true,true,true));
+    }
+    // Nether Star
+    public static void netherStarTick(World world, LivingEntity shooter, ItemStack weaponStack, int slot){
+        if (shooter instanceof PlayerEntity player){
+
+            ArrayList<Entity> entityList = new ArrayList<>();
+
+            for (Entity entity : world.getOtherEntities(shooter, shooter.getBoundingBox().expand(50F), entity -> entity instanceof LivingEntity)){
+                Vec3d angle = entity.getPos().add(entity.getEyePos()).multiply(0.5).subtract(shooter.getEyePos()).normalize().subtract(shooter.getRotationVec(1F));
+                if (angle.length() < 0.2F){
+                    if (shooter.canSee(entity)){
+                        entityList.add(entity);
+                    }
+                }
+            }
+
+            if (!entityList.isEmpty()){
+                float minDist = (float) entityList.getFirst().squaredDistanceTo(shooter);
+                Entity target = entityList.getFirst();
+                float tempDist;
+                int i = 0;
+                for (Entity entity : entityList){
+                    if (i == 0){
+                        i++;
+                        continue;
+                    }
+                    tempDist = (float) entity.squaredDistanceTo(shooter);
+                    if (tempDist < minDist){
+                        target = entity;
+                        minDist = tempDist;
+                    }
+                }
+                ((EntityInterface) target).arbalests$setTag(true);
+            }
+        }
     }
 
+
+    // Get Data
     public static Projectiles getProjectileData(ItemStack stack){
         if (stack.isIn(ModItemTypeTags.DEADBEAT_PROJECTILE)){
             for (Projectiles projectile : Projectiles.values()){
@@ -685,41 +725,41 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
 
 
     public enum Projectiles implements StringIdentifiable {
-        NONE((Item) null,1.0F,3.0F, DeadbeatCrossbowItem::createArrow),
-        ARROW(Items.ARROW, 0.9F, 3.0F, DeadbeatCrossbowItem::createArrow),
-        TIPPED_ARROW(Items.TIPPED_ARROW, 1.0F, 2.5F, DeadbeatCrossbowItem::createArrow, "POTION", "head", "base"),
-        SPECTRAL_ARROW(Items.SPECTRAL_ARROW,1.0F, 3.2F, DeadbeatCrossbowItem::createArrow),
+        NONE((Item) null,1.0F,3.0F, 1, DeadbeatCrossbowItem::createArrow),
+        ARROW(Items.ARROW, 0.9F, 3.0F,1, DeadbeatCrossbowItem::createArrow),
+        TIPPED_ARROW(Items.TIPPED_ARROW, 1.0F, 2.5F,1, DeadbeatCrossbowItem::createArrow, "POTION", "head", "base"),
+        SPECTRAL_ARROW(Items.SPECTRAL_ARROW,1.0F, 3.2F,1, DeadbeatCrossbowItem::createArrow),
 
-        ROCKET(Items.FIREWORK_ROCKET,0.8F,1.6F,
+        ROCKET(Items.FIREWORK_ROCKET,0.8F,1.6F,1,
                 (world,shooter,weaponStack, projectileStack, critical) -> new FireworkRocketEntity(
                         world, projectileStack, shooter, shooter.getX(), shooter.getEyeY() - 0.15F, shooter.getZ(), true
                 )
         ),
 
-        WIND_CHARGE(Items.WIND_CHARGE, 0.2F, 2.5F,
+        WIND_CHARGE(Items.WIND_CHARGE, 0.2F, 2.5F,1,
                 (world,shooter,weaponStack, projectileStack, critical) -> new WindGaleEntity(
                         shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),1.8F,3F
                 )
         ),
 
-        SNOWBALL(Items.SNOWBALL, 0.0F, 5.0F,
+        SNOWBALL(Items.SNOWBALL, 0.0F, 5.0F,1,
                 (world,shooter,weaponStack, projectileStack, critical) -> new SnowProjectileEntity(
                         world, shooter, projectileStack
                 )
         ),
 
-        EGG(Items.EGG,0.0F, 6.0F,
+        EGG(Items.EGG,0.0F, 6.0F,1,
                 (world,shooter,weaponStack, projectileStack, critical) -> new CustomEggProjectileEntity(
                         world,shooter,projectileStack
                 )
         ),
 
-        ENDER_PEARL(Items.ENDER_PEARL, 2.0F, 5.0F,
+        ENDER_PEARL(Items.ENDER_PEARL, 2.0F, 5.0F,1,
                 (world,shooter,weaponStack, projectileStack, critical) -> new CustomEnderPearlEntity(
                         world, shooter, projectileStack
                 )
         ),
-        FIREBALL(Items.FIRE_CHARGE, 1.0F, 3.2F,
+        FIREBALL(Items.FIRE_CHARGE, 1.0F, 3.2F,1,
                 (world,shooter,weaponStack, projectileStack, critical) -> new CustomFireBallEntity(
                         shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),2.8F,2F
                 )
@@ -734,7 +774,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                 DeadbeatCrossbowItem::spawnSonicBoom,
                 ((world, shooter, weapon, projectile, target, speed, divergence) -> DeadbeatCrossbowItem.clientShootSonicBoom(shooter) )),
 
-        NETHER_STAR(Items.NETHER_STAR, 2F,1F,DeadbeatCrossbowItem::createArrow);
+        NETHER_STAR(Items.NETHER_STAR, 1F,1F,3,DeadbeatCrossbowItem::createArrow,(TickInterface) DeadbeatCrossbowItem::netherStarTick);
 
 
         public static final EnumCodec<Projectiles> CODEC = StringIdentifiable.createCodec(Projectiles::values);
@@ -744,33 +784,18 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
 
         float cooldown = 0;
         float speed = 0;
-        float damage = 0;
         int slots = 1;
 
         ProjectileInterface projectileBuilder;
         ClientShootingInterface clientShootingInterface;
+        TickInterface tickInterface;
 
         boolean tinted = false;
         boolean clientShooting = false;
         boolean variation = false;
+        boolean tick = false;
 
         String[] layers = null;
-
-        Projectiles(Item item, float cooldown, float speed, ProjectileInterface projectileBuilder){
-            this.item = item;
-            this.cooldown = cooldown;
-            this.speed = speed;
-            this.projectileBuilder = projectileBuilder;
-        }
-
-        Projectiles(Item item, float cooldown, float speed, ProjectileInterface projectileBuilder, ClientShootingInterface clientShootingInterface ){
-            this.item = item;
-            this.cooldown = cooldown;
-            this.speed = speed;
-            this.projectileBuilder = projectileBuilder;
-            this.clientShootingInterface = clientShootingInterface;
-            this.clientShooting = true;
-        }
 
         Projectiles(Item item, float cooldown, float speed, int slots, ProjectileInterface projectileBuilder){
             this.item = item;
@@ -789,11 +814,34 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             this.clientShootingInterface = clientShootingInterface;
             this.clientShooting = true;
         }
-
-        Projectiles(Item item, float cooldown, float speed, ProjectileInterface projectileBuilder, String tintSourceEnumName, String... layerSuffix){
+        Projectiles(Item item, float cooldown, float speed, int slots, ProjectileInterface projectileBuilder, TickInterface tickInterface){
             this.item = item;
             this.cooldown = cooldown;
             this.speed = speed;
+            this.projectileBuilder = projectileBuilder;
+            this.slots = slots;
+            this.tickInterface = tickInterface;
+            this.tick = true;
+        }
+
+        Projectiles(Item item, float cooldown, float speed, int slots, ProjectileInterface projectileBuilder, ClientShootingInterface clientShootingInterface, TickInterface tickInterface){
+            this.item = item;
+            this.cooldown = cooldown;
+            this.speed = speed;
+            this.slots = slots;
+
+            this.projectileBuilder = projectileBuilder;
+            this.clientShootingInterface = clientShootingInterface;
+            this.clientShooting = true;
+            this.tickInterface = tickInterface;
+            this.tick = true;
+        }
+
+        Projectiles(Item item, float cooldown, float speed,int slots, ProjectileInterface projectileBuilder, String tintSourceEnumName, String... layerSuffix){
+            this.item = item;
+            this.cooldown = cooldown;
+            this.speed = speed;
+            this.slots = slots;
             this.projectileBuilder = projectileBuilder;
             this.enumName = tintSourceEnumName;
             this.tinted = true;
@@ -815,10 +863,8 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         public float getCooldown() {
             return cooldown;
         }
+        public Item getItem() {return item;}
 
-        public boolean hasClientShooting(){
-            return clientShooting;
-        }
 
         public String getName() {
             if (this.item == null)
@@ -826,9 +872,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             return (item.toString().split(":"))[1];
         }
 
-        public Item getItem() {
-            return item;
-        }
+
         public TagKey<Item> getTagKey() {
             return tagKey;
         }
@@ -836,9 +880,9 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         public boolean isTinted(){
             return tinted;
         }
-        public boolean isVariation(){
-            return variation;
-        }
+        public boolean isVariation(){return variation;}
+        public boolean hasClientShooting(){return clientShooting;}
+        public boolean doTick() {return this.tick;}
 
         public String getEnumName(){
             return enumName;
@@ -865,6 +909,11 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     @FunctionalInterface
     interface ClientShootingInterface {
         void create(World world, LivingEntity shooter, ItemStack weapon, ItemStack projectile, Entity target, float speed, float divergence);
+    }
+
+    @FunctionalInterface
+    interface TickInterface {
+        void tick(World world, LivingEntity shooter, ItemStack stack, int slot);
     }
 
 

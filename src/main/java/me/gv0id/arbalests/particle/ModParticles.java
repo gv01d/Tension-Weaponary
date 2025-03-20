@@ -46,6 +46,10 @@ public class ModParticles{
     public static final ModParticleType FIRE_BOOM = register("fire_boom", true);
     public static final ModParticleType FIRE_BOOM_EMITTER = register("fire_boom_emitter", true);
 
+    // Sonic Boom
+    public static final ParticleType<AngularColoredParticleEffect> SONIC_BOOM = register("sonic_boom", true, AngularColoredParticleEffect::createCodec, AngularColoredParticleEffect::createPacketCodec);
+    public static final ParticleType<RecisableTrailParticleEffect> SONIC_BEAM = register("sonic_beam", true, RecisableTrailParticleEffect::createCodec, RecisableTrailParticleEffect::createPacketCodec);
+
     // Shaded Cosmic End Crystal Explosion
     public static final ModParticleType COSMIC_BOOM = register("cosmic_boom", false);
     public static final ModParticleType COSMIC_SPARK = register("cosmic_spark", true);

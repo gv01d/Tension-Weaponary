@@ -2,9 +2,11 @@ package me.gv0id.arbalests.mixin;
 
 
 import me.gv0id.arbalests.entity.projectile.SnowProjectileEntity;
+import me.gv0id.arbalests.helper.EntityInterface;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.*;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,23 +18,42 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Debug(export = true)
 @Mixin(Entity.class)
-public abstract class EntityMixin implements EntityInterface{
+public abstract class EntityMixin implements EntityInterface {
 
     @Unique
     boolean tagged;
 
+    @Unique
+    boolean justTagged;
+
     @Override
     public boolean arbalests$isTagged(){
-        return this.tagged;
+        if (this.world.isClient) {
+            return this.tagged;
+        }
+        return false;
     }
 
     @Override
     public void arbalests$setTag(boolean b){
-        this.tagged = b;
+        if (this.world.isClient) {
+            this.tagged = b;
+            this.justTagged = b;
+        }
+    }
+
+    @Inject(method = "tick", at = @At("TAIL"))
+    public void tick(CallbackInfo ci){
+        if (justTagged){
+            justTagged = false;
+        } else if (tagged) {
+            tagged = false;
+        }
     }
 
     @Shadow public abstract boolean isOnGround();
 
+    @Shadow private World world;
     @Unique
     public int arbalests_coyoteTime;
     @Unique

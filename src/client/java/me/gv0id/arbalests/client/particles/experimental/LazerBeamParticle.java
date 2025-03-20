@@ -1,21 +1,18 @@
 package me.gv0id.arbalests.client.particles.experimental;
 
-import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.particle.RecisableTrailParticleEffect;
-import me.gv0id.arbalests.particle.TrailParticleEffect;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 
-public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle {
+public class LazerBeamParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
     Vec3d position;
@@ -30,19 +27,23 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
     float startAlpha;
     float endAlpha;
 
-    int index;
+    float edgePorcentage;
+    float maxEdgeSize;
 
     ArrayList<Vec3d> vertexPoint;
     ArrayList<Vec3d> positionList = new ArrayList<>();
     ArrayList<Float> tickDeltas = new ArrayList<>();
 
-    protected ExperimentalProjectileTrailParticle(ClientWorld clientWorld, double d, double e, double f, SpriteProvider spriteProvider) {
+    protected LazerBeamParticle(ClientWorld clientWorld, double d, double e, double f, SpriteProvider spriteProvider) {
         super(clientWorld, d, e, f);
         this.spriteProvider = spriteProvider;
         this.setSpriteForAge(spriteProvider);
         this.maxAge = 30;
         this.scale = 1.0F;
         this.setBoundingBoxSpacing(1.0F, 1.0F);
+
+        this.edgePorcentage = 5;
+        this.maxEdgeSize = 0.5F;
     }
 
     @Override
@@ -50,7 +51,12 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
         return 15728880;
     }
 
-    public void setStartGap(float start, float end){
+    @Override
+    public ParticleTextureSheet getType() {
+        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
+    }
+
+    public void setGap(float start, float end){
         this.startGap = start;
         this.endGap = end;
         this.gap = start;
@@ -89,76 +95,48 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
         }
     }
 
-    public void setStart(Vec3d pos){
-        this.positionList.add(new Vec3d(pos.x,pos.y,pos.z));
-        this.tickDeltas.add(0.0F);
-    }
-
-    protected float headDelta(){
-        float amount =  Math.min(this.age + this.index + 1, this.maxAge);
-        float pos = Math.min(this.age, amount);
-        return pos / amount;
-    }
-
-    protected float tailDelta(){
-        float amount =  Math.min(this.age + this.index + 1, this.maxAge);
-        float pos = Math.min(this.age, amount);
-        return (pos + 1) / amount;
-    }
-
-    public float getAlpha(float tickDelta){
-        float halpha = MathHelper.lerp(headDelta(), this.startAlpha, this.endAlpha);
-        float talpha = MathHelper.lerp(tailDelta(), this.startAlpha, this.endAlpha);
-
-        return tickDelta == 0? talpha : tickDelta == 1F? halpha : MathHelper.lerp(tickDelta, talpha, halpha);
-    }
-
-
-    public float getGap(float tickDelta){
-        float hgap = MathHelper.lerp(headDelta(), this.startGap, this.endGap);
-        float tgap = MathHelper.lerp(tailDelta(), this.startGap, this.endGap);
-
-        return tickDelta == 0? tgap : tickDelta == 1F? hgap : MathHelper.lerp(tickDelta, tgap, hgap);
-    }
-
     @Override
     public void render(VertexConsumer vertexConsumer, Camera camera, float tickDelta) {
-        //super.render(vertexConsumer,camera,tickDelta);
         vertexPoint = new ArrayList<>();
-        if (this.age == 0 && (this.tickDeltas.isEmpty() || tickDelta >= this.tickDeltas.getLast())) // Create trail points on 1st tick
-        {
-            if (this.positionList.isEmpty()) // Ensure 1st point is set to the starting position
-            {
-                setStart(this.position);
-            } else if (this.tickDeltas.getLast() != tickDelta) // Ensure there is no repetition of the same point and creates all other points
-            {
-                Vec3d pos = new Vec3d(
-                        MathHelper.lerp(tickDelta, this.position.x, this.x),
-                        MathHelper.lerp(tickDelta, this.position.y, this.y),
-                        MathHelper.lerp(tickDelta, this.position.z, this.z)
-                );
 
-                this.positionList.add(pos);
-                this.tickDeltas.add(tickDelta);
-            }
-        } else if (!this.tickDeltas.isEmpty() && this.tickDeltas.getLast() != 1) // Ensure the last point is set to the ending position
-        {
-            this.positionList.add(new Vec3d(this.x, this.y, this.z));
+        Vec3d pos = new Vec3d(this.x, this.y, this.z);
+
+        double length = pos.subtract(this.position).length();
+        double size = (edgePorcentage / 100) * length;
+        if (size > maxEdgeSize){
+            size = maxEdgeSize;
+        }
+
+        Vec3d vec3d = new Vec3d(this.x, this.y, this.z).subtract(position).normalize();
+
+        if (this.positionList.isEmpty()){
+            this.positionList.add(position);
+            this.tickDeltas.add(0F);
+            this.positionList.add(position.add(vec3d.multiply(size)));
+            this.tickDeltas.add((float)(size / length));
+
+            this.positionList.add(pos.subtract(vec3d.multiply(size)));
+            this.tickDeltas.add((float)((1.0F) - (size / length)));
+            this.positionList.add(pos);
             this.tickDeltas.add(1F);
         }
+
 
         renderTrailQuads(vertexConsumer, camera);
 
 
         //this.method_60373(vertexConsumer, camera, quaternionf, tickDelta);
     }
+
     protected void renderTrailQuads(VertexConsumer vertexConsumer, Camera camera){
 
         Vec3d cameraPos = camera.getPos();
         // Calculate the vertex points for the trail
-        for (int i = 0; i < this.positionList.size(); i++) {
-            this.RotatePoints(vertexConsumer, cameraPos, i);
-        }
+
+        this.RotatePoints(vertexConsumer, cameraPos, 0, 0);
+        this.RotatePoints(vertexConsumer, cameraPos, this.gap, 1);
+        this.RotatePoints(vertexConsumer, cameraPos, this.gap, 2);
+        this.RotatePoints(vertexConsumer, cameraPos, 0, 3);
 
         if (this.positionList.size() > 2){
             for (int i = 0; i < this.positionList.size() - 1; i++) {
@@ -177,23 +155,28 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
                         this.vertexPoint.get((i * 2) + 2),
                         this.vertexPoint.get((i * 2) + 3),
                         k, l, MathHelper.lerp(this.tickDeltas.get(i),m,n), MathHelper.lerp(this.tickDeltas.get(i+1),m,n),
-                        this.getBrightness(this.tickDeltas.get(i)),
-                        getAlpha(this.tickDeltas.get(i)), getAlpha(this.tickDeltas.get(i+1))
+                        this.getBrightness(1F),
+                        alpha, alpha
                 );
             }
         }
 
     }
 
-    protected void renderQuad(VertexConsumer vertexConsumer, Vec3d posA1, Vec3d posA2, Vec3d posB1, Vec3d posB2, float u1, float u2, float v1, float v2, int light, float alpha1 ,float alpha2){
-        this.addVertex(vertexConsumer, posA2, u1, v1, light, alpha1);
-        this.addVertex(vertexConsumer, posA1, u2, v1, light, alpha1);
-        this.addVertex(vertexConsumer, posB1, u2, v2, light, alpha2);
-        this.addVertex(vertexConsumer, posB2, u1, v2, light, alpha2);
-    }
+    protected void RotatePoints(VertexConsumer vertexConsumer, Vec3d cameraPos,float gap, int index){
 
-    protected void RotatePoints(VertexConsumer vertexConsumer, Vec3d cameraPos, int index){
+        // Calculate the normal of the path for gap == 0
+        if (gap == 0){
+            vertexPoint.add((this.positionList.get(index)).subtract(cameraPos));
+            vertexPoint.add((this.positionList.get(index)).subtract(cameraPos));
+            return;
+        }
 
+        if (gap < 0){
+            gap = -gap;
+        }
+
+        // Calculate the normal of the path
         Vec3d prevPos;
         if (index == 0){
             prevPos = this.prevPosition;
@@ -208,29 +191,29 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
         Vec3d normal = pathDirection.crossProduct(cameraPos.subtract(pos.add(prevPos).multiply(0.5))).normalize();
         //normal = new Vec3d(1,0 ,0);
 
-        float gapSize = getGap(this.tickDeltas.get(index)) * this.getSize(this.tickDeltas.get(index));
+        vertexPoint.add(pos.add(
+                normal.multiply(
+                        gap
+                )).subtract(cameraPos)
+        );
+        vertexPoint.add(pos.add(
+                normal.multiply(
+                        -gap
+                )).subtract(cameraPos)
+        );
+    }
 
-        vertexPoint.add(pos.add(
-                normal.multiply(
-                        gapSize
-                )).subtract(cameraPos)
-        );
-        vertexPoint.add(pos.add(
-                normal.multiply(
-                        -gapSize
-                )).subtract(cameraPos)
-        );
+    protected void renderQuad(VertexConsumer vertexConsumer, Vec3d posA1, Vec3d posA2, Vec3d posB1, Vec3d posB2, float u1, float u2, float v1, float v2, int light, float alpha1 ,float alpha2){
+        this.addVertex(vertexConsumer, posA2, u1, v1, light, alpha1);
+        this.addVertex(vertexConsumer, posA1, u2, v1, light, alpha1);
+        this.addVertex(vertexConsumer, posB1, u2, v2, light, alpha2);
+        this.addVertex(vertexConsumer, posB2, u1, v2, light, alpha2);
     }
 
     private void addVertex(
             VertexConsumer vertexConsumer, Vec3d pos, float u, float v, int light, float alpha
     ){
         vertexConsumer.vertex((float) pos.x, (float) pos.y, (float) pos.z).texture(u, v).color(this.red, this.green, this.blue, alpha).light(light);
-    }
-
-    @Override
-    public ParticleTextureSheet getType() {
-        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
     }
 
     @Environment(EnvType.CLIENT)
@@ -252,16 +235,15 @@ public class ExperimentalProjectileTrailParticle extends SpriteBillboardParticle
         }
 
         public Particle createParticle(RecisableTrailParticleEffect parameters, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            ExperimentalProjectileTrailParticle streakParticle = new ExperimentalProjectileTrailParticle(clientWorld, d, e, f, this.spriteProvider);
-            streakParticle.setColor(parameters.getRed(),parameters.getGreen(), parameters.getBlue());
-            streakParticle.position = parameters.getPos();
-            streakParticle.prevPosition = parameters.getPrevPos();
-            streakParticle.index = parameters.getIndex();
+            LazerBeamParticle lazerBeamParticle = new LazerBeamParticle(clientWorld, d, e, f, this.spriteProvider);
+            lazerBeamParticle.setColor(parameters.getRed(),parameters.getGreen(), parameters.getBlue());
+            lazerBeamParticle.position = parameters.getPos();
+            lazerBeamParticle.prevPosition = parameters.getPrevPos();
 
-            streakParticle.maxAge = parameters.age();
-            streakParticle.setStartGap((this.startSize / 2) * parameters.getSize() , (this.endSize / 2) * parameters.getSize());
-            streakParticle.setStartAlpha(this.startAlpha * parameters.getAlpha(), this.endAlpha * parameters.getAlpha());
-            return streakParticle;
+            lazerBeamParticle.maxAge = parameters.age();
+            lazerBeamParticle.setGap((this.startSize / 2) * parameters.getSize() , (this.endSize / 2) * parameters.getSize());
+            lazerBeamParticle.setStartAlpha(this.startAlpha * parameters.getAlpha(), this.endAlpha * parameters.getAlpha());
+            return lazerBeamParticle;
         }
     }
 }
