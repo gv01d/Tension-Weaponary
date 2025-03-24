@@ -1,8 +1,6 @@
 package me.gv0id.arbalests.client.property.numeric;
 
 import com.mojang.serialization.MapCodec;
-import me.gv0id.arbalests.Arbalests;
-import me.gv0id.arbalests.ArbalestsClient;
 import me.gv0id.arbalests.item.custom.DeadbeatCrossbowItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -30,7 +28,7 @@ public class DeadbeatCrossbowPullProperty implements NumericProperty{
                 return 1.0F;
             return 0.0F;
         }
-        if (!DeadbeatCrossbowItem.isLoaded(stack) && !DeadbeatCrossbowItem.isCharging(stack) && !DeadbeatCrossbowItem.isCharged(stack) )
+        if (DeadbeatCrossbowItem.isNotLoaded(stack) && !DeadbeatCrossbowItem.isCharging(stack) && !DeadbeatCrossbowItem.isCharged(stack) )
             return 0.0F;
         int i = DeadbeatCrossbowItem.getPullTime(stack, holder);
         return (float) UseDurationProperty.getTicksUsedSoFar(stack, holder) / (float)i;
