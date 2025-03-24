@@ -88,35 +88,28 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     public int getMaxUseTime(ItemStack stack, LivingEntity user) {
         return getPullTime(stack, user) + 3;
     }
-
     public static int getPullTime(ItemStack stack, LivingEntity user) {
         // TODO : Faster Charge Enchantment
         float f = EnchantmentHelper.getCrossbowChargeTime(stack, user, DEFAULT_PULL_TIME);
 
         return MathHelper.floor(f * 20.0F);
     }
-
-
-    @Override
-    public UseAction getUseAction(ItemStack stack) {
-        return UseAction.CROSSBOW;
-    }
-
-    CrossbowItem.LoadingSounds getLoadingSounds(ItemStack stack) {
-        return (CrossbowItem.LoadingSounds)EnchantmentHelper.getEffect(stack, EnchantmentEffectComponentTypes.CROSSBOW_CHARGING_SOUNDS)
-                .orElse(DEFAULT_LOADING_SOUNDS);
-    }
-
     private static float getPullProgress(int useTicks, ItemStack stack, LivingEntity user) {
         float f = (float)useTicks / (float)getPullTime(stack, user);
         if (f > 1.0F) {
             f = 1.0F;
         }
-
         return f;
     }
 
-
+    @Override
+    public UseAction getUseAction(ItemStack stack) {
+        return UseAction.CROSSBOW;
+    }
+    CrossbowItem.LoadingSounds getLoadingSounds(ItemStack stack) {
+        return (CrossbowItem.LoadingSounds)EnchantmentHelper.getEffect(stack, EnchantmentEffectComponentTypes.CROSSBOW_CHARGING_SOUNDS)
+                .orElse(DEFAULT_LOADING_SOUNDS);
+    }
 
     // Boolean Tests
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
@@ -175,6 +168,8 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         return false;
     }
 
+    // Tick Functions
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
@@ -186,6 +181,9 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             }
         }
     }
+
+    // Use-ish functions
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
     @Override
     public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference){
         if ((clickType == ClickType.LEFT) || otherStack.isEmpty()) return false;
@@ -270,6 +268,56 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     }
 
     @Override
+    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+
+        if (!world.isClient) {
+
+            if (user instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(stack)){
+                return;
+            }
+
+            CrossbowItem.LoadingSounds loadingSounds = this.getLoadingSounds(stack);
+            float f = (float)(stack.getMaxUseTime(user) - remainingUseTicks) / (float)getPullTime(stack, user);
+            float s = (float) Objects.requireNonNull(stack.get(ModDataComponentTypes.CHARGE_VALUE)).value();
+
+            // Load charge everytime TICKS PASSED % is greater than AMMO %
+            if ( s < AMMO && f >= (( s + 1F)/AMMO)){
+                int t = Objects.requireNonNull(stack.get(ModDataComponentTypes.CHARGE_VALUE)).points();
+
+                if (charge(stack, user.getProjectileType(stack), user)){
+                    stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.CHARGING);
+                    loadingSounds.end()
+                            .ifPresent(sound -> world.playSound(null, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), SoundCategory.PLAYERS, 1.0F, 0.5F + (f/2)));
+                }
+                //loadProjectiles(user,stack);
+            }
+
+            // Check if it is fully loaded and tag as fully loaded
+            if (f >= (s / AMMO) && stack.getOrDefault(ModDataComponentTypes.CHARGE_VALUE, ChargeValueComponent.DEFAULT).points() >= AMMO){
+                stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.FULLYCHARGED);
+                user.setCurrentHand(user.getActiveHand());
+            }
+
+            if (f < 0.1F) {
+                this.charged = false;
+                this.loaded = false;
+            }
+
+            if (f >= 0.1F && !this.charged) {
+                this.charged = true;
+                loadingSounds.start()
+                        .ifPresent(sound -> world.playSound(null, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), SoundCategory.PLAYERS, 0.5F, 1.0F));
+            }
+
+            if (f >= 0.5F && !this.loaded) {
+                this.loaded = true;
+                loadingSounds.mid()
+                        .ifPresent(sound -> world.playSound(null, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), SoundCategory.PLAYERS, 0.5F, 1.0F));
+            }
+        }
+    }
+
+    @Override
     public boolean onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
         int i = this.getMaxUseTime(stack, user) - remainingUseTicks;
         float f = getPullProgress(i, stack, user);
@@ -301,45 +349,6 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         // Setting charge type to DEFAULT ( could not charge crossbow )
         stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.DEFAULT);
         return false;
-    }
-
-    protected static List<ItemStack> repeaterLoad(ItemStack stack, ItemStack projectileStack, LivingEntity shooter) {
-        if (projectileStack.isEmpty()) {
-            return List.of();
-        } else {
-            int i = shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND;
-            int s = i + Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles().size();
-            List<ItemStack> list = new ArrayList<>(s);
-
-            int slots = AMMO;
-            for (ItemStack stack1 : list){
-                slots -= getProjectileData(stack1).slots;
-            }
-
-            if (getProjectileData(projectileStack).slots > slots){
-                return list;
-            }
-
-            list.addAll(Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles());
-            ItemStack itemStack = projectileStack.copy();
-
-            for (int j = 0; j < i; j++) {
-                ItemStack itemStack2 = getProjectile(stack, j == 0 ? projectileStack : itemStack, shooter, j > 0);
-                if (!itemStack2.isEmpty()) {
-                    list.add(itemStack2);
-                }
-            }
-            return list;
-        }
-    }
-
-    private static void loadProjectiles(LivingEntity shooter, ItemStack crossbow) {
-
-
-        List<ItemStack> list = repeaterLoad(crossbow, shooter.getProjectileType(crossbow), shooter);
-        if (!list.isEmpty()) {
-            crossbow.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.of(list));
-        }
     }
 
     @Override
@@ -516,59 +525,6 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     private static float getSoundPitch(boolean flag, Random random) {
         float f = flag ? 0.63F : 0.43F;
         return 1.0F / (random.nextFloat() * 0.5F + 1.8F) + f;
-    }
-
-    public boolean testLoad(LivingEntity user,ItemStack stack){
-        return user.getProjectileType(stack) != null;
-    }
-
-    @Override
-    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
-
-        if (!world.isClient) {
-
-            if (user instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(stack)){
-                return;
-            }
-
-            CrossbowItem.LoadingSounds loadingSounds = this.getLoadingSounds(stack);
-            float f = (float)(stack.getMaxUseTime(user) - remainingUseTicks) / (float)getPullTime(stack, user);
-            float s = (float) Objects.requireNonNull(stack.get(ModDataComponentTypes.CHARGE_VALUE)).value();
-
-            // Load charge everytime TICKS PASSED % is greater than AMMO %
-            if ( s < AMMO && f >= (( s + 1F)/AMMO)){
-                int t = Objects.requireNonNull(stack.get(ModDataComponentTypes.CHARGE_VALUE)).points();
-
-                if (charge(stack, user.getProjectileType(stack), user)){
-                    stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.CHARGING);
-                    loadingSounds.end()
-                            .ifPresent(sound -> world.playSound(null, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), SoundCategory.PLAYERS, 1.0F, 0.5F + (f/2)));
-                }
-                //loadProjectiles(user,stack);
-            }
-
-            if (f >= (s / AMMO) && stack.getOrDefault(ModDataComponentTypes.CHARGE_VALUE, ChargeValueComponent.DEFAULT).points() >= AMMO){
-                stack.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE,DeadbeatCrossbowCharging.FULLYCHARGED);
-                user.setCurrentHand(user.getActiveHand());
-            }
-
-            if (f < 0.1F) {
-                this.charged = false;
-                this.loaded = false;
-            }
-
-            if (f >= 0.1F && !this.charged) {
-                this.charged = true;
-                loadingSounds.start()
-                        .ifPresent(sound -> world.playSound(null, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), SoundCategory.PLAYERS, 0.5F, 1.0F));
-            }
-
-            if (f >= 0.5F && !this.loaded) {
-                this.loaded = true;
-                loadingSounds.mid()
-                        .ifPresent(sound -> world.playSound(null, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), SoundCategory.PLAYERS, 0.5F, 1.0F));
-            }
-        }
     }
 
     @Override
