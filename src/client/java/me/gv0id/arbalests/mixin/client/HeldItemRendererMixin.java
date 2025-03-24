@@ -43,7 +43,7 @@ public class HeldItemRendererMixin {
             Arm arm = bl ? player.getMainArm() : player.getMainArm().getOpposite();
             matrices.push();
             if (!item.isEmpty() && !item.contains(DataComponentTypes.MAP_ID) && item.isOf(ModItems.DEADBEAT_CROSSBOW)){
-                boolean bl2 = DeadbeatCrossbowItem.isFullyCharged(item);
+                boolean bl2 = DeadbeatCrossbowItem.isCharged(item);
 
                 boolean bl3 = arm == Arm.RIGHT;
                 int i = bl3 ? 1 : -1;

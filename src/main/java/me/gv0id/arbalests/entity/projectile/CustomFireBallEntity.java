@@ -85,7 +85,7 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
         }
 
         if (this.previousEyePos == null){
-            previousEyePos = this.getPos().subtract(this.getVelocity().normalize());
+            previousEyePos = this.getEyePos().subtract(this.getVelocity().normalize());
         }
         if (this.previousPreviousEyePos == null){
             previousPreviousEyePos = this.previousEyePos.subtract(this.getVelocity().normalize());

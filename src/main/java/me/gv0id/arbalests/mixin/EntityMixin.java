@@ -54,6 +54,15 @@ public abstract class EntityMixin implements EntityInterface {
     @Shadow public abstract boolean isOnGround();
 
     @Shadow private World world;
+
+    @Shadow public abstract Vec3d getPos();
+
+    @Shadow public abstract Vec3d getVelocity();
+
+    @Shadow public abstract World getWorld();
+
+    @Shadow public abstract Vec3d getEyePos();
+
     @Unique
     public int arbalests_coyoteTime;
     @Unique

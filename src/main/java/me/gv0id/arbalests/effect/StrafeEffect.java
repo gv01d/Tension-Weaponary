@@ -11,6 +11,8 @@ public class StrafeEffect extends StatusEffect {
         super(category, color, ModParticles.STRAFE);
     }
 
+
+
     @Override
     public boolean applyUpdateEffect(ServerWorld world, LivingEntity entity, int amplifier) {
         return super.applyUpdateEffect(world, entity, amplifier);
