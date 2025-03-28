@@ -2,6 +2,7 @@ package me.gv0id.arbalests;
 
 import com.google.common.collect.Multimaps;
 import me.gv0id.arbalests.effect.ModEffects;
+import me.gv0id.arbalests.enchantment.ModEnchantments;
 import me.gv0id.arbalests.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 
@@ -41,6 +42,7 @@ public class Arbalests implements ModInitializer {
 	public void onInitialize() {
 		ModItems.initialize();
 		ModEffects.registerEffects();
+		ModEnchantments.init();
 
 	}
 

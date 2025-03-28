@@ -5,6 +5,7 @@ import me.gv0id.arbalests.client.render.entity.model.EndCrystalProjectilEntityMo
 import me.gv0id.arbalests.client.render.entity.model.HighlightModels;
 import me.gv0id.arbalests.client.render.entity.state.EndCrystalProjectileEntityRenderState;
 import me.gv0id.arbalests.entity.projectile.EndCrystalProjectileEntity;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
 import net.minecraft.client.gl.ShaderLoader;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.network.ClientPlayerEntity;

@@ -8,6 +8,9 @@ import net.minecraft.registry.tag.TagKey;
 public interface ModItemTypeTags {
     TagKey<Item> DEADBEAT_PROJECTILE = of("deadbeat_projectile");
     TagKey<Item> DISCS = of("record_discs");
+    TagKey<Item> QUICK_CHARGE_COMPATIBLE = of("quick_charge_compatible");
+
+    TagKey<Item> IGNORE_EXTRA_LAYER_GLINT = of("ignore_extra_layer_glint");
 
     private static TagKey<Item> of(String id) {
         return TagKey.of(RegistryKeys.ITEM, Arbalests.identifierOf(id));
