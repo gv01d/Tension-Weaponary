@@ -1,8 +1,6 @@
 package me.gv0id.arbalests.mixin.client;
 
-import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.item.ModItems;
-import me.gv0id.arbalests.registry.tag.ModItemTypeTags;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.item.ItemModelManager;

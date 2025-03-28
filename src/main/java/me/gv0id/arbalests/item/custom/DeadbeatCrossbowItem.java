@@ -3,6 +3,7 @@ package me.gv0id.arbalests.item.custom;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.components.ModDataComponentTypes;
 import me.gv0id.arbalests.components.type.ArbalestCooldown;
 import me.gv0id.arbalests.components.type.ChargeValueComponent;
@@ -16,8 +17,11 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.component.type.UseCooldownComponent;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -198,9 +202,13 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         super.inventoryTick(stack, world, entity, slot, selected);
 
         if (selected && entity instanceof LivingEntity livingEntity && isCharged(stack)){
-            Projectiles proj = getProjectileData(Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles().getFirst());
-            if (proj.doTick()){
-                proj.tickInterface.tick(world,livingEntity,stack,slot);
+            ArrayList<ItemStack> list = new ArrayList<>(Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles());
+            if(!list.isEmpty()){
+                ItemStack stk = list.getFirst();
+                Projectiles proj = getProjectileData(stk);
+                if (proj.doTick()){
+                    proj.tickInterface.tick(world,livingEntity,stack,slot);
+                }
             }
         }
     }
@@ -412,40 +420,35 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         ChargedProjectilesComponent temp = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (world instanceof ServerWorld serverWorld) {
             ChargeValueComponent chargeValueComponent = stack.get(ModDataComponentTypes.CHARGE_VALUE);
+            assert chargeValueComponent != null;
 
             assert temp != null;
-            List<ItemStack> tList = temp.getProjectiles();
-            int amt = EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, 1);
+            ArrayList<ItemStack> tList = new ArrayList<>(temp.getProjectiles());
 
-            List<ItemStack> l2 = new ArrayList<ItemStack>();
-            ChargedProjectilesComponent chargedProjectilesComponent;
-            if (amt < tList.size()) {
-                for (int i = amt; i < tList.size(); i++) {
-                    l2.add(tList.get(i));
-                }
-                temp = ChargedProjectilesComponent.of(l2);
-                chargedProjectilesComponent = stack.set(DataComponentTypes.CHARGED_PROJECTILES, temp);
-                assert chargeValueComponent != null;
+            ItemStack projStack = tList.removeFirst();
+            if (tList.isEmpty()){
+                stack.set(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.DEFAULT);
+                stack.set(ModDataComponentTypes.CHARGE_VALUE, ChargeValueComponent.DEFAULT);
+            }
+            else
+            {
+                stack.set(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.of(tList));
                 stack.set(ModDataComponentTypes.CHARGE_VALUE, new ChargeValueComponent(
                         Math.max(chargeValueComponent.value() - 1, 0),
                         Math.max(chargeValueComponent.points() - getProjectileData(tList.getFirst()).slots, 0)
                 ));
             }
-            else {
-                chargedProjectilesComponent = stack.set(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.DEFAULT);
-                stack.set(ModDataComponentTypes.CHARGE_VALUE, ChargeValueComponent.DEFAULT);
-            }
 
 
 
-            if (chargedProjectilesComponent != null && !chargedProjectilesComponent.isEmpty()) {
+            if (projStack != null) {
                 //shoot projectiles
                 this.shootRound(
                         serverWorld,
                         shooter,
                         hand,
                         stack,
-                        chargedProjectilesComponent.getProjectiles(), // Component stack of projectiles
+                        projStack, // Component stack of projectiles
                         speed,
                         divergence,
                         shooter instanceof PlayerEntity,
@@ -474,17 +477,35 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             LivingEntity shooter,
             Hand hand,
             ItemStack stack,
-            List<ItemStack> projectiles, // get the component stack of projectiles
+            ItemStack projectileStack, // get the projectile stack
             float speed,
             float divergence,
             boolean critical,
             @Nullable LivingEntity target
     ){
+        int s = 0;
+        if (stack.hasEnchantments() ){
+            ArrayList<RegistryEntry<Enchantment>> enchants = new ArrayList<>(stack.getEnchantments().getEnchantments());
+            Arbalests.LOGGER.info(enchants.toString());
+            for (RegistryEntry<Enchantment> echantment : enchants){
+                if (echantment.matchesKey(Enchantments.MULTISHOT)){
+                    s--;
+                }
+            }
+        }
+        s += (shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND); // shoots amount based on enchantment
+
+        ArrayList<ItemStack> projectiles = new ArrayList<>();
+        projectiles.add(projectileStack);
+
+        for (int i = 0; i < s - 1; i++){
+            projectiles.add(projectileStack.copy());
+        }
+
         float f = EnchantmentHelper.getProjectileSpread(world, stack, shooter, 0.0F);
         float g = projectiles.size() == 1 ? 0.0F : 2.0F * f / (float)(projectiles.size() - 1);
         float h = (float)((projectiles.size() - 1) % 2) * g / 2.0F;
         float i = 1.0F;
-        int s = (shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND); // shoots amount based on enchantment
 
         float roll = 0F;
         float power = 3F;

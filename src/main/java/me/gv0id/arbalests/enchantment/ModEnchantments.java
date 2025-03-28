@@ -31,12 +31,13 @@ public class ModEnchantments {
 
     public static void init(){
         EnchantmentEvents.ALLOW_ENCHANTING.register(((enchantment, target, enchantingContext) -> {
-            if (enchantment.matchesKey(Enchantments.QUICK_CHARGE) && target.isIn(ModItemTypeTags.QUICK_CHARGE_COMPATIBLE)){
+            if ((enchantment.matchesKey(Enchantments.QUICK_CHARGE) || enchantment.matchesKey(Enchantments.MULTISHOT)) && target.isIn(ModItemTypeTags.QUICK_CHARGE_COMPATIBLE)){
                 Arbalests.LOGGER.info("RUNNED EVENT");
                 return TriState.TRUE;
             }
             return TriState.DEFAULT;
         }));
+
     }
 
 }
