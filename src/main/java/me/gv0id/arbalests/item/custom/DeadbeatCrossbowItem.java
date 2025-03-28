@@ -484,16 +484,18 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             @Nullable LivingEntity target
     ){
         int s = 0;
+        float f = EnchantmentHelper.getProjectileSpread(world, stack, shooter, 0.0F);
+        s += (shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND); // shoots amount based on enchantment
         if (stack.hasEnchantments() ){
             ArrayList<RegistryEntry<Enchantment>> enchants = new ArrayList<>(stack.getEnchantments().getEnchantments());
             Arbalests.LOGGER.info(enchants.toString());
             for (RegistryEntry<Enchantment> echantment : enchants){
                 if (echantment.matchesKey(Enchantments.MULTISHOT)){
                     s--;
+                    f -= 5F;
                 }
             }
         }
-        s += (shooter.getWorld() instanceof ServerWorld serverWorld ? EnchantmentHelper.getProjectileCount(serverWorld, stack, shooter, ROUND) : ROUND); // shoots amount based on enchantment
 
         ArrayList<ItemStack> projectiles = new ArrayList<>();
         projectiles.add(projectileStack);
@@ -502,7 +504,6 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
             projectiles.add(projectileStack.copy());
         }
 
-        float f = EnchantmentHelper.getProjectileSpread(world, stack, shooter, 0.0F);
         float g = projectiles.size() == 1 ? 0.0F : 2.0F * f / (float)(projectiles.size() - 1);
         float h = (float)((projectiles.size() - 1) % 2) * g / 2.0F;
         float i = 1.0F;
@@ -698,8 +699,8 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
 
     public enum Projectiles implements StringIdentifiable {
         NONE((Item) null,1.0F,3.0F, 1, 3,DeadbeatCrossbowItem::createArrow),
-        ARROW(Items.ARROW, 0.9F, 3.0F,1, 3,DeadbeatCrossbowItem::createArrow),
-        TIPPED_ARROW(Items.TIPPED_ARROW, 1.0F, 2.5F,1,5, DeadbeatCrossbowItem::createArrow, "POTION", "head", "base"),
+        ARROW(Items.ARROW, 0.9F, 2.0F,1, 3,DeadbeatCrossbowItem::createArrow),
+        TIPPED_ARROW(Items.TIPPED_ARROW, 1.0F, 2.0F,1,5, DeadbeatCrossbowItem::createArrow, "POTION", "head", "base"),
         SPECTRAL_ARROW(Items.SPECTRAL_ARROW,1.0F, 3.2F,1,3, DeadbeatCrossbowItem::createArrow),
         ROCKET(Items.FIREWORK_ROCKET,0.8F,1.6F,1,2,
                 (world,shooter,weaponStack, projectileStack, critical) -> new FireworkRocketEntity(
@@ -708,7 +709,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         ),
         WIND_CHARGE(Items.WIND_CHARGE, 0.2F, 2.5F,1,1,
                 (world,shooter,weaponStack, projectileStack, critical) -> new WindGaleEntity(
-                        shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),1.8F,3F
+                        shooter,world,shooter.getX() ,shooter.getEyeY() - 0.15F, shooter.getZ(),shooter.getVelocity(),1.1F,3F
                 )
         ),
         SNOWBALL(Items.SNOWBALL, 0.0F, 5.0F,1,1,
