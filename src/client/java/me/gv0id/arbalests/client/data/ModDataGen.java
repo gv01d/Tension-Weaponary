@@ -2,6 +2,7 @@ package me.gv0id.arbalests.client.data;
 
 import me.gv0id.arbalests.client.data.enchantments.ModEnchantmentGen;
 import me.gv0id.arbalests.client.data.models.ModModelProvider;
+import me.gv0id.arbalests.client.data.tag.ModValueLookupEnchantmentTagProvider;
 import me.gv0id.arbalests.client.data.tag.ModValueLookupEntityTagProvider;
 import me.gv0id.arbalests.client.data.tag.ModValueLookupItemTagProvider;
 import me.gv0id.arbalests.client.data.recipes.ModRecipesProvider;
@@ -18,6 +19,7 @@ public class ModDataGen implements DataGeneratorEntrypoint {
         pack.addProvider(ModModelProvider::new);
         pack.addProvider(ModValueLookupEntityTagProvider::new);
         pack.addProvider(ModValueLookupItemTagProvider::new);
+        pack.addProvider(ModValueLookupEnchantmentTagProvider::new);
         pack.addProvider(ModRecipesProvider::new);
         pack.addProvider(ModRegistryDataGeneration::new);
     }

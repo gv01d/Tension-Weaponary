@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values":[
+    "arbalests:strafe_charge",
+    "arbalests:fast_ball",
+    "arbalests:slow_ball",
+    "arbalests:beggars_backfire"
+  ]
+}

@@ -17,5 +17,10 @@
   "item.minecraft.lingering_potion.effect.unstable_strafe_potion" : "Lingering Unstable Strafe Potion",
 
   "effect.arbalests.strafe":"Strafe",
-  "effect.arbalests.unstable_strafe_explosion":"Unstable Strafe"
+  "effect.arbalests.unstable_strafe_explosion":"Unstable Strafe",
+
+  "enchantment.arbalests.strafe_charge":"Strafe Charge",
+  "enchantment.arbalests.fast_ball":"Fast Ball",
+  "enchantment.arbalests.slow_ball":"Slow Ball",
+  "enchantment.arbalests.beggars_backfire":"Beggar's Backfire"
 }

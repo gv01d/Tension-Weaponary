@@ -62,12 +62,15 @@ public class ModValueLookupItemTagProvider extends FabricTagProvider.ItemTagProv
                         ModItems.ECHO_CRYSTAL
                 );
         getOrCreateTagBuilder(ItemTags.CROSSBOW_ENCHANTABLE);
-        getOrCreateTagBuilder(ModItemTypeTags.QUICK_CHARGE_COMPATIBLE)
-                .addTag(ItemTags.CROSSBOW_ENCHANTABLE)
+        getOrCreateTagBuilder(ModItemTypeTags.IGNORE_EXTRA_LAYER_GLINT)
                 .add(
                         ModItems.DEADBEAT_CROSSBOW
                 );
-        getOrCreateTagBuilder(ModItemTypeTags.IGNORE_EXTRA_LAYER_GLINT)
+        getOrCreateTagBuilder(ModItemTypeTags.DEADBEAT_ENCHANTABLE)
+                .add(
+                        ModItems.DEADBEAT_CROSSBOW
+                );
+        getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
                 .add(
                         ModItems.DEADBEAT_CROSSBOW
                 );

@@ -41,8 +41,8 @@ public class HeldItemRendererMixin {
         if (!player.isUsingSpyglass()) {
             boolean bl = hand == Hand.MAIN_HAND;
             Arm arm = bl ? player.getMainArm() : player.getMainArm().getOpposite();
-            matrices.push();
             if (!item.isEmpty() && !item.contains(DataComponentTypes.MAP_ID) && item.isOf(ModItems.DEADBEAT_CROSSBOW)){
+                matrices.push();
                 boolean bl2 = DeadbeatCrossbowItem.isCharged(item);
 
                 boolean bl3 = arm == Arm.RIGHT;
@@ -88,6 +88,7 @@ public class HeldItemRendererMixin {
                 );
 
                 ci.cancel();
+                matrices.pop();
             }
         }
     }

@@ -1,6 +1,7 @@
 package me.gv0id.arbalests.registry.tag;
 
 
+import me.gv0id.arbalests.Arbalests;
 import net.minecraft.entity.EntityType;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
@@ -13,6 +14,6 @@ public interface ModEntityTypeTags {
     TagKey<EntityType<?>> STRAFE_JUMP = of("strafe_jump");
 
     private static TagKey<EntityType<?>> of(String id) {
-        return TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of("arbalests",id));
+        return TagKey.of(RegistryKeys.ENTITY_TYPE, Arbalests.identifierOf(id));
     }
 }

@@ -15,15 +15,6 @@ public class ModEnchantmentEffects {
         return Registry.register(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, Arbalests.identifierOf(name), codec);
     }
 
-    public static void init(){
-        EnchantmentEvents.ALLOW_ENCHANTING.register(((enchantment, target, enchantingContext) -> {
-            if (enchantment.equals(Enchantments.QUICK_CHARGE) && target.isIn(ModItemTypeTags.QUICK_CHARGE_COMPATIBLE)){
-                return TriState.TRUE;
-            }
-            return net.fabricmc.fabric.api.util.TriState.DEFAULT;
-        }));
-    }
-
     public static void registerEnchantmentEffects() {
         Arbalests.LOGGER.info("Registering enchantments for:" + Arbalests.MOD_ID);
 
