@@ -49,7 +49,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -96,9 +95,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
         return getPullTime(stack, user) + 3;
     }
     public static int getPullTime(ItemStack stack, LivingEntity user) {
-        // TODO : Faster Charge Enchantment
         float f = EnchantmentHelper.getCrossbowChargeTime(stack, user, DEFAULT_PULL_TIME);
-
         return MathHelper.floor(f * 20.0F);
     }
     private static float getPullProgress(int useTicks, ItemStack stack, LivingEntity user) {
@@ -169,27 +166,24 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
 
     ///
     /// Function for charging - receives deadbeat crossbow ItemStack and item to be charged with
+    /// returns if it was able to charge
     ///
     public boolean charge(ItemStack crossbow,ItemStack stack, LivingEntity user){
         ChargeValueComponent chargeValueComponent = crossbow.getOrDefault(ModDataComponentTypes.CHARGE_VALUE, ChargeValueComponent.DEFAULT);
-        /*
-            TODO : Support for enchantments
-                 - Multi Charge
-                 - Extra Charge
+        // Ammo + extras
+        int ammo = getAmmo(crossbow);
 
-        */
-        // Check if the CHARGE VALUE is less than MAX AMMO
-        Arbalests.LOGGER.info("Value : " + chargeValueComponent.value() + " Points : " + chargeValueComponent.points() + " Ammo : " + getAmmo(crossbow));
-        if (chargeValueComponent.value() < getAmmo(crossbow)){
+        // Check if charge value is lower than max ammo
+        if (chargeValueComponent.value() < ammo){
             Projectiles projectile = getProjectileData(stack);
             /*
                 Check for if CHARGE POINTS (for projectiles that take more than one slot*) have space for the incoming projectile
              */
-            if (chargeValueComponent.points() <= getAmmo(crossbow) - projectile.slots){
+            if (chargeValueComponent.points() <= ammo - projectile.slots){
                 // List of current
                 ArrayList<ItemStack> stackList = new ArrayList<>(Objects.requireNonNull(crossbow.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles());
 
-                // Add new stack to List of stacks (TODO : MULTI-CHARGE)
+                // Add new stack to List of stacks
                 stackList.add(stack.split(1));
 
                 crossbow.set(ModDataComponentTypes.CHARGE_VALUE,new ChargeValueComponent(
@@ -198,6 +192,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
                         )
                 );
 
+                // save new charge and change charging mode
                 crossbow.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.of(stackList));
                 if (isChamberFull(crossbow, user))
                     crossbow.set(ModDataComponentTypes.DEADBEAT_CROSSBOW_CHARGING_COMPONENT_TYPE, DeadbeatCrossbowCharging.LOADED);
@@ -214,10 +209,13 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
+
+        // Beggar's Mode
         if (beggarsShoot(stack) && entity instanceof LivingEntity livingEntity && isCharged(stack)){
             beggarsShootAll(livingEntity.getWorld(), livingEntity, livingEntity.getActiveHand(), stack, 10.0F, null);
         }
 
+        // Tick selected projectile
         if (selected && entity instanceof LivingEntity livingEntity && isCharged(stack)){
             ArrayList<ItemStack> list = new ArrayList<>(Objects.requireNonNull(stack.get(DataComponentTypes.CHARGED_PROJECTILES)).getProjectiles());
             if(!list.isEmpty()){
@@ -236,10 +234,35 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
     public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference){
         if ((clickType == ClickType.LEFT) || otherStack.isEmpty()) return false;
 
-        // TODO : Charge discs into Copper Disc
         if (DEADBEAT_CROSSBOW_HELD_PROJECTILES.test(otherStack)) {
-            // Calls defaul charge function
+            // Calls default charge function
             return charge(stack, otherStack, player);
+        }
+
+        // Charge discs into Copper Disc
+        if (otherStack.isIn(ModItemTypeTags.DISCS)){
+            ChargedProjectilesComponent chargedProjectilesComponent = stack.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
+            ArrayList<ItemStack> projStackList = new ArrayList<>(chargedProjectilesComponent.getProjectiles());
+            if (!projStackList.isEmpty()){
+
+                int i = 0;
+                // For each Projectile
+                for (ItemStack stk : projStackList){
+                    // Check if it is a CopperDisc
+                    if(stk.isOf(ModItems.COPPER_DISC)){
+
+                        if (stk.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT).getProjectiles().isEmpty()){
+                            // Add disc to CopperDisc if it is empty
+                            stk.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.of(otherStack.split(1)));
+                            projStackList.set(i, stk);
+                            // Add CopperDisc to Crossbow
+                            stack.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.of(projStackList));
+                            return true;
+                        }
+                        i++;
+                    }
+                }
+            }
         }
         return false;
     }
@@ -999,7 +1022,7 @@ public class DeadbeatCrossbowItem extends RangedWeaponItem {
 
 
     public static final Predicate<ItemStack> DEADBEAT_CROSSBOW_HELD_PROJECTILES = stack -> stack.isIn(ModItemTypeTags.DEADBEAT_PROJECTILE);
-
+    public static final Predicate<ItemStack> COPPER_DISC_FILTER = stack -> stack.isOf(ModItems.COPPER_DISC);
     public static record LoadingSounds(Optional<RegistryEntry<SoundEvent>> start, Optional<RegistryEntry<SoundEvent>> mid, Optional<RegistryEntry<SoundEvent>> end) {
         public static final Codec<CrossbowItem.LoadingSounds> CODEC = RecordCodecBuilder.create(
                 instance -> instance.group(
