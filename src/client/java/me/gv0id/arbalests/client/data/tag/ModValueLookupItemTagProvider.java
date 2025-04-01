@@ -56,10 +56,8 @@ public class ModValueLookupItemTagProvider extends FabricTagProvider.ItemTagProv
                         Items.EGG,
                         Items.ENDER_PEARL,
                         Items.FIRE_CHARGE,
-                        Items.NETHER_STAR,
                         ModItems.COPPER_DISC,
-                        Items.END_CRYSTAL,
-                        ModItems.ECHO_CRYSTAL
+                        Items.END_CRYSTAL
                 );
         getOrCreateTagBuilder(ItemTags.CROSSBOW_ENCHANTABLE);
         getOrCreateTagBuilder(ModItemTypeTags.IGNORE_EXTRA_LAYER_GLINT)
