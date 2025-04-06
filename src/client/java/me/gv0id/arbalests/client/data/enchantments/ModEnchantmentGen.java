@@ -7,7 +7,6 @@ import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentLevelBasedValue;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.enchantment.effect.value.AddEnchantmentEffect;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registerable;
