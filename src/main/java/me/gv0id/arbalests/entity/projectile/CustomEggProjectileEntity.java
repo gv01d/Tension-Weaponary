@@ -42,7 +42,7 @@ public class CustomEggProjectileEntity extends ThrownItemEntity {
         super.tick();
 
         if (this.previousEyePos == null){
-            previousEyePos = this.getPos().subtract(this.getVelocity().normalize());
+            previousEyePos = this.getEyePos().subtract(this.getVelocity().normalize());
         }
         if (this.previousPreviousEyePos == null){
             previousPreviousEyePos = this.previousEyePos.subtract(this.getVelocity().normalize());
@@ -55,12 +55,12 @@ public class CustomEggProjectileEntity extends ThrownItemEntity {
                             10,1F,
                             this.previousEyePos, this.previousPreviousEyePos,
                             trailIndex++
-                    ), this.getPos().x, this.getPos().y,this.getPos().z,0,0,0
+                    ), this.getEyePos().x, this.getEyePos().y,this.getEyePos().z,0,0,0
             );
         }
 
         this.previousPreviousEyePos = this.previousEyePos;
-        this.previousEyePos = this.getPos();
+        this.previousEyePos = this.getEyePos();
     }
 
     @Override

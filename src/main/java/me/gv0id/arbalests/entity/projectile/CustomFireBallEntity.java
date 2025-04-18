@@ -43,8 +43,12 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
     private float FIRE_EXPLOSION_POWER = 4;
     private float FIRE_KNOCKBACK_POWER = 5.0F;
     public ExplosionBehavior EXPLOSION_BEHAVIOR = new AdvancedExplosionBehavior(
-            true, false, Optional.of(KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
+            true,
+            false,
+            Optional.of(KNOCKBACK_POWER),
+            Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
     );
+
     private Entity lastDeflectedEntity;
     private Vec3d previousEyePos;
     private Vec3d previousPreviousEyePos;
@@ -85,7 +89,7 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
         }
 
         if (this.previousEyePos == null){
-            previousEyePos = this.getPos().subtract(this.getVelocity().normalize());
+            previousEyePos = this.getEyePos().subtract(this.getVelocity().normalize());
         }
         if (this.previousPreviousEyePos == null){
             previousPreviousEyePos = this.previousEyePos.subtract(this.getVelocity().normalize());
@@ -148,8 +152,13 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
         super.onCollision(hitResult);
         if (this.getWorld() instanceof ServerWorld serverWorld) {
             EXPLOSION_BEHAVIOR = new AdvancedExplosionBehavior(
-                    true, true, Optional.of(KNOCKBACK_POWER), Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
+                    true,
+                    true,
+                    Optional.of(KNOCKBACK_POWER),
+                    Registries.BLOCK.getOptional(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity())
             );
+
+
 
             Vec3d vec3d = this.getPos();
             float pow = this.EXPLOSION_POWER;
@@ -166,6 +175,7 @@ public class CustomFireBallEntity extends AbstractFireballEntity {
                     entity.setVelocity(vec3d1.x,Math.max(0, vec3d1.y),vec3d1.z);
                     pow *= 1.5F;
                     explosionSourceType = World.ExplosionSourceType.TNT;
+                    EXPLOSION_BEHAVIOR = null;
 
                     RegistryEntry<SoundEvent> registryEntry = RegistryEntry.of(SoundEvents.ITEM_TOTEM_USE);
                     for (ServerPlayerEntity serverPlayerEntity : serverWorld.getPlayers()){

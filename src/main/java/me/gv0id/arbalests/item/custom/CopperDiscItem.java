@@ -122,18 +122,23 @@ public class CopperDiscItem extends Item {
         ItemStack itemStack = context.getStack();
         Block block = world.getBlockState(blockPos).getBlock();
 
-        if (!(block instanceof JukeboxBlock jukeboxBlock) || !(world.getBlockEntity(blockPos) instanceof JukeboxBlockEntity jukeboxBlockEntity)) {
+        if (!(block instanceof JukeboxBlock) || !(world.getBlockEntity(blockPos) instanceof JukeboxBlockEntity jukeboxBlockEntity)) {
             return ActionResult.PASS;
         }
         ChargedProjectilesComponent chargedProjectilesComponent = itemStack.get(DataComponentTypes.CHARGED_PROJECTILES);
         if ( world.getBlockState(blockPos).get(JukeboxBlock.HAS_RECORD) ){
+            assert chargedProjectilesComponent != null;
             if (chargedProjectilesComponent.isEmpty()){
                 ItemStack stack = jukeboxBlockEntity.getStack();
                 ArrayList<ItemStack> list = new ArrayList<>();
                 list.add(stack);
                 itemStack.set(DataComponentTypes.CHARGED_PROJECTILES,ChargedProjectilesComponent.of(list));
                 jukeboxBlockEntity.emptyStack();
-                world.setBlockState(blockPos, world.getBlockState(blockPos).with(JukeboxBlock.HAS_RECORD, Boolean.valueOf(false)), Block.NOTIFY_LISTENERS);
+                world.setBlockState(
+                        blockPos,
+                        world.getBlockState(blockPos).with(JukeboxBlock.HAS_RECORD, Boolean.FALSE),
+                        Block.NOTIFY_LISTENERS
+                );
                 return ActionResult.SUCCESS;
             }
             else {
@@ -145,7 +150,11 @@ public class CopperDiscItem extends Item {
                 ArrayList<ItemStack> list = new ArrayList<>(chargedProjectilesComponent.getProjectiles());
                 jukeboxBlockEntity.setDisc(list.removeFirst());
                 jukeboxBlockEntity.reloadDisc();
-                world.setBlockState(blockPos, world.getBlockState(blockPos).with(JukeboxBlock.HAS_RECORD, Boolean.valueOf(true)), Block.NOTIFY_LISTENERS);
+                world.setBlockState(
+                        blockPos,
+                        world.getBlockState(blockPos).with(JukeboxBlock.HAS_RECORD, Boolean.TRUE),
+                        Block.NOTIFY_LISTENERS
+                );
                 itemStack.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.of(list));
                 return ActionResult.SUCCESS;
             }
@@ -173,14 +182,14 @@ public class CopperDiscItem extends Item {
             for (ItemStack itemStack : itemList){
                 if (type.isAdvanced()) {
                     JukeboxPlayableComponent jukeboxPlayableComponent = itemStack.get(DataComponentTypes.JUKEBOX_PLAYABLE);
-                    List<Text> list = Lists.<Text>newArrayList();
+                    List<Text> list = Lists.newArrayList();
                     Consumer<Text> textConsumer = list::add;
                     if (jukeboxPlayableComponent != null){
                         jukeboxPlayableComponent.appendTooltip(context, textConsumer,type);
                     }
                     itemStack.getItem().appendTooltip(itemStack, context, list, type);
                     if (!list.isEmpty()) {
-                        list.replaceAll(text -> Text.literal("").append((Text) text).formatted(Formatting.GRAY));
+                        list.replaceAll(text -> Text.literal("").append(text).formatted(Formatting.GRAY));
                         tooltip.addAll(list);
                     }
                 }
@@ -204,7 +213,7 @@ public class CopperDiscItem extends Item {
     }
 
     public enum Music implements StringIdentifiable {
-        NONE((Item) null, ModParticles.COPPER_DISC_TRAIL),
+        NONE(null, ModParticles.COPPER_DISC_TRAIL),
         D13(Items.MUSIC_DISC_13, ModParticles.D13_TRAIL),
         D11(Items.MUSIC_DISC_11, ColorHelper.fromFloats(1F,0.533F,0.533F,0.533F)),
         D_BLOCKS(Items.MUSIC_DISC_BLOCKS, ColorHelper.fromFloats(1F,0.886F,0.329F,0.231F)),
@@ -227,7 +236,7 @@ public class CopperDiscItem extends Item {
 
         public static final EnumCodec<Music> CODEC = StringIdentifiable.createCodec(Music::values);
 
-        Item item = null;
+        final Item item;
         ParticleType<me.gv0id.arbalests.particle.TrailParticleEffect> particleType = ModParticles.GENERIC_DISC_TRAIL;
         int color = ColorHelper.fromFloats(1F,1F, 1F, 1F);
 

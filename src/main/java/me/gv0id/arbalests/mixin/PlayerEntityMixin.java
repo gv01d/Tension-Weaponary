@@ -4,6 +4,8 @@ import com.google.common.collect.Multimaps;
 import me.gv0id.arbalests.Arbalests;
 import me.gv0id.arbalests.effect.ModEffects;
 import me.gv0id.arbalests.entity.attribute.ModEntityAttributes;
+import me.gv0id.arbalests.particle.ModParticles;
+import me.gv0id.arbalests.particle.RecisableTrailParticleEffect;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PowderSnowBlock;
 import net.minecraft.entity.MovementType;
@@ -15,10 +17,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -42,6 +41,51 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
 
     @Unique
     float maxAirVelocity = 40;
+
+    @Unique
+    Vec3d prevPrevPos = null;
+
+    @Unique
+    Vec3d prevPos = null;
+
+    @Unique
+    int trailIndex = 0;
+    /*
+    @Inject(method = "tickMovement", at = @At("RETURN"))
+    void tickInject(CallbackInfo ci){
+
+        if (prevPos == null){
+            prevPrevPos = this.getEyePos().subtract(getVelocity().multiply(2));
+            prevPos = this.getEyePos().subtract(getVelocity());
+        }
+
+        Collection<StatusEffectInstance> temp = ((PlayerEntity)(Object)this).getStatusEffects();
+        boolean ret = true;
+        for ( StatusEffectInstance inst : temp ){
+            if(inst.equals(ModEffects.STRAFE)){
+                ret = false;
+            }
+        }
+        if (!ret) {
+            Arbalests.logSide(((PlayerEntity)(Object)this).getWorld());
+
+            ((PlayerEntity)(Object)this).getWorld().addParticle(
+                    RecisableTrailParticleEffect.create(
+                            ModParticles.EXPERIMENTAL_TRAIL, ColorHelper.fromFloats(1F,0F,0.807F,0.607F),
+                            10,2f,
+                            this.prevPos, this.prevPrevPos,
+                            trailIndex++
+                    ), this.getEyePos().x, this.getEyePos().y,this.getEyePos().z,0,0,0
+            );
+        }
+        else{
+            trailIndex = 0;
+        }
+
+        prevPrevPos = prevPos;
+        prevPos = this.getEyePos();
+    }
+     */
 
 
 
@@ -72,6 +116,7 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
                 player.isOnGround() ||
                 player.isFrozen()
         ) {
+            trailIndex = 0;
             return false;
         }
 
@@ -82,8 +127,29 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
                 ret = false;
             }
         }
-        if (ret) return false;
+        if (ret) {
+            trailIndex = 0;
+            return false;
+        }
 
+        if (prevPos == null){
+            prevPrevPos = this.getEyePos().subtract(getVelocity().multiply(2));
+            prevPos = this.getEyePos().subtract(getVelocity());
+        }
+
+        /*
+        ((PlayerEntity)(Object)this).getWorld().addParticle(
+                RecisableTrailParticleEffect.create(
+                        ModParticles.EXPERIMENTAL_TRAIL, ColorHelper.fromFloats(1F,0F,0.807F,0.607F),
+                        30,2f,
+                        this.prevPos, this.prevPrevPos,
+                        trailIndex++
+                ), this.getEyePos().x, this.getEyePos().y,this.getEyePos().z,0,0,0
+        );
+        */
+
+        prevPrevPos = prevPos;
+        prevPos = this.getEyePos();
         return travelQuake(player,movementInput);
     }
 

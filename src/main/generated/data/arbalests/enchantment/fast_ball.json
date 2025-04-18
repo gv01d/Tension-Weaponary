@@ -1,0 +1,21 @@
+{
+  "anvil_cost": 2,
+  "description": {
+    "translate": "enchantment.arbalests.fast_ball"
+  },
+  "exclusive_set": "#arbalests:shotvariety_enchantments",
+  "max_cost": {
+    "base": 15,
+    "per_level_above_first": 10
+  },
+  "max_level": 3,
+  "min_cost": {
+    "base": 1,
+    "per_level_above_first": 9
+  },
+  "slots": [
+    "mainhand"
+  ],
+  "supported_items": "#arbalests:deadbeat_enchantable",
+  "weight": 8
+}

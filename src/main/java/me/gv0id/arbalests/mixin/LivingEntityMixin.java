@@ -2,6 +2,8 @@ package me.gv0id.arbalests.mixin;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,6 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class LivingEntityMixin extends EntityMixin {
     @Shadow protected boolean jumping;
     @Shadow public abstract void jump();
+
+    @Shadow public abstract boolean hasStatusEffect(RegistryEntry<StatusEffect> effect);
 
     @Inject(
             method = "jump",

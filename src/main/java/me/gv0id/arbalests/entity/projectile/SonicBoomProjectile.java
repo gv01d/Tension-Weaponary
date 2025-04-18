@@ -95,9 +95,6 @@ public class SonicBoomProjectile extends PersistentProjectileEntity {
             long l = this.getWorld().random.nextLong();
             this.getWorld().playSound(null, vec3d.x, vec3d.y, vec3d.z, registryEntry, SoundCategory.PLAYERS, 3.0F, 1.0F, l);
         }
-
-
-        Arbalests.LOGGER.info("SonicBoomProjectile created");
     }
 
     @Override
@@ -133,7 +130,6 @@ public class SonicBoomProjectile extends PersistentProjectileEntity {
 
     @Override
     protected void onCollision(HitResult hitResult) {
-        Arbalests.LOGGER.info("SonicBoomProjectile collision");
         HitResult.Type type = hitResult.getType();
         if (type == HitResult.Type.ENTITY) {
             EntityHitResult entityHitResult = (EntityHitResult)hitResult;

@@ -1,0 +1,43 @@
+{
+  "anvil_cost": 6,
+  "description": {
+    "translate": "enchantment.arbalests.beggars_backfire"
+  },
+  "effects": {
+    "minecraft:crossbow_charge_time": {
+      "type": "minecraft:add",
+      "value": {
+        "type": "minecraft:linear",
+        "base": 4.0,
+        "per_level_above_first": 4.0
+      }
+    },
+    "minecraft:projectile_spread": [
+      {
+        "effect": {
+          "type": "minecraft:add",
+          "value": {
+            "type": "minecraft:linear",
+            "base": 12.0,
+            "per_level_above_first": 12.0
+          }
+        }
+      }
+    ]
+  },
+  "exclusive_set": "#arbalests:deadbeat_special_exclusive_set",
+  "max_cost": {
+    "base": 20,
+    "per_level_above_first": 10
+  },
+  "max_level": 3,
+  "min_cost": {
+    "base": 10,
+    "per_level_above_first": 9
+  },
+  "slots": [
+    "mainhand"
+  ],
+  "supported_items": "#arbalests:deadbeat_enchantable",
+  "weight": 3
+}

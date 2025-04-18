@@ -94,7 +94,7 @@ public class ModEntityType {
             "custom_egg",
             EntityType.Builder.<CustomEggProjectileEntity>create(CustomEggProjectileEntity::new, SpawnGroup.MISC)
                     .dropsNothing()
-                    .dimensions(5.0F, 5.0F)
+                    .dimensions(0.25F, 0.25F)
                     .maxTrackingRange(4)
                     .trackingTickInterval(10)
     );
