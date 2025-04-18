@@ -1,15 +1,15 @@
 {
 	"schemaVersion": 1,
 	"id": "arbalests",
-	"version": "${version}",
-	"name": "Arbalests",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"version": "0.1.0-1.21.4",
+	"name": "Razenn's Tension Weaponary",
+	"description": "new tension based weapons for minecraft",
 	"authors": [
-		"Me!"
+		"RazennGabe"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://modrinth.com/project/razens-tension-weaponary",
+		"sources": "https://github.com/gv01d/Tension-Weaponary"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/arbalests/icon.png",
