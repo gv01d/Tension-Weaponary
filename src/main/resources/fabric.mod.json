@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "arbalests",
-	"version": "0.1.0-1.21.4",
+	"version": "${version}",
 	"name": "Razenn's Tension Weaponary",
 	"description": "new tension based weapons for minecraft",
 	"authors": [
