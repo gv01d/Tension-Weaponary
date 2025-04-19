@@ -18,6 +18,9 @@
   "item.minecraft.splash_potion.effect.unstable_strafe_potion" : "Splash Unstable Strafe Potion",
   "item.minecraft.lingering_potion.effect.unstable_strafe_potion" : "Lingering Unstable Strafe Potion",
 
+  "item.minecraft.tipped_arrow.effect.strafe_arrow" : "Arrow of Strafe",
+    "item.minecraft.tipped_arrow.effect.unstable_strafe_arrow" : "Arrow of Unstable Strafe",
+
   "effect.arbalests.strafe":"Strafe",
   "effect.arbalests.unstable_strafe_explosion":"Unstable Strafe",
 
