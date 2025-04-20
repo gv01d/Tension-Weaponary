@@ -3,15 +3,16 @@
 	"id": "arbalests",
 	"version": "${version}",
 	"name": "Razenn's Tension Weaponary",
-	"description": "new tension based weapons for minecraft",
+	"description": "New tension based weapons for minecraft",
 	"authors": [
 		"RazennGabe"
 	],
 	"contact": {
 		"homepage": "https://modrinth.com/project/razens-tension-weaponary",
-		"sources": "https://github.com/gv01d/Tension-Weaponary"
+		"sources": "https://github.com/gv01d/Tension-Weaponary",
+		"issues": "https://github.com/gv01d/TensionWeaponary-Issues"
 	},
-	"license": "CC0-1.0",
+	"license": "ARR",
 	"icon": "assets/arbalests/icon.png",
 	"environment": "*",
 	"entrypoints": {
