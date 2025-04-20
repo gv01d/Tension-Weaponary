@@ -10,9 +10,9 @@
 	"contact": {
 		"homepage": "https://modrinth.com/project/razens-tension-weaponary",
 		"sources": "https://github.com/gv01d/Tension-Weaponary",
-		"issues": "https://github.com/gv01d/TensionWeaponary-Issues"
+		"issues": "https://github.com/gv01d/Tension-Weaponary/issues"
 	},
-	"license": "ARR",
+	"license": "CC0 1.0",
 	"icon": "assets/arbalests/icon.png",
 	"environment": "*",
 	"entrypoints": {
